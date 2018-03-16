@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf8">
+<title>Sudoku ratkaisija</title>
+<script language="JavaScript">
+////////////////////////////////////////////////////////////////////////////////
+
+var sudoku = new Array(81);
+var solution = new Array(81);
+
+var Level = 0;
+
+var timer;
+
+var CELL = new Array(81);
+var LEVEL;
+
+////////////////////////////////////////////////////////////////////////////////
+
+   // cells are indexed 0..80
+   // cells of row, col, or box are indexed 0..8
+
+function rowCell(C,I) {
+  return (C - (C % 9)) + I;
+}
+
+function colCell(C,I) {
+  return (C % 9) + 9*I;
+}
+
+function boxCell(C,I) {
+  return (C - (C % 3) - ((C - (C % 9)) % 27)) + (I % 3) + 3*(I - (I % 3));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function blankBoard() {
+  var I;
+  var board = new Array(81);
+  for (I = 0; I < 81; I++) {
+    board[I] = 0;
+  }
+  return board;
+}
+
+function copyBoard(src) {
+  var I;
+  var board = new Array(81);
+  for (I = 0; I < 81; I++) {
+    board[I] = src[I];
+  }
+  return board;
+}
+
+function emptycells(board) {
+  var ans = new Array();
+  var K = 0;
+  for (I = 0; I < 81; I++) {
+    if (board[I] == 0) {
+      ans[K] = I;
+      K++;
+    }
+  }
+  return ans;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// validity check
+
+function check(board,C,V) {
+  var X;
+  for (I = 0; I < 9; I++) {
+    X = rowCell(C,I);
+    if (X != C && board[X] == V) {
+      return false;
+    }
+    X = colCell(C,I);
+    if (X != C && board[X] == V) {
+      return false;
+    }
+    X = boxCell(C,I);
+    if (X != C && board[X] == V) {
+      return false;
+    }
+  }
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// solve sudoku
+//  - initial data
+//    - sudoku: problem to be solved
+//    - solution: previous solution or random numbers
+//  - results
+//    - function value is
+//      0 if there is no solution
+//      1 if there is only one solution
+//      2 if there are two or more solutions
+//    - solution: the first solution unless there is none
+//    - level: the effort needed to determine the results
+
+function sudokuSolve() {
+  var phase = new Array(81);
+  var ans = 0;
+  var good;
+  var work = copyBoard(sudoku);
+  var worklist = emptycells(work);
+  E = 0;
+  F = 0;
+  var N = 0;
+  Level = 0;
+  while (E >= 0 && ans < 2) {
+    N++;
+    if (E < worklist.length) {
+      var C = worklist[E];
+      if (work[C] < 9) {
+        // next guess
+        work[C]++;
+        if (check(work,C,work[C])) {
+          // compatible with previous guesses
+          E++; // advance
+          if (F > E) {
+            worklist = worklist.slice(0,E).concat(worklist.slice(F,F+1),
+                       worklist.slice(E,F),worklist.slice(F+1));
+            F = 0;
+          }
+        }
+      } else {
+        // no more guesses, revise previous guesses
+        work[C] = 0;
+        if (F < E) F = E;
+        E--;
+      }
+    } else {
+      // solution found
+      if (ans == 0) {
+        solution = copyBoard(work);
+      }
+      ans++;
+      F = 0;
+      E--;
+    }
+  } // while(E >= 0);
+  Level = N;
+  return ans;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function sudokuShow(result) {
+  if (result == 0) {
+    msg = "Mahdoton";
+  } else if (result == 1) {
+    msg = "Taso = "+Math.floor(Level/1000);
+  } else {
+    msg = "Anna alkuarvo klikkaamalla numeroa";
+  }
+  LEVEL.innerHTML = msg;
+  for (var C = 0; C < 81; C++) {
+    var text;
+    if (sudoku[C] > 0) {
+      text = ""+sudoku[C];
+      if (solution[C] != sudoku[C]) {
+        text += "<i>"+solution[C]+"</i>";
+      }
+    } else if (solution[C] > 0) {
+      text = "<span style=\"color:green\"><i>"+solution[C]+"</i></span>";
+    } else {
+      text = "&#xa0;";
+    }
+    CELL[C].innerHTML = text;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function sudokuCreate() {
+  LEVEL = document.getElementById("level");
+  for (var C = 0; C < 81; C++) {
+    CELL[C] = document.getElementById(""+C);
+    CELL[C].onclick = move;
+    CELL[C].style.cursor = "default";
+  }
+  sudoku = blankBoard();
+  sudokuSolve();
+  sudokuShow();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function move() {
+  var msg = "&#xa0;";
+  LEVEL.innerHTML = msg;
+  timer = setTimeout("move1("+this.id+")",10);
+}
+
+function move1(C) {
+  var oldVal = sudoku[C];
+  var solutions = 2;
+  var Ntot = 0;
+  var msg = "&#xa0;";
+  do {
+    sudoku[C] = (sudoku[C] + 1) % 10;
+    if (sudoku[C] == 0 || check(sudoku,C,sudoku[C])) {
+      solutions = sudokuSolve();
+      Ntot = Ntot + Level;
+    } else {
+      solutions = 0;
+    }
+  } while (sudoku[C] != 0 && solutions == 0);
+  sudokuShow(solutions);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+</script>
+</head>
+<body align="center">
+<H1 align="center">Sudokun ratkaisija</H1>
+<p>&#xa0;</p>
+<big><big><big>
+<table id="Sudoku" border="1" align="center">
+<tr>
+<td><table align="center">
+<tr>
+<td id="0" width="30">&#xa0;</td>
+<td id="1" width="30">&#xa0;</td>
+<td id="2" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="9" width="30">&#xa0;</td>
+<td id="10" width="30">&#xa0;</td>
+<td id="11" width="30">H</td>
+</tr>
+<tr>
+<td id="18" width="30">&#xa0;</td>
+<td id="19" width="30">&#xa0;</td>
+<td id="20" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="3" width="30">&#xa0;</td>
+<td id="4" width="30">&#xa0;</td>
+<td id="5" width="30">&#xa0;</td>
+</tr>
+</tr>
+<tr>
+<td id="12" width="30">&#xa0;</td>
+<td id="13" width="30">E</td>
+<td id="14" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="21" width="30">&#xa0;</td>
+<td id="22" width="30">&#xa0;</td>
+<td id="23" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="6" width="30">&#xa0;</td>
+<td id="7" width="30">&#xa0;</td>
+<td id="8" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="15" width="30">T</td>
+<td id="16" width="30">&#xa0;</td>
+<td id="17" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="24" width="30">&#xa0;</td>
+<td id="25" width="30">&#xa0;</td>
+<td id="26" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+<tr>
+<td><table align="center">
+<tr>
+<td id="27" width="30">&#xa0;</td>
+<td id="28" width="30">&#xa0;</td>
+<td id="29" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="36" width="30">&#xa0;</td>
+<td id="37" width="30">&#xa0;</td>
+<td id="38" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="45" width="30">&#xa0;</td>
+<td id="46" width="30">&#xa0;</td>
+<td id="47" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="30" width="30">&#xa0;</td>
+<td id="31" width="30">&#xa0;</td>
+<td id="32" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="39" width="30">K</td>
+<td id="40" width="30">&#xa0;</td>
+<td id="41" width="30">I</td>
+</tr>
+<tr>
+<td id="48" width="30">&#xa0;</td>
+<td id="49" width="30">&#xa0;</td>
+<td id="50" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="33" width="30">&#xa0;</td>
+<td id="34" width="30">&#xa0;</td>
+<td id="35" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="42" width="30">&#xa0;</td>
+<td id="43" width="30">&#xa0;</td>
+<td id="44" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="51" width="30">&#xa0;</td>
+<td id="52" width="30">&#xa0;</td>
+<td id="53" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+<tr>
+<td><table align="center">
+<tr>
+<td id="54" width="30">&#xa0;</td>
+<td id="55" width="30">&#xa0;</td>
+<td id="56" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="63" width="30">&#xa0;</td>
+<td id="64" width="30">&#xa0;</td>
+<td id="65" width="30">N</td>
+</tr>
+<tr>
+<td id="72" width="30">&#xa0;</td>
+<td id="73" width="30">&#xa0;</td>
+<td id="74" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="57" width="30">&#xa0;</td>
+<td id="58" width="30">&#xa0;</td>
+<td id="59" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="66" width="30">&#xa0;</td>
+<td id="67" width="30">E</td>
+<td id="68" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="75" width="30">&#xa0;</td>
+<td id="76" width="30">&#xa0;</td>
+<td id="77" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<tr>
+<td id="60" width="30">&#xa0;</td>
+<td id="61" width="30">&#xa0;</td>
+<td id="62" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="69" width="30">N</td>
+<td id="70" width="30">&#xa0;</td>
+<td id="71" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="78" width="30">&#xa0;</td>
+<td id="79" width="30">&#xa0;</td>
+<td id="80" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+</table>
+</big></big></big>
+<p id="level">&#xa0;</p>
+<script language="JavaScript">
+sudokuCreate();
+</script>
+</body>
+</html>
