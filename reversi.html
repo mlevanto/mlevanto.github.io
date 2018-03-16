@@ -1,0 +1,711 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf8">
+<title>Reversi</title>
+
+<style type="text/css">
+.b { background-image:url('data:image/gif;base64,R0lGODdhRABAAPcAAAAAA\
+IAAAACAAICAAAAAgIAAgACAgMDAwMDcwKbK8EAgAGAgAIAgAKAgAMAgAOAgAABAACBAAEB\
+AAGBAAIBAAKBAAMBAAOBAAABgACBgAEBgAGBgAIBgAKBgAMBgAOBgAACAACCAAECAAGCAA\
+ICAAKCAAMCAAOCAAACgACCgAECgAGCgAICgAKCgAMCgAOCgAADAACDAAEDAAGDAAIDAAKD\
+AAMDAAODAAADgACDgAEDgAGDgAIDgAKDgAMDgAODgAAAAQCAAQEAAQGAAQIAAQKAAQMAAQ\
+OAAQAAgQCAgQEAgQGAgQIAgQKAgQMAgQOAgQABAQCBAQEBAQGBAQIBAQKBAQMBAQOBAQAB\
+gQCBgQEBgQGBgQIBgQKBgQMBgQOBgQACAQCCAQECAQGCAQICAQKCAQMCAQOCAQACgQCCgQ\
+ECgQGCgQICgQKCgQMCgQOCgQADAQCDAQEDAQGDAQIDAQKDAQMDAQODAQADgQCDgQEDgQGD\
+gQIDgQKDgQMDgQODgQAAAgCAAgEAAgGAAgIAAgKAAgMAAgOAAgAAggCAggEAggGAggIAgg\
+KAggMAggOAggABAgCBAgEBAgGBAgIBAgKBAgMBAgOBAgABggCBggEBggGBggIBggKBggMB\
+ggOBggACAgCCAgECAgGCAgICAgKCAgMCAgOCAgACggCCggECggGCggICggKCggMCggOCgg\
+ADAgCDAgEDAgGDAgIDAgKDAgMDAgODAgADggCDggEDggGDggIDggKDggMDggODggAAAwCA\
+AwEAAwGAAwIAAwKAAwMAAwOAAwAAgwCAgwEAgwGAgwIAgwKAgwMAgwOAgwABAwCBAwEBAw\
+GBAwIBAwKBAwMBAwOBAwABgwCBgwEBgwGBgwIBgwKBgwMBgwOBgwACAwCCAwECAwGCAwIC\
+AwKCAwMCAwOCAwACgwCCgwECgwGCgwICgwKCgwMCgwOCgwADAwCDAwEDAwGDAwIDAwKDAw\
+P/78KCgpICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAAAAAAALAAAAABEAEAAAAjUAP/\
+9E0CwoMGDCBMqXMhwoUCBDSNKnDjx4UCKGDNStKixo8eEHD+K9BhypMmND0+qlFhypUuEL\
+V/KFBBzpsuaNlXizGlyJ0+RPn+STCl0ZdCiGY8iRQlxaU+iToFCjTq0KdWqF692VKpVIde\
+uMKeCrSh2bMSvZgmiTbvWbNuxb8HG7TpXa92rd6nmjbrXad+lf5EGLjpYaOGfh3kmzrnYZ\
+uOZj2VGfjn5Ztm0Di9jBql588HKRjt7Lghap+jRNE+PLn2S9VOrqDnDjv1ZtWfXI3FLDQg\
+AOw==');
+background-repeat:no-repeat;
+height:65px;
+width:66px;
+}
+.x { background-image:url('data:image/gif;base64,R0lGODdhRABAAPcAAAAAA\
+IAAAACAAICAAAAAgIAAgACAgMDAwMDcwKbK8EAgAGAgAIAgAKAgAMAgAOAgAABAACBAAEB\
+AAGBAAIBAAKBAAMBAAOBAAABgACBgAEBgAGBgAIBgAKBgAMBgAOBgAACAACCAAECAAGCAA\
+ICAAKCAAMCAAOCAAACgACCgAECgAGCgAICgAKCgAMCgAOCgAADAACDAAEDAAGDAAIDAAKD\
+AAMDAAODAAADgACDgAEDgAGDgAIDgAKDgAMDgAODgAAAAQCAAQEAAQGAAQIAAQKAAQMAAQ\
+OAAQAAgQCAgQEAgQGAgQIAgQKAgQMAgQOAgQABAQCBAQEBAQGBAQIBAQKBAQMBAQOBAQAB\
+gQCBgQEBgQGBgQIBgQKBgQMBgQOBgQACAQCCAQECAQGCAQICAQKCAQMCAQOCAQACgQCCgQ\
+ECgQGCgQICgQKCgQMCgQOCgQADAQCDAQEDAQGDAQIDAQKDAQMDAQODAQADgQCDgQEDgQGD\
+gQIDgQKDgQMDgQODgQAAAgCAAgEAAgGAAgIAAgKAAgMAAgOAAgAAggCAggEAggGAggIAgg\
+KAggMAggOAggABAgCBAgEBAgGBAgIBAgKBAgMBAgOBAgABggCBggEBggGBggIBggKBggMB\
+ggOBggACAgCCAgECAgGCAgICAgKCAgMCAgOCAgACggCCggECggGCggICggKCggMCggOCgg\
+ADAgCDAgEDAgGDAgIDAgKDAgMDAgODAgADggCDggEDggGDggIDggKDggMDggODggAAAwCA\
+AwEAAwGAAwIAAwKAAwMAAwOAAwAAgwCAgwEAgwGAgwIAgwKAgwMAgwOAgwABAwCBAwEBAw\
+GBAwIBAwKBAwMBAwOBAwABgwCBgwEBgwGBgwIBgwKBgwMBgwOBgwACAwCCAwECAwGCAwIC\
+AwKCAwMCAwOCAwACgwCCgwECgwGCgwICgwKCgwMCgwOCgwADAwCDAwEDAwGDAwIDAwKDAw\
+P/78KCgpICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAAAAAAALAAAAABEAEAAAAj/AP/\
+9E0CwoMGDCBMqXMhwoUCBDSNKnDjx4UCCDylq3GgwI0aPFiFyHOkw5EWLH02SXCnAJMqWH\
+mG6ZEnRZciCL1OqpMnQZk6dCG3yVOjzYtCYB2cO7ai0pEiiN5cKjfgz4U6WUyVWtRqVZNO\
+KSJ1u1Xq1ZlixZxuW1TgWaleqbze2RfuULta0atcmjctxbk+9Out6xUt2K+C+hAsjPYxYc\
+GOQfFf6BYsysuTEZn0uBTo06+bJckGPFK3Y8mXHoyuTpmz0dEbGj2lehc0Wc96qtFm7Rp0\
+bLmrWrfeudhs882+cvYkPtv219vG/tgMX1x16uGno028/5zqcs/Hs2rcfgxWP/Dp28uXBC\
++++Xv1499Lh+0YvU7757/Lrz88P3D7m5PjNdx5/zonn1327aYfWZtxtNxeCdyXWFoQRPjc\
+he6kRNhaFsj14FoA8WYYbhyFeWBeIUm0YE4opGrYihi2G9RKJDAa2no01xsaUSDDm6FhO9\
+OVInZBC9kikgkf6GF2SoQUEADs=');
+background-repeat:no-repeat;
+height:65px;
+width:66px;
+}
+.o { background-image:url('data:image/gif;base64,R0lGODdhRABAAPcAAAAAA\
+IAAAACAAICAAAAAgIAAgACAgMDAwMDcwKbK8EAgAGAgAIAgAKAgAMAgAOAgAABAACBAAEB\
+AAGBAAIBAAKBAAMBAAOBAAABgACBgAEBgAGBgAIBgAKBgAMBgAOBgAACAACCAAECAAGCAA\
+ICAAKCAAMCAAOCAAACgACCgAECgAGCgAICgAKCgAMCgAOCgAADAACDAAEDAAGDAAIDAAKD\
+AAMDAAODAAADgACDgAEDgAGDgAIDgAKDgAMDgAODgAAAAQCAAQEAAQGAAQIAAQKAAQMAAQ\
+OAAQAAgQCAgQEAgQGAgQIAgQKAgQMAgQOAgQABAQCBAQEBAQGBAQIBAQKBAQMBAQOBAQAB\
+gQCBgQEBgQGBgQIBgQKBgQMBgQOBgQACAQCCAQECAQGCAQICAQKCAQMCAQOCAQACgQCCgQ\
+ECgQGCgQICgQKCgQMCgQOCgQADAQCDAQEDAQGDAQIDAQKDAQMDAQODAQADgQCDgQEDgQGD\
+gQIDgQKDgQMDgQODgQAAAgCAAgEAAgGAAgIAAgKAAgMAAgOAAgAAggCAggEAggGAggIAgg\
+KAggMAggOAggABAgCBAgEBAgGBAgIBAgKBAgMBAgOBAgABggCBggEBggGBggIBggKBggMB\
+ggOBggACAgCCAgECAgGCAgICAgKCAgMCAgOCAgACggCCggECggGCggICggKCggMCggOCgg\
+ADAgCDAgEDAgGDAgIDAgKDAgMDAgODAgADggCDggEDggGDggIDggKDggMDggODggAAAwCA\
+AwEAAwGAAwIAAwKAAwMAAwOAAwAAgwCAgwEAgwGAgwIAgwKAgwMAgwOAgwABAwCBAwEBAw\
+GBAwIBAwKBAwMBAwOBAwABgwCBgwEBgwGBgwIBgwKBgwMBgwOBgwACAwCCAwECAwGCAwIC\
+AwKCAwMCAwOCAwACgwCCgwECgwGCgwICgwKCgwMCgwOCgwADAwCDAwEDAwGDAwIDAwKDAw\
+P/78KCgpICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAAAAAAALAAAAABEAEAAAAj/AP/\
+9E0CwoMGDCBMqXMhwoUCBDSNKnDjx4UCKCC0+xMiRoMWOHjWKFAky4UeMI1OmLGnwZEWVM\
+EmydBlRZcuYG0vSZDgSpcyOOxX+5DiUYtCMGlkKKCrx6E2nPpMazSlUqtKQVmtSNQkVZM+\
+mWw9mvfo0bFWIZ9GSRdoV60WuateyNSuW7tK2ZMfOTftWLty4e+f29St4cNm/hgmXTexWs\
+OKGehvXtfvYLeOgeB9Hxky5suW/gT075Az4bmnRi0MXzFyZtGHWmne6Rs1TtlnYsQHPpj1\
+a923chG2Xjszb9OCjxGkLT5wc9XK+xScft9u89fO00VdfB53duGrpjD3vdkbcfTz54nq7M\
+rX++3Rq5cg7f3Ye3/3i8GudZl6fX7987f95RRxs/OmUHIEFAqVegAACB11t9vXmIHiQMXi\
+fhRRWGCGEK72E14QNxlTYhpLNhNOJ+B3WH4pfgUWigiymKB18LRKFYXfY4agUiDqW2COMM\
+v5YVUAAOw==');
+background-repeat:no-repeat;
+height:65px;
+width:66px;
+}
+</style>
+
+<script language="JavaScript">
+var displaystate;
+var animationstate;
+var xturn;
+var xmoves;
+var timer;
+var CELL;
+var SX;
+var SO;
+var MX;
+var MO;
+var TX;
+var TO;
+var direction;
+var centre;
+
+function init() {
+  var i;
+  var initstate;
+  direction = [1,9,8,7,-1,-9,-8,-7];
+  centre = [28,29,36,37];
+  displaystate = state('.','b');
+  animationstate = state('+','b');
+  xturn = 1;
+  xmoves = [null];
+  CELL = new Array();
+  for (i = 1; i <= 64; i++) {
+    xmoves[i] = null;
+    CELL[i] = document.getElementById("C"+i);
+    CELL[i].style.cursor = 'default';
+    CELL[i].style.cursor = 'pointer';
+  }
+  SX = document.getElementById("SX");
+  SO = document.getElementById("SO");
+  MX = document.getElementById("MX");
+  MO = document.getElementById("MO");
+  TX = document.getElementById("TX");
+  TO = document.getElementById("TO");
+  initstate = state('i','b');
+  xmoves[0] = setCells(initstate,36,0,1,'o');
+  xmoves[28] = setCells(setCells(initstate,28,0,1,'x'),36,0,1,'o');
+  xmoves[29] = setCells(setCells(initstate,29,0,1,'x'),37,0,1,'o');
+  xmoves[36] = setCells(setCells(initstate,36,0,1,'x'),37,0,1,'o');
+  xmoves[37] = setCells(setCells(initstate,37,0,1,'x'),36,0,1,'o');
+}
+
+function play(pos) {
+  var turn;
+  var curstate;
+  var newstate;
+  var xmove;
+  var omove;
+  var omovecand;
+  var i;
+  var j;
+  if (xturn) {
+    curstate = xmoves[pos];
+    if (curstate == null) {
+      curstate = xmoves[0];
+    }
+    if (curstate != null) {
+      turn = curstate.charAt(0);
+      if (turn == 'i') {
+        xmoves[0] = null;
+        free = 0;
+        for (i = 0; i < centre.length; i++) {
+          xmove = centre[i];
+          if (curstate.charAt(xmove) != 'b') {
+            xmoves[xmove] = null;
+          } else {
+            free = free + 1;
+            newstate = setCells(curstate,xmove,0,1,'x');
+            omove = 0;
+            for (j = 0; j < centre.length; j++) {
+              omovecand = centre[j];
+              if (newstate.charAt(omovecand) == 'b') {
+                if (omove == 0 || newstate.charAt(65-omovecand) != 'x') {
+                  omove = omovecand;
+                }
+              }
+            }
+            if (omove != 0) {
+              xmoves[xmove] = setCells(newstate,omove,0,1,'o');
+            } else {
+              xmoves[xmove] = 'o' + newstate.substring(1);
+            }
+          }
+        }
+        if (free == 0) {
+          curstate = 'x'+curstate.substring(1);
+          reqx(curstate);
+        }
+      } else {
+        if (turn == 'o') {
+          for (i = 0; i <= 64; i++) {
+            xmoves[i] = null;
+          }
+        } else if (turn == 'x') {
+          reqx(curstate);
+        }
+      }
+      display(curstate);
+    }
+  }
+}
+
+function playo() {
+  var i;
+  var newstate;
+  var pos;
+  newstate = think();
+  reqx(newstate);
+  setCursor(1);
+  if (xmoves[0] != null) {
+    newstate = '#' + newstate.substring(1);
+    for(pos = 1; pos <= 64; pos++) {
+      if (move2(xmoves[0],pos,'o') != xmoves[0]) {
+        newstate = 'x' + newstate.substring(1);
+        break;
+      }
+    }
+  }
+  display(newstate);
+}
+
+function reqx(oldstate) {
+  var newstate;
+  var checkstate;
+  var i;
+  var j;
+  var n;
+  xmoves[0] = 'o'+oldstate.substring(1);
+  for (i = 1; i <= 64; i++) {
+    newstate = move2(oldstate,i,'x');
+    if (newstate.charAt(0) == 'o') {
+      xmoves[0] = null;
+      xmoves[i] = newstate;
+    } else {
+      xmoves[i] = null;
+    }
+  }
+  for (i = 0; i <= 64; i++) {
+    newstate = xmoves[i];
+    if (newstate != null) {
+      n = 0;
+      for (j = 1; j <= 64 && n == 0; j++) {
+        checkstate = move2(newstate,j,'o');
+        if (checkstate.charAt(0) == 'x') {
+          n = 1;
+        }
+      }
+      if (n == 0) { // if x plays this o must pass
+        newstate = 'x' + newstate.substring(1);
+        for (j = 1; j <= 64 && n == 0; j++) {
+          checkstate = move2(newstate,j,'x');
+          if (checkstate.charAt(0) == 'o') {
+            n = 1;
+          }
+        }
+        if (n == 0) { // neither o nor x can continue so game over
+          newstate = '#' + newstate.substring(1);
+        }
+        xmoves[i] = newstate;
+      }
+    }
+  }
+}
+
+function display(state) {
+  var i;
+  var org = 0;
+  setCursor(0);
+  if (state.charAt(0) != 'i') {
+    TX.innerHTML = "<big>&#xa0;</big>";
+    TO.innerHTML = "<big>&#xa0;</big>";
+  }
+  for (i = 1; org == 0 && i <= 64; i++) {
+    if (displaystate.charAt(i) == 'b' && state.charAt(i) != 'b') {
+      org = i;
+    }
+  }
+  displaystate = state;
+  animate(org,0,org);
+}
+
+function animate(org,d) {
+  var i;
+  var key;
+  var sx = 0;
+  var so = 0;
+  var pos = org;
+  var changed = 0;
+  var more;
+  var turn = displaystate.charAt(0);
+  if (org == 28 || org == 29 || org == 36 || org == 37) {
+    for (i = 0; i < centre.length; i++) {
+      animationstate = displaystate;
+      pos = centre[i];
+      CELL[pos].className = displaystate.charAt(pos);
+    }
+  } else if (org != 0) {
+    changed = 0;
+    pos = org;
+    var more = true;
+    while (d < direction.length && more) {
+      pos = pos + direction[d];
+      if (pos >= 1 && pos <= 64) {
+        key = displaystate.charAt(pos);
+        if (key != animationstate.charAt(pos)) {
+          changed = pos;
+        } // if
+      } else if (changed == 0) {
+        d = d + 1;
+        pos = org;
+      } else {
+        more = false;
+      } // if (pos >= 1 && pos <= 64)
+    } // while
+    if (changed != 0) {
+      key = displaystate.charAt(changed);
+      CELL[changed].className = key;
+      animationstate = animationstate.substring(0,changed) + key
+                     + animationstate.substring(changed+1);
+    } else {
+      animationstate = displaystate;
+      CELL[org].className = displaystate.charAt(org);
+    }
+  } // if
+
+  for (i = 1; i <= 64; i++) {
+    key = animationstate.charAt(i);
+    if (key == 'x') {
+      sx = sx + 1;
+    } else if (key == 'o') {
+      so = so + 1;
+    }
+  }
+
+  SX.innerHTML = sx;
+  SO.innerHTML = so;
+
+  if (changed != 0) {
+    timer = setTimeout("animate("+org+","+d+","+pos+")",150);
+  } else {
+    animationstate = displaystate;
+    if (turn == 'o') {
+      TX.innerHTML = "<big>&#xa0;</big>";
+      TO.innerHTML = "<big>&#x3c;</big>";
+      timer = setTimeout("playo()",1000);
+    } else if (turn == 'x' || turn == 'i') {
+      TX.innerHTML = "<big>&#x3c;</big>";
+      TO.innerHTML = "<big>&#xa0;</big>";
+      setCursor(1);
+    } else if (sx > so) {
+      TX.innerHTML = "<big>&#x3c;=====</big>";
+      TO.innerHTML = "<big>&#xa0;</big>";
+      setCursor(2);
+    } else if (so > sx) {
+      TX.innerHTML = "<big>&#xa0;</big>";
+      TO.innerHTML = "<big>&#x3c;=====</big>";
+      setCursor(2);
+    } else {
+      TX.innerHTML = "<big>&#x3c;-----</big>";
+      TO.innerHTML = "<big>&#x3c;-----</big>";
+      setCursor(2);
+    }
+  }
+}
+
+function setCursor(ready) {
+  var i;
+  xturn = ready;
+  if (ready == 2) {
+    for (i = 1; i <= 64; i++) {
+      CELL[i].style.cursor = 'default';
+    }
+    document.getElementById("board").style.cursor = 'default';
+    document.getElementById("body").style.cursor = 'default';
+  } else if (!ready) {
+    for (i = 1; i <= 64; i++) {
+      CELL[i].style.cursor = 'default';
+      CELL[i].style.cursor = 'not-allowed';
+      CELL[i].style.cursor = 'wait';
+    }
+  } else if (xmoves[0] == null) {
+    for (i = 1; i <= 64; i++) {
+      CELL[i].style.cursor = 'default';
+      if (xmoves[i] != null) {
+        CELL[i].style.cursor = 'pointer';
+      } else {
+        CELL[i].style.cursor = 'not-allowed';
+      }
+    }
+  } else { // user must pass
+    for (i = 1; i <= 64; i++) {
+      CELL[i].style.cursor = 'default';
+      CELL[i].style.cursor = 'pointer';
+    }
+  }
+}
+
+function state(turn,fill) {
+  var newstate = fill;
+  while (newstate.length < 64) {
+    newstate = newstate + newstate;
+  }
+  newstate = turn+newstate;
+  return newstate;
+}
+
+function setCells(state,first,step,cnt,val) {
+  var newstate = '';
+  var i;
+  var pos;
+  var s;
+  if (step > 0) {
+    pos = first;
+    s = step;
+  } else {
+    s = -step;
+    pos = first - s * (cnt-1);
+  }
+  for (i = 0; i < cnt; i++) {
+    newstate = newstate + state.substring(newstate.length,pos) + val;
+    pos = pos + s;
+  }
+  newstate = newstate + state.substring(newstate.length);
+  return newstate;
+}
+
+function move1(state,pos,step,key) {
+  var px = (pos - 1) % 8;
+  var py = (pos - 1 - px) / 8;
+  var dx = (step + 17) % 8 - 1;
+  var dy = (step - dx) / 8;
+  var x = px + dx;
+  var y = py + dy;
+  var first = pos + step;
+  var cur = first;
+  var cnt = 0;
+  var v = ' ';
+  while (x >= 0 && x < 8 && y >= 0 && y <= 8) {
+    v = state.charAt(cur);
+    if (v == key || v == 'b') {
+      break;
+    }
+    cur = cur + step;
+    x = x + dx;
+    y = y + dy;
+    cnt = cnt + 1;
+  }
+  if (v == key && cnt > 0) {
+    return setCells(state,first,step,cnt,key);
+  } else {
+    return state;
+  }
+}
+
+function move2(state,pos,key) {
+  var newstate = state;
+  if (newstate.charAt(0) == key && newstate.charAt(pos) == 'b') {
+    newstate = move1(newstate,pos,-9,key);
+    newstate = move1(newstate,pos,-8,key);
+    newstate = move1(newstate,pos,-7,key);
+    newstate = move1(newstate,pos,-1,key);
+    newstate = move1(newstate,pos,1,key);
+    newstate = move1(newstate,pos,7,key);
+    newstate = move1(newstate,pos,8,key);
+    newstate = move1(newstate,pos,9,key);
+    if (newstate != state) {
+      newstate = setCells(newstate,pos,0,1,key);
+      if (key == 'x') {
+        newstate = 'o'+newstate.substring(1);
+      } else {
+        newstate = 'x'+newstate.substring(1);
+      }
+    }
+  }
+  return newstate;
+}
+
+function move(state,pos,key) {
+  var i;
+  var newstate = state;
+  if (pos != 0) {
+    newstate = move2(state,pos,key);
+  } else {
+    for (i = 1; i <= 64; i++) {
+      if (move2(state,i,key) != state) {
+        break;
+      }
+    }
+    if (i > 64) { // loop completed without break
+      if (key = 'x') {
+        newstate = 'o' + state.substring(1);
+      } else {
+        newstate = 'x' + state.substring(1);
+      }
+    }
+  }
+  return newstate;
+}
+</script>
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+<script language="JavaScript">
+function think() {
+  var pos;
+  var newstate;
+  var newval;
+  var tststate;
+  var tstval;
+  newstate = displaystate;
+  newval = Number.NEGATIVE_INFINITY;
+  for (pos = 64; pos > 0; pos--) {
+    tststate = move2(displaystate,pos,'o');
+    if (tststate.charAt(0) != 'o') {
+      tstval = eval(tststate,false,5,newval,Number.POSITIVE_INFINITY);
+      if (tstval > newval) {
+        newstate = tststate;
+        newval = tstval;
+      }
+    }
+  }
+  if (newstate.charAt(0) == 'o') {
+    newstate = 'x'+displaystate.substring(1);
+  }
+  return newstate;
+}
+
+function eval(state,passed,level,low,hgh) {
+  var pos;
+  var newval;
+  var tstval;
+  var tststate;
+  var moved = false;
+  if (level > 0) {
+    if (state.charAt(0) == 'o') {
+      newval = low;
+      for (pos = 64; pos > 0 && newval < hgh; pos--) {
+        tststate = move2(state,pos,'o');
+        if (tststate.charAt(0) != 'o') {
+          moved = true;
+          tstval = eval(tststate,false,level-1,newval,hgh);
+          if (tstval > newval) {
+            newval = tstval;
+          }
+        }
+      }
+      if (!passed && !moved) {
+        tststate = 'x'+state.substring(1);
+        moved = true;
+        newval = eval(tststate,true,level,low,hgh);
+      }
+    } else if (state.charAt(0) == 'x') {
+      newval = hgh;
+      for (pos = 64; pos > 0 && low < newval; pos--) {
+        tststate = move2(state,pos,'x');
+        if (tststate.charAt(0) != 'x') {
+          moved = true;
+          tstval = eval(tststate,false,level-1,low,newval);
+          if (tstval < newval) {
+            newval = tstval;
+          }
+        }
+      }
+      if (!passed && !moved) {
+        tststate = 'o'+state.substring(1);
+        moved = true;
+        newval = eval(tststate,true,level,low,hgh);
+      }
+    }
+  }
+  if (!moved) {
+    newval = 0;
+    for (pos = 64; pos > 0; pos--) {
+      newval += piece_val(state.charAt(pos));
+    }
+    if (level < 1) {
+      newval = newval / 1000 + corner_val(state,1,1) + corner_val(state,-1,1)
+                             + corner_val(state,1,-1) + corner_val(state,-1,-1);
+    }
+    newval = newval + Math.random()/1000;
+  }
+
+  return newval;
+}
+
+function corner_val(state,dx,dy) {
+  var ans = 0;
+  var pos = (65 - 7*dx - 56*dy) / 2;
+  var sy = 8 * dy;
+  var c = state.charAt(pos);
+  var v = piece_val(c);
+  if (v != 0) {
+    var i;
+    var j;
+    var w = 4;
+    for (i = 0; i < 4; i++) {
+      for (j = 0; j < w; j++) {
+        if (state.charAt(pos+i*sy+j*dx) == c) {
+          ans += v;
+        } else {
+          w = j;
+        }
+      }
+    }
+  } else {
+    ans -= ( piece_val(state.charAt(pos+dx))
+           + piece_val(state.charAt(pos+sy))
+           + piece_val(state.charAt(pos+dx+sy)) );
+  }
+  return ans;
+}
+
+function piece_val(c) {
+  if (c == 'o') return 1;
+  if (c == 'x') return -1;
+  return 0;
+}
+</script>
+<!-- ----------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+</head>
+<body id="body" style="cursor:not-allowed">
+<table id="board" style="cursor:not-allowed">
+<tr>
+<td id="C1" class='b' onclick='play(1)'>&#xa0;</td>
+<td id="C2" class='b' onclick='play(2)'>&#xa0;</td>
+<td id="C3" class='b' onclick='play(3)'>&#xa0;</td>
+<td id="C4" class='b' onclick='play(4)'>&#xa0;</td>
+<td id="C5" class='b' onclick='play(5)'>&#xa0;</td>
+<td id="C6" class='b' onclick='play(6)'>&#xa0;</td>
+<td id="C7" class='b' onclick='play(7)'>&#xa0;</td>
+<td id="C8" class='b' onclick='play(8)'>&#xa0;</td>
+</tr>
+<tr>
+<td id="C9" class='b' onclick='play(9)'>&#xa0;</td>
+<td id="C10" class='b' onclick='play(10)'>&#xa0;</td>
+<td id="C11" class='b' onclick='play(11)'>&#xa0;</td>
+<td id="C12" class='b' onclick='play(12)'>&#xa0;</td>
+<td id="C13" class='b' onclick='play(13)'>&#xa0;</td>
+<td id="C14" class='b' onclick='play(14)'>&#xa0;</td>
+<td id="C15" class='b' onclick='play(15)'>&#xa0;</td>
+<td id="C16" class='b' onclick='play(16)'>&#xa0;</td>
+</tr>
+<tr>
+<td id="C17" class='b' onclick='play(17)'>&#xa0;</td>
+<td id="C18" class='b' onclick='play(18)'>&#xa0;</td>
+<td id="C19" class='b' onclick='play(19)'>&#xa0;</td>
+<td id="C20" class='b' onclick='play(20)'>&#xa0;</td>
+<td id="C21" class='b' onclick='play(21)'>&#xa0;</td>
+<td id="C22" class='b' onclick='play(22)'>&#xa0;</td>
+<td id="C23" class='b' onclick='play(23)'>&#xa0;</td>
+<td id="C24" class='b' onclick='play(24)'>&#xa0;</td>
+</tr>
+<tr>
+<td id="C25" class='b' onclick='play(25)'>&#xa0;</td>
+<td id="C26" class='b' onclick='play(26)'>&#xa0;</td>
+<td id="C27" class='b' onclick='play(27)'>&#xa0;</td>
+<td id="C28" class='b' onclick='play(28)'>&#xa0;</td>
+<td id="C29" class='b' onclick='play(29)'>&#xa0;</td>
+<td id="C30" class='b' onclick='play(30)'>&#xa0;</td>
+<td id="C31" class='b' onclick='play(31)'>&#xa0;</td>
+<td id="C32" class='b' onclick='play(32)'>&#xa0;</td>
+<td width="60">&#xa0;</td>
+<td align="right" width="30"><big><big><span id="SO">0</span></big></big></td>
+<td id="MO" class='o'>&#xa0;</td>
+<td id="TO" width="70">&#xa0;</td>
+</tr>
+<tr>
+<td id="C33" class='b' onclick='play(33)'>&#xa0;</td>
+<td id="C34" class='b' onclick='play(34)'>&#xa0;</td>
+<td id="C35" class='b' onclick='play(35)'>&#xa0;</td>
+<td id="C36" class='b' onclick='play(36)'>&#xa0;</td>
+<td id="C37" class='b' onclick='play(37)'>&#xa0;</td>
+<td id="C38" class='b' onclick='play(38)'>&#xa0;</td>
+<td id="C39" class='b' onclick='play(39)'>&#xa0;</td>
+<td id="C40" class='b' onclick='play(40)'>&#xa0;</td>
+</tr>
+<tr>
+<td id="C41" class='b' onclick='play(41)'>&#xa0;</td>
+<td id="C42" class='b' onclick='play(42)'>&#xa0;</td>
+<td id="C43" class='b' onclick='play(43)'>&#xa0;</td>
+<td id="C44" class='b' onclick='play(44)'>&#xa0;</td>
+<td id="C45" class='b' onclick='play(45)'>&#xa0;</td>
+<td id="C46" class='b' onclick='play(46)'>&#xa0;</td>
+<td id="C47" class='b' onclick='play(47)'>&#xa0;</td>
+<td id="C48" class='b' onclick='play(48)'>&#xa0;</td>
+<td width="60">&#xa0;</td>
+<td align="right" width="30"><big><big><span id="SX">0</span></big></big></td>
+<td id="MX" class='x'>&#xa0;</td>
+<td id="TX" width="70">&#x3c;</td>
+</tr>
+<tr>
+<td id="C49" class='b' onclick='play(49)'>&#xa0;</td>
+<td id="C50" class='b' onclick='play(50)'>&#xa0;</td>
+<td id="C51" class='b' onclick='play(51)'>&#xa0;</td>
+<td id="C52" class='b' onclick='play(52)'>&#xa0;</td>
+<td id="C53" class='b' onclick='play(53)'>&#xa0;</td>
+<td id="C54" class='b' onclick='play(54)'>&#xa0;</td>
+<td id="C55" class='b' onclick='play(55)'>&#xa0;</td>
+<td id="C56" class='b' onclick='play(56)'>&#xa0;</td>
+</tr>
+<tr>
+<td id="C57" class='b' onclick='play(57)'>&#xa0;</td>
+<td id="C58" class='b' onclick='play(58)'>&#xa0;</td>
+<td id="C59" class='b' onclick='play(59)'>&#xa0;</td>
+<td id="C60" class='b' onclick='play(60)'>&#xa0;</td>
+<td id="C61" class='b' onclick='play(61)'>&#xa0;</td>
+<td id="C62" class='b' onclick='play(62)'>&#xa0;</td>
+<td id="C63" class='b' onclick='play(63)'>&#xa0;</td>
+<td id="C64" class='b' onclick='play(64)'>&#xa0;</td>
+</tr>
+</table>
+<script language="JavaScript">
+  init();
+</script>
+</body>
+</html>
