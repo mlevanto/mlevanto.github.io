@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf8">
+<title>Mikon sudoku</title>
+<script language="JavaScript">
+
+var Tr = false; // debugging flag
+var MARK = "white"; // use "white" for no mark or "yellow" for mark 
+
+////////////////////////////////////////////////////////////////////////////////
+   // cells are indexed 0..80
+   // cells of row, col, or box are indexed 0..8
+
+function rowCell(C,I) {
+  return (C - (C % 9)) + I;
+}
+
+function colCell(C,I) {
+  return (C % 9) + 9*I;
+}
+
+function boxCell(C,I) {
+  return (C - (C % 3) - ((C - (C % 9)) % 27)) + (I % 3) + 3*(I - (I % 3));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// random number generator
+
+var date = new Date();
+var rndLimit = 4294967296;
+var rndstate = date.getTime() % rndLimit;
+function rnd9() {
+  rndstate = (1 + rndstate*5) % rndLimit;
+  return Math.floor(9*rndstate/rndLimit) + 1;
+}
+rnd9();rnd9();rnd9();rnd9();rnd9();rnd9();
+rnd9();rnd9();rnd9();rnd9();rnd9();rnd9();
+
+////////////////////////////////////////////////////////////////////////////////
+
+var sudoku = new Array(81);
+var solution = new Array(81);
+var work = new Array(81);
+
+var Nmax = 0;
+////////////////////////////////////////////////////////////////////////////////
+
+function blankBoard() {
+  var I;
+  var board = new Array(81);
+  for (I = 0; I < 81; I++) {
+    board[I] = 0;
+  }
+  return board;
+}
+
+function rndBoard() {
+  var I;
+  var board = new Array(81);
+  for (I = 0; I < 81; I++) {
+    board[I] = rnd9();
+  }
+  return board;
+}
+
+function copyBoard(src) {
+  var I;
+  var board = new Array(81);
+  for (I = 0; I < 81; I++) {
+    board[I] = src[I];
+  }
+  return board;
+}
+</script>
+<script language="javascript">
+
+////////////////////////////////////////////////////////////////////////////////
+// validity check
+
+function check(board,C,V) {
+  var X;
+  for (I = 0; I < 9; I++) {
+    X = rowCell(C,I);
+    if (X != C && board[X] == V) {
+//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
+      return false;
+    }
+    X = colCell(C,I);
+    if (X != C && board[X] == V) {
+//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
+      return false;
+    }
+    X = boxCell(C,I);
+    if (X != C && board[X] == V) {
+//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
+      return false;
+    }
+  }
+//if(Tr) alert("["+C+"] : "+V+" - OK");
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// solve sudoku
+//  - initial data
+//    - sudoku: problem to be solved
+//    - solution: previous solution or random numbers
+//  - results
+//    - function value is true if a new solution is found
+//      - the found solution is in work
+//    - otherwise function value is false
+
+function sudokuSolve() {
+  var C;
+  var D;
+  var E;
+  var F;
+  var phase = new Array(81);
+  var ans = 0;
+  var good;
+  var worklist = new Array(81);
+  for (var k = 0; k < 81; k++) worklist[k] = k;
+  work = copyBoard(sudoku);
+  C = 0;
+  D = 81;
+  E = 0;
+  F = 0;
+  phase[0] = 0;
+  work[0] = solution[0];
+//alert("sudokuSolve:A");
+  var N = 0;
+  while (E < 81) {
+    N++;
+    C = worklist[E];
+//alert("sudokuSolve:B:"+D+"~"+C+":"+phase[C]);
+    if (phase[C] < 9) {
+      phase[C]++;
+      if (sudoku[C] > 0) {
+        phase[C] = 10;
+      } else {
+        if (phase[C] == 1 && C > D) {
+          work[C] = solution[C];
+        } else {
+          work[C] = (work[C] % 9) + 1;
+        }
+        if (work[C] != solution[C]) {
+          if (D > E) {
+            D = E;
+          }
+        } else {
+          if (D == E) {
+            D = 81;
+          }
+        }
+      }
+//alert("sudokuSolve:C:"+phase[C]);
+//if (phase[C] < 10) {
+//workShow(C);
+//alert("sudokuSolve:H:"+D+"~"+C+":"+phase[C]+":"+solution[C]+"->"+work[C]);
+//}
+      if (phase[C] == 10 || check(work,C,work[C])) {
+        E++;
+        if (F > E) {
+          worklist = worklist.slice(0,E).concat(worklist.slice(F,F+1),
+                     worklist.slice(E,F),worklist.slice(F+1));
+          F = 0;
+        }
+        C = worklist[E];
+        if (E < 81) {
+          if (sudoku[C] > 0) {
+            work[C] = sudoku[C];
+            phase[C] = 8;
+          } else {
+            work[C] = solution[C];
+            phase[C] = 0;
+          }
+        } else {
+          // solution found
+//alert("sudokuSolve:I:"+D+"~"+C+":"+ans+":"+C);
+          if (D < 81) {
+            ans = 2; // new solution found
+          } else {
+            ans = 1; // old solution is unique
+          }
+//alert("sudokuSolve:L:"+D+"~"+C+":"+ans+":"+C);
+        }
+      }
+    } else {
+      work[C] = sudoku[C];
+      if (D == E) {
+        D = 81;
+      }
+      if (E > 0) {
+        if (F < E) F = E;
+        E--;
+      } else {
+//workShow(C);
+//alert("sudokuSolve:M1:");
+        E = 81; // no other solution
+//workShow(C);
+//alert("sudokuSolve:M2:");
+      }
+    }
+  } // while(E < 81);
+//workShow(C);
+//alert("sudokuSolve:Z:"+ans);
+  if (N > Nmax) Nmax = N;
+//document.getElementById("status").innerHTML = Nmax+" -> "+ans;
+  return (ans > 1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function sudokuShow() {
+  var C;
+  for (C = 0; C < 81; C++) {
+    if (sudoku[C] > 0) {
+      document.getElementById(""+(C)).innerHTML = sudoku[C];
+    } else {
+      document.getElementById(""+(C)).innerHTML = "&#xa0;";
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function workShow(X) {
+  var C;
+  for (C = 0; C < 81; C++) {
+    var Img = "";
+    if (solution[C] > 0 && work[C] != solution[C]) {
+      Img = "<s>" + solution[C] + "</s>";
+    }
+    if (work[C] > 0) {
+      Img = Img + work[C];
+    }
+    if (Img == "") {
+      Img = "&#xa0;";
+    }
+    if (C == X) {
+      Img = "<u>" + Img + "</u>";
+    }
+    if (sudoku[C] == 0) {
+      Img = "<i>" + Img + "</i>";
+    }
+    document.getElementById(""+(C)).innerHTML = Img;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var timer;
+
+////////////////////////////////////////////////////////////////////////////////
+</script>
+<script languae="javascript">
+var animation_state = 0;
+
+function animation_step(Cmd) {
+//alert("animation step: "+Cmd);
+  if (animation_state == 8) {
+    document.getElementById("11").innerHTML = "h";
+  } else if (animation_state == 7) {
+    document.getElementById("13").innerHTML = "e";
+  } else if (animation_state == 6) {
+    document.getElementById("15").innerHTML = "t";
+  } else if (animation_state == 5) {
+    document.getElementById("39").innerHTML = "k";
+  } else if (animation_state == 4) {
+    document.getElementById("41").innerHTML = "i";
+  } else if (animation_state == 3) {
+    document.getElementById("65").innerHTML = "n";
+  } else if (animation_state == 2) {
+    document.getElementById("67").innerHTML = "e";
+  } else if (animation_state == 1) {
+    document.getElementById("69").innerHTML = "n";
+  } else {
+    document.getElementById("11").innerHTML = "H";
+    document.getElementById("13").innerHTML = "E";
+    document.getElementById("15").innerHTML = "T";
+    document.getElementById("39").innerHTML = "K";
+    document.getElementById("41").innerHTML = "I";
+    document.getElementById("65").innerHTML = "N";
+    document.getElementById("67").innerHTML = "E";
+    document.getElementById("69").innerHTML = "N";
+  }
+  animation_state = (animation_state + 1) % 9;
+  timer = setTimeout(Cmd,100);
+}
+</script>
+<script languae="javascript">
+////////////////////////////////////////////////////////////////////////////////
+
+function sudoku_Clear() {
+//alert("sudokuClear:A:");
+  sudoku = blankBoard();
+  sudokuShow();
+  document.getElementById("11").innerHTML = "H";
+  document.getElementById("13").innerHTML = "E";
+  document.getElementById("15").innerHTML = "T";
+  document.getElementById("39").innerHTML = "K";
+  document.getElementById("41").innerHTML = "I";
+  document.getElementById("65").innerHTML = "N";
+  document.getElementById("67").innerHTML = "E";
+  document.getElementById("69").innerHTML = "N";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var cntRemain = 0;
+var undoList = [];
+var failList = []; // usually empty or singlet
+var hardList = [];
+var easyList = [];
+var hard = blankBoard();
+
+////////////////////////////////////////////////////////////////////////////////
+
+function sudokuCreate() {
+  var C;
+  sudoku = blankBoard();
+  solution = rndBoard();
+  sudokuSolve();
+  solution = copyBoard(work);
+  sudoku = copyBoard(solution);
+  X = 9*rnd9()+rnd9();
+  animation_step("sudokuCreate1(0,32,"+X+");");
+}
+
+function sudokuCreate1(I,K,X) {
+  var J;
+  if (I < 81) {
+    for (J = I; J < K; J++) {
+      C = (X + 31*J) % 81;
+      if (sudoku[C] > 0) {
+        sudoku[C] = 0;
+        cntRemain++;
+      }
+    }
+    if (sudokuSolve()) {
+      for (J = I; J < K; J++) {
+        C = (X + 31*J) % 81;
+        sudoku[C] = solution[C];
+        cntRemain--;
+      }
+      if (K > I + 1) {
+        K = (I + K) / 2;
+      } else {
+        I = I + 1;
+        K = I + 1;
+      }
+    } else {
+      J = K - I;
+      I = K;
+      K = K + J;
+      if (K > 81) {
+        K = 81;
+      }
+    }
+    animation_step("sudokuCreate1("+I+","+K+","+X+");");
+  } else {
+    animation_step("sudokuCreate2()",1);
+  }
+}
+
+function sudokuCreate2() {
+  var C;
+  sudokuShow();
+  cntRemain = 0;
+  undoList = [];
+  easyList = [];
+  hardList = [];
+  for (C = 0; C < 81; C++) {
+    if (sudoku[C] == 0) {
+      cntRemain++;
+      document.getElementById(""+C).onclick = move;
+      hard[C] = false;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function move() {
+  var C = Number(this.id);
+  var text = document.getElementById(this.id);
+  var V = sudoku[C];
+  if (V == 0) {
+    cntRemain--;
+  }
+  if (undoList.length > 0) {
+    var last = undoList.length - 1;
+    document.getElementById(undoList[last]).style.backgroundColor = "white";
+    var xin = undoList.indexOf(this.id);
+    if (xin >= 0) undoList.splice(xin, 1);
+  }
+  if (failList.length > 0) {
+    var last = failList.length - 1;
+    document.getElementById(failList[last]).style.backgroundColor = "white";
+    var xin = failList.indexOf(this.id);
+    if (xin >= 0) failList.splice(xin, 1);
+  }
+  if (hardList.length > 0) {
+    var last = hardList.length - 1;
+    document.getElementById(hardList[last]).style.backgroundColor = "white";
+    var xin = hardList.indexOf(this.id);
+    if (xin >= 0) hardList.splice(xin, 1);
+  }
+  if (easyList.length > 0) {
+    var last = easyList.length - 1;
+    document.getElementById(easyList[last]).style.backgroundColor = "white";
+    var xin = easyList.indexOf(this.id);
+    if (xin >= 0) easyList.splice(xin, 1);
+  }
+  do {
+    sudoku[C] = (sudoku[C] + 1) % 10;
+  } while (sudoku[C] != 0 && !check(sudoku,C,sudoku[C]));
+  if (sudoku[C] > 0) {
+    text.innerHTML = "<i style='color:green'>"+sudoku[C]+"</i>";
+    undoList.push(this.id);
+    hard[C] = (V == 0);
+  } else {
+    var T = '<i style="color:red">?</i>';
+    if (V == 0 && text.innerHTML != T) {
+      text.innerHTML = T;
+    } else {
+      text.innerHTML = "<i style='color:red'>&#xa0;</i>";
+    }
+    cntRemain++;
+    if (V == 0) {
+      hard[C] = true;
+      failList.push(this.id);
+    } else if (hard[C]) {
+      hardList.push(this.id);
+    } else {
+      easyList.push(this.id);
+    }
+  }
+  if (undoList.length > 0) {
+    var last = undoList.length - 1;
+    var C1 = Number(undoList[last]);
+    if (sudoku[C1] != 0) {
+      document.getElementById(undoList[last]).style.backgroundColor = MARK;
+    }
+  }
+  if (failList.length > 0) {
+    var last = failList.length - 1;
+    var C1 = Number(failList[last]);
+    if (sudoku[C1] == 0) {
+      document.getElementById(failList[last]).style.backgroundColor = MARK;
+    }
+  } else if (hardList.length > 0) {
+    var last = hardList.length - 1;
+    var C1 = Number(hardList[last]);
+    if (sudoku[C1] == 0) {
+      document.getElementById(hardList[last]).style.backgroundColor = MARK;
+    }
+  } else if (easyList.length > 0) {
+    var last = easyList.length - 1;
+    var C1 = Number(easyList[last]);
+    if (sudoku[C1] == 0) {
+      document.getElementById(easyList[last]).style.backgroundColor = MARK;
+    }
+  }
+  if (cntRemain > 0) {
+    document.getElementById("status").innerHTML = "&#xa0;";
+  } else {
+    document.getElementById("status").innerHTML = "Valmis";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+</script>
+</head>
+<body align="center">
+<H1 align="center">Mikon sudoku</H1>
+<p>&#xa0;</p>
+<big><big><big>
+<table id="Sudoku" border="1" align="center">
+<tr>
+<td><table align="center">
+<tr>
+<td id="0" width="30">&#xa0;</td>
+<td id="1" width="30">&#xa0;</td>
+<td id="2" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="9" width="30">&#xa0;</td>
+<td id="10" width="30">&#xa0;</td>
+<td id="11" width="30">H</td>
+</tr>
+<tr>
+<td id="18" width="30">&#xa0;</td>
+<td id="19" width="30">&#xa0;</td>
+<td id="20" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="3" width="30">&#xa0;</td>
+<td id="4" width="30">&#xa0;</td>
+<td id="5" width="30">&#xa0;</td>
+</tr>
+</tr>
+<tr>
+<td id="12" width="30">&#xa0;</td>
+<td id="13" width="30">E</td>
+<td id="14" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="21" width="30">&#xa0;</td>
+<td id="22" width="30">&#xa0;</td>
+<td id="23" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="6" width="30">&#xa0;</td>
+<td id="7" width="30">&#xa0;</td>
+<td id="8" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="15" width="30">T</td>
+<td id="16" width="30">&#xa0;</td>
+<td id="17" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="24" width="30">&#xa0;</td>
+<td id="25" width="30">&#xa0;</td>
+<td id="26" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+<tr>
+<td><table align="center">
+<tr>
+<td id="27" width="30">&#xa0;</td>
+<td id="28" width="30">&#xa0;</td>
+<td id="29" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="36" width="30">&#xa0;</td>
+<td id="37" width="30">&#xa0;</td>
+<td id="38" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="45" width="30">&#xa0;</td>
+<td id="46" width="30">&#xa0;</td>
+<td id="47" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="30" width="30">&#xa0;</td>
+<td id="31" width="30">&#xa0;</td>
+<td id="32" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="39" width="30">K</td>
+<td id="40" width="30">&#xa0;</td>
+<td id="41" width="30">I</td>
+</tr>
+<tr>
+<td id="48" width="30">&#xa0;</td>
+<td id="49" width="30">&#xa0;</td>
+<td id="50" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="33" width="30">&#xa0;</td>
+<td id="34" width="30">&#xa0;</td>
+<td id="35" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="42" width="30">&#xa0;</td>
+<td id="43" width="30">&#xa0;</td>
+<td id="44" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="51" width="30">&#xa0;</td>
+<td id="52" width="30">&#xa0;</td>
+<td id="53" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+<tr>
+<td><table align="center">
+<tr>
+<td id="54" width="30">&#xa0;</td>
+<td id="55" width="30">&#xa0;</td>
+<td id="56" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="63" width="30">&#xa0;</td>
+<td id="64" width="30">&#xa0;</td>
+<td id="65" width="30">N</td>
+</tr>
+<tr>
+<td id="72" width="30">&#xa0;</td>
+<td id="73" width="30">&#xa0;</td>
+<td id="74" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<td id="57" width="30">&#xa0;</td>
+<td id="58" width="30">&#xa0;</td>
+<td id="59" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="66" width="30">&#xa0;</td>
+<td id="67" width="30">E</td>
+<td id="68" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="75" width="30">&#xa0;</td>
+<td id="76" width="30">&#xa0;</td>
+<td id="77" width="30">&#xa0;</td>
+</tr>
+</table></td>
+<td><table align="center">
+<tr>
+<tr>
+<td id="60" width="30">&#xa0;</td>
+<td id="61" width="30">&#xa0;</td>
+<td id="62" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="69" width="30">N</td>
+<td id="70" width="30">&#xa0;</td>
+<td id="71" width="30">&#xa0;</td>
+</tr>
+<tr>
+<td id="78" width="30">&#xa0;</td>
+<td id="79" width="30">&#xa0;</td>
+<td id="80" width="30">&#xa0;</td>
+</tr>
+</table></td>
+</tr>
+</table>
+</big></big></big>
+<p id="status">&#xa0;</p>
+<p>&#xa0;</p>
+<script language="JavaScript">
+//alert("Hei");
+Nmax = 0;
+animation_step("sudokuCreate();");
+</script>
+</body>
+</html>
