@@ -669,7 +669,7 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
         var pos2 = -1;
         var nxt = placeNext[dir][xin];
         var nxtDir = (nxt < 0 ? 0 : markDir[nxt]);
-        if (  (nxt < 0 || (nxt > 61 && dir != markColor[xin]))
+        if (  (nxt < 0 || (nxt > 60 && dir != markColor[xin]))
            || (dir != 0 && nxtDir != 0 && (9 + dir - nxtDir) % 6 == 0)  )
         {
           pos = markFr[xin];
