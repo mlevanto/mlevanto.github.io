@@ -47,6 +47,7 @@
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 3px;
     color: white;
     background-color: darkblue;
     border: inset;
@@ -60,6 +61,7 @@
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 3px;
     color: white;
     background-color: darkblue;
     border: outset;
@@ -73,6 +75,7 @@
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 3px;
     color: white;
     background-color: darkblue;
     border: outset;
@@ -86,6 +89,7 @@
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 3px;
     color: white;
     background-color: blue;
     border: outset;
@@ -99,6 +103,7 @@
     text-align: center;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 3px;
     color: gray;
     background-color: lightgrey;
     border: outset;
@@ -202,8 +207,8 @@
   <polygon points="540,58 680,300 540,542 260,542 120,300 260,58"
       style="fill:black;" />
 
-  <text id="valmis" class="valmis-hidden" x="310" y="315"
-      fill="yellow" font-size="300%">VALMIS</text>
+  <text id="valmis" x="310" y="315"
+      fill="black" font-size="300%">VALMIS</text>
 
   <polygon id="m0" class="c0" points="0,0 1,0 1,1"/>
   <polygon id="m1" class="c0" points="0,0 1,0 1,1"/>
@@ -631,7 +636,14 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
     if (color > 60) color = color - 60;
     for (var xin = 0; xin < 61; xin++) {
       if (markColor[xin] == color) {
-        markDir[xin] = color;
+        var dir = color;
+        if (placeNext[dir][xin] < 0) {
+          dir = 1 + (dir % 6);
+          if (placeNext[dir][xin] < 0) {
+            dir = 1 + ((dir + 3) % 6);
+          }
+        }
+        markDir[xin] = dir;
         setMark(xin);
       }
     }
@@ -848,13 +860,13 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
       ASKEL.setAttribute("class", "askel-enabled");
       count = 0;
       COUNT.innerHTML = "0";
-      VALMIS.setAttribute("class", "valmis-hidden");
+      VALMIS.setAttribute("fill", "black");
       if (status == 1) {
         LEVEL[level].setAttribute("class", "used");
       }
     } else {
       ASKEL.setAttribute("class", "askel-disabled");
-      VALMIS.setAttribute("class", "valmis-shown");
+      VALMIS.setAttribute("fill", "yellow");
       LEVEL[level].setAttribute("class", "selected");
     }    
     gameStatus = status;
