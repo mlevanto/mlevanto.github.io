@@ -639,7 +639,7 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
         var dir = color;
         if (placeNext[dir][xin] < 0) {
           dir = 1 + (dir % 6);
-          if (placeNext[dir][xin] < 0) {
+          if (placeNext[dir][xin] < 0 || placeNext[dir][xin] > 60) {
             dir = 1 + ((dir + 3) % 6);
           }
         }
