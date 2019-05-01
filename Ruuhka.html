@@ -112,6 +112,24 @@
     cursor: not-allowed;
   }
 
+  .nextgame-enabled {
+    padding-left: 2px;
+    padding-right: 10px;
+    padding-top: 2px;
+    color: white;
+    background-color: blue;
+    border-radius: 0px 10px 10px 0px;
+  }
+
+  .nextgame-disabled {
+    padding-left: 2px;
+    padding-right: 10px;
+    padding-top: 2px;
+    color: gray;
+    background-color: lightgrey;
+    border-radius: 0px 10px 10px 0px;
+  }
+
   .askel-box {
     margin-right: 30px;
     float: left;
@@ -352,6 +370,7 @@
 <span id="l3" class="enabled">VAIKEA</span><br/>
 <span style="white-space:nowrap">Peli:
 <input id="gameid" type="text" value="1" style="text-align:right" size="10">
+<span id="nextgame" class="nextgame-enabled">SEURAAVA</span>
 </span>
 </p>
 <p>Jokaisella kulkijalla on p&auml;&auml;m&auml;&auml;r&auml;, mutta reitti
@@ -359,7 +378,8 @@ sinne ei ole selv&auml;. Auta kulkijoita, jotka eiv&auml;t muuten
 p&auml;&auml;se perille. Tasolla HELPPO kaikki kulkijat, jotka eiv&auml;t p&auml;&auml;se liikkumaan, on merkitty renkaalla. Klikkaa (niin monta kertaa
 kuin on tarpeen) jokaista, joka on menossa v&auml;&auml;r&auml;&auml;n
 suuntaan. Voit my&ouml;s klikata p&auml;&auml;m&auml;&auml;r&auml;&auml;n, jolloin
-kaikki sinne pyrkiv&auml;t kulkijat asettuvat samaan suuntaan.</p>
+kaikki sinne pyrkiv&auml;t kulkijat k&auml;&auml;ntuv&auml;t kohti
+p&auml;&auml;m&auml;&auml;r&auml;&auml;.</p>
 <table class="askel-box">
 <tr>
 <td id="askel" class="askel-enabled">ASKEL</td>
@@ -550,6 +570,9 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
 
   var GAMEID = document.getElementById("gameid");
   GAMEID.oninput = setGameId;
+
+  var NEXTGAME = document.getElementById("nextgame");
+  NEXTGAME.onmousedown = nextGameId;
 
   var ASKEL = document.getElementById("askel");
   ASKEL.onmousedown = doMove;
@@ -854,6 +877,22 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
     }
   }
 
+  function nextGameId() {
+    if (gameStatus != 1) {
+      var oldid = GAMEID.value;
+      var lst = oldid.length - 1;
+      while (lst >= 0 && oldid.charAt(lst) <= ' ') lst--;
+      var fst = lst;
+      while (fst >= 0 && oldid.charAt(fst) >= '0'
+                      && oldid.charAt(fst) <= '9') fst--;
+      var pre = oldid.substring(0, fst+1);
+      var num = oldid.substring(fst+1, lst+1);
+      if (num.length == 0) num = "0";
+      GAMEID.value = pre + (Number(num)+1);
+      reset(level);
+    }
+  }
+
   function setStatus(status) {
     GAMEID.disabled = (status == 1);
     if (status < 2) {
@@ -863,11 +902,13 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
       VALMIS.setAttribute("fill", "black");
       if (status == 1) {
         LEVEL[level].setAttribute("class", "used");
+        NEXTGAME.setAttribute("class", "nextgame-disabled");
       }
     } else {
       ASKEL.setAttribute("class", "askel-disabled");
       VALMIS.setAttribute("fill", "yellow");
       LEVEL[level].setAttribute("class", "selected");
+      NEXTGAME.setAttribute("class", "nextgame-enabled");
     }    
     gameStatus = status;
     for (var i = 0; i < LEVEL.length; i++) {
