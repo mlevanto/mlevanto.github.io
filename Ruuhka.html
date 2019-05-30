@@ -22,7 +22,7 @@
 
   svg {
     position: relative;
-    left: -30px;
+    left: -50px;
     cursor: not-allowed;
   }
 
@@ -131,8 +131,14 @@
   }
 
   .askel-box {
+    position: relative;
+    top: -600px;
+    left: 580px;
+    height: 0px;
+/*
     margin-right: 30px;
     float: left;
+*/
   }
 
   .askel-enabled {
@@ -360,9 +366,26 @@
 </g>
   <text x="610" y="580" fill="black" font-size="50%">© 2019 Mikko Levanto</text> 
 </svg>
+<table class="askel-box">
+<tr>
+<td id="count">123</td>
+</tr>
+<tr>
+<td id="askel" class="askel-enabled">ASKEL</td>
+</tr>
+</table>
 </td>
 <td style="padding-right: 2px">
 <h1>Ruuhka</h1>
+<p>Jokaisella kulkijalla on p&auml;&auml;m&auml;&auml;r&auml; (alueen
+nurkassa), mutta reitti sinne ei ole selv&auml;. Auta kulkijoita, jotka
+eiv&auml;t muuten p&auml;&auml;se perille. Klikkaile
+p&auml;&auml;m&auml;&auml;ri&auml; ja kulkijoita, kunnes suunnat n&auml;ytt&auml;v&auml;t hyvilt&auml;. Kun olet saanut kaikki kulkijat (tai
+ainakin tarpeeksi monta) oikeaan suuntaa, klikkaa painiketta ASKEL. Toista
+kunnes kaikki kulkijat ovat p&auml;&auml;sseet perille. Painikkeen
+p&auml;&auml;ll&auml; oleva numero kertoo, montako kertaa olet klikannut.
+T&auml;m&auml; on tuloksesi, kun pelin loppuessa n&auml;ytt&ouml;&ouml;n tulee
+sana VALMIS. Mit&auml; v&auml;hemm&auml;n askelia tarvitset, sen parempi!</p>
 <p style="line-height:220%">
 <span id="l0" class="selected">HELPPO</span>
 <span id="l1" class="enabled">HELPOHKO</span>
@@ -373,30 +396,12 @@
 <span id="nextgame" class="nextgame-enabled">SEURAAVA</span>
 </span>
 </p>
-<p>Jokaisella kulkijalla on p&auml;&auml;m&auml;&auml;r&auml;, mutta reitti
-sinne ei ole selv&auml;. Auta kulkijoita, jotka eiv&auml;t muuten
-p&auml;&auml;se perille. Tasolla HELPPO kaikki kulkijat, jotka eiv&auml;t p&auml;&auml;se liikkumaan, on merkitty renkaalla. Klikkaa (niin monta kertaa
-kuin on tarpeen) jokaista, joka on menossa v&auml;&auml;r&auml;&auml;n
-suuntaan. Voit my&ouml;s klikata p&auml;&auml;m&auml;&auml;r&auml;&auml;n, jolloin
-kaikki sinne pyrkiv&auml;t kulkijat k&auml;&auml;ntuv&auml;t kohti
-p&auml;&auml;m&auml;&auml;r&auml;&auml;.</p>
-<table class="askel-box">
-<tr>
-<td id="askel" class="askel-enabled">ASKEL</td>
-<td id="count">123</td>
-</tr>
-</table>
-<p>Kun olet saanut kaikki kulkijat (tai ainakin
-tarpeeksi monta) oikeaan suuntaa, klikkaa painiketta ASKEL. Toista kunnes
-kaikki kulkijat ovat p&auml;&auml;sseet perille. Painikkeen vieress&auml; oleva
-numero kertoo, montako kertaa olet klikannut. T&auml;m&auml; on tuloksesi, kun
-pelin loppuessa n&auml;ytt&ouml;&ouml;n tulee sana VALMIS. Mit&auml;
-v&auml;hemm&auml;n, sen parempi!</p>
-<p>Kun taso HELPPO tuntuu liian helpolla, voit ennen seuraavaa peli&auml;
-vaihtaa tasoa ylh&auml;&auml;ll&auml; olvilla painikkeilla. Silloin kulkijoita
-on enemm&auml;n ja ruuhkaa osoittavia renkaita v&auml;hemm&auml;n eik&auml;
-tasolla VAIKEA ollenkaan. Lis&auml;&auml; vaihtelua saat kirjoittamalla
-kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
+<p>Lis&auml;&auml; vaihtelua saat painikkeesta SEURAAVA tai kirjoittamalla
+kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta. Kun taso HELPPO tuntuu
+liian helpolla, voit vaihtaa tasoa ylh&auml;&auml;ll&auml; olevilla
+painikkeilla.
+
+</p>
 </td>
 </tr>
 </table>
@@ -657,9 +662,17 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
   function clickGoal() {
     var color = Number(this.id.substring(1));
     if (color > 60) color = color - 60;
+    alignMarks(color);
+  }
+
+  function outGoal() {
+    checkMoves();
+  }
+
+  function alignMarks(color) {
     for (var xin = 0; xin < 61; xin++) {
-      if (markColor[xin] == color) {
-        var dir = color;
+      var dir = markColor[xin];
+      if (dir > 0 && (color == undefined || color == dir)) {
         if (placeNext[dir][xin] < 0) {
           dir = 1 + (dir % 6);
           if (placeNext[dir][xin] < 0 || placeNext[dir][xin] > 60) {
@@ -670,10 +683,6 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
         setMark(xin);
       }
     }
-  }
-
-  function outGoal() {
-    checkMoves();
   }
 
   function setMark(xin) {
@@ -812,6 +821,9 @@ kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta.</p>
       } else {
         clearInterval(timer);
         timer = null;
+        if (level == 0) {
+          alignMarks();
+        }
         checkMoves();
         var remaining_cnt = 0;
         for (var xin = 0; xin < 67; xin++) {
