@@ -5,29 +5,169 @@
 <style>
 
   body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     -webkit-user-select: none;
     user-select: none;
-    cursor: default;
-    padding-right: 10px;
     cursor: not-allowed;
+    padding: 0px;
+    margin: 0px;
   }
 
-  table {
-    max-width: 1200px;
+  #mainbox {
+    position: relative;
+    transform-origin: 0 0;
+    margin: auto;
   }
 
-  td {
-    vertical-align: top;
+  .widebox {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 722px;
+    height: 622px;
+    text-align: center;
   }
 
   svg {
-    position: relative;
-    left: -50px;
+    position: absolute;
+    top: 11px;
+    left: -39px;
     cursor: not-allowed;
+  }
+
+  #titlebox {
+    height: auto;
+    font-size: 42px;
+    font-weight: bold;
+  }
+
+  #askel-box {
+    position: absolute;
+    right: 23px;
+    top: 15px;
+  }
+
+  #levelpanel {
+    position: absolute;
+    top: 320px;
+    left: 140px;
+    right: 140px;
+    white-space: normal;
+    font-size: 24px;
+    line-height: 250%;
+  }
+
+  #finalbox {
+    height: 310px;
+    display: none;
+  }
+
+  #helpbox {
+    height: 310px;
+  }
+
+  #helpbuttonbox {
+    position: absolute;
+    left: 15px;
+    top: 500px;
+  }
+
+  #playbutton {
+    position: relative;
+    top: 298px;
+  }
+
+  .button {
+    font-size: 24px;
+    text-align: center;
+    padding: 3px 20px 0px 20px;
+    margin: 10px;
+    color: white;
+    background-color: blue;
+    border: outset;
+    border-radius: 20px;
+    cursor: default;
+  }
+
+  .round {
+    font-family: monospace;
+    padding: 0px 7px;
+  }
+
+  .pressed {
+    background-color: darkblue;
+    border: inset;
+  }
+
+  .selected {
+    background-color: darkblue;
+  }
+
+  .disabled {
+    color: gray;
+    background-color: lightgrey;
+    cursor: not-allowed;
+  }
+
+  #valmis {
+    position: absolute;
+    width: 100%;
+    top: 70px;
+    color: yellow;
+    white-space: pre;
+    font-size: 78px;
+  }
+
+  .helptext {
+    position: absolute;
+    width: 100%;
+    top: 60px;
+    color: yellow;
+    white-space: pre;
+    font-size: 30px;
+    display: none;
+  }
+
+  #intro {
+    position: absolute;
+    width: 100%;
+    top: 50px;
+    color: yellow;
+    white-space: pre;
+    font-size: 30px;
+    display: block;
+  }
+
+  #helpnavi {
+    display: none;
+  }
+
+  #prevhelp {
+    position: absolute;
+    top: 260px;
+    left: 95px;
+  }
+
+  #nexthelp {
+    position: absolute;
+    top: 260px;
+    right: 95px;
+  }
+
+  #gameid {
+    margin-top: 20px;
+    font-size: 18px;
   }
 
   #game {
     cursor: default;
+  }
+
+  td {
+    vertical-align: top;
+    max-width: 400px;
   }
 
   .c0 { opacity: 0; }
@@ -42,141 +182,6 @@
   .place-weak { fill-opacity: 0; stroke: gray; stroke-width 1; }
   .place-strong { fill-opacity: 0; stroke: white; stroke-width 1; }
 
-  .pressed {
-    font-size: 24px;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 3px;
-    color: white;
-    background-color: darkblue;
-    border: inset;
-    border-radius: 20px;
-    margin: 20px;
-    cursor: default;
-  }
-
-  .selected {
-    font-size: 24px;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 3px;
-    color: white;
-    background-color: darkblue;
-    border: outset;
-    border-radius: 20px;
-    margin: 20px;
-    cursor: default;
-  }
-
-  .used {
-    font-size: 24px;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 3px;
-    color: white;
-    background-color: darkblue;
-    border: outset;
-    border-radius: 20px;
-    margin: 20px;
-    cursor: not-allowed;
-  }
-
-  .enabled {
-    font-size: 24px;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 3px;
-    color: white;
-    background-color: blue;
-    border: outset;
-    border-radius: 20px;
-    margin: 20px;
-    cursor: default;
-  }
-
-  .disabled {
-    font-size: 24px;
-    text-align: center;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 3px;
-    color: gray;
-    background-color: lightgrey;
-    border: outset;
-    border-radius: 20px;
-    margin: 20px;
-    cursor: not-allowed;
-  }
-
-  .nextgame-enabled {
-    padding-left: 2px;
-    padding-right: 10px;
-    padding-top: 2px;
-    color: white;
-    background-color: blue;
-    border-radius: 0px 10px 10px 0px;
-  }
-
-  .nextgame-disabled {
-    padding-left: 2px;
-    padding-right: 10px;
-    padding-top: 2px;
-    color: gray;
-    background-color: lightgrey;
-    border-radius: 0px 10px 10px 0px;
-  }
-
-  .askel-box {
-    position: relative;
-    top: -600px;
-    left: 580px;
-    height: 0px;
-/*
-    margin-right: 30px;
-    float: left;
-*/
-  }
-
-  .askel-enabled {
-    font-size: 24px;
-    text-align: center;
-    padding: 10px;
-    color: white;
-    background-color: blue;
-    border: outset;
-    border-radius: 20px;
-    cursor: default;
-    float: left;
-  }
-
-  .askel-pressed {
-    font-size: 24px;
-    text-align: center;
-    padding: 10px;
-    color: white;
-    background-color: blue;
-    border: inset;
-    border-radius: 20px;
-    cursor: default;
-    float: left;
-  }
-
-  .askel-disabled {
-    font-size: 24px;
-    text-align: center;
-    padding: 10px;
-    color: gray;
-    background-color: lightgrey;
-    border: outset;
-    border-radius: 20px;
-    cursor: not-allowed;
-    float: left;
-  }
-
   #count {
     vertical-align: middle;
     font-family: monospace;
@@ -186,121 +191,108 @@
     padding: 10px;
   }
 
-  .valmis-hidden {
-    opacity: 0;
-    cursor: default;
-  }     
-
-  .valmis-shown {
-    opacity: 1;
-    cursor: not-allowed;
-  }     
-
 </style>
 </head>
 <body>
-<table>
-<tr>
-<td>
+<div id="mainbox" class="widebox">
+<div id="titlebox" class="widebox">Ruuhka</div>
+<div id="gamebox" class="widebox">
 <svg width="745" height="600">
 <g id="game">
   <circle cx="550" cy="40" r="38" fill="black" />
-  <circle id="g1" cx="550" cy="40" r="32" stroke="black" stroke-width="8"
+  <circle id="G1" cx="550" cy="40" r="32" stroke="black" stroke-width="8"
       class="c1" />
 
   <circle cx="700" cy="300" r="38" fill="black" />
-  <circle id="g2" cx="700" cy="300" r="32" stroke="black" stroke-width="8"
+  <circle id="G2" cx="700" cy="300" r="32" stroke="black" stroke-width="8"
       class="c2" />
 
   <circle cx="550" cy="560" r="38" fill="black" />
-  <circle id="g3" cx="550" cy="560" r="32" stroke="black" stroke-width="8"
+  <circle id="G3" cx="550" cy="560" r="32" stroke="black" stroke-width="8"
       class="c3" />
 
   <circle cx="250" cy="560" r="38" stroke="black" />
-  <circle id="g4" cx="250" cy="560" r="32" stroke="black" stroke-width="8"
+  <circle id="G4" cx="250" cy="560" r="32" stroke="black" stroke-width="8"
       class="c4" />
 
   <circle cx="100" cy="300" r="38" stroke="black" />
-  <circle id="g5" cx="100" cy="300" r="32" stroke="black" stroke-width="8"
+  <circle id="G5" cx="100" cy="300" r="32" stroke="black" stroke-width="8"
       class="c5" />
 
   <circle cx="250" cy="40" r="38" stroke="black" />
-  <circle id="g6" cx="250" cy="40" r="32" stroke="black" stroke-width="8"
+  <circle id="G6" cx="250" cy="40" r="32" stroke="black" stroke-width="8"
       class="c6" />
 
   <polygon points="540,58 680,300 540,542 260,542 120,300 260,58"
       style="fill:black;" />
 
-  <text id="valmis" x="310" y="315"
-      fill="black" font-size="300%">VALMIS</text>
-
-  <polygon id="m0" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m1" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m2" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m3" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m4" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m5" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m6" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m7" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m8" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m9" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m10" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m11" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m12" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m13" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m14" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m15" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m16" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m17" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m18" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m19" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m20" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m21" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m22" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m23" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m24" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m25" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m26" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m27" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m28" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m29" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m30" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m31" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m32" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m33" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m34" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m35" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m36" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m37" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m38" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m39" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m40" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m41" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m42" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m43" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m44" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m45" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m46" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m47" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m48" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m49" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m50" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m51" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m52" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m53" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m54" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m55" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m56" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m57" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m58" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m59" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m60" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m61" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m62" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m63" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m64" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m65" class="c0" points="0,0 1,0 1,1"/>
-  <polygon id="m66" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M0" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M1" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M2" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M3" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M4" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M5" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M6" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M7" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M8" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M9" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M10" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M11" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M12" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M13" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M14" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M15" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M16" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M17" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M18" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M19" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M20" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M21" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M22" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M23" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M24" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M25" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M26" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M27" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M28" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M29" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M30" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M31" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M32" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M33" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M34" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M35" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M36" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M37" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M38" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M39" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M40" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M41" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M42" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M43" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M44" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M45" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M46" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M47" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M48" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M49" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M50" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M51" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M52" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M53" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M54" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M55" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M56" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M57" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M58" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M59" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M60" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M61" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M62" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M63" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M64" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M65" class="c0" points="0,0 1,0 1,1"/>
+  <polygon id="M66" class="c0" points="0,0 1,0 1,1"/>
 
   <circle id="0" cx="280" cy="92" r="28" class="place"/>
   <circle id="1" cx="340" cy="92" r="28" class="place"/>
@@ -366,52 +358,130 @@
 </g>
   <text x="610" y="580" fill="black" font-size="50%">© 2019 Mikko Levanto</text> 
 </svg>
-<table class="askel-box">
-<tr>
-<td id="count">123</td>
-</tr>
-<tr>
-<td id="askel" class="askel-enabled">ASKEL</td>
-</tr>
-</table>
-</td>
-<td style="padding-right: 2px">
-<h1>Ruuhka</h1>
-<p>Jokaisella kulkijalla on p&auml;&auml;m&auml;&auml;r&auml; (alueen
-nurkassa), mutta reitti sinne ei ole selv&auml;. Auta kulkijoita, jotka
-eiv&auml;t muuten p&auml;&auml;se perille. Klikkaile
-p&auml;&auml;m&auml;&auml;ri&auml; ja kulkijoita, kunnes suunnat n&auml;ytt&auml;v&auml;t hyvilt&auml;. Kun olet saanut kaikki kulkijat (tai
-ainakin tarpeeksi monta) oikeaan suuntaa, klikkaa painiketta ASKEL. Toista
-kunnes kaikki kulkijat ovat p&auml;&auml;sseet perille. Painikkeen
-p&auml;&auml;ll&auml; oleva numero kertoo, montako kertaa olet klikannut.
-T&auml;m&auml; on tuloksesi, kun pelin loppuessa n&auml;ytt&ouml;&ouml;n tulee
-sana VALMIS. Mit&auml; v&auml;hemm&auml;n askelia tarvitset, sen parempi!</p>
-<p style="line-height:220%">
-<span id="l0" class="selected">HELPPO</span>
-<span id="l1" class="enabled">HELPOHKO</span>
-<span id="l2" class="enabled">VAIKEAHKO</span>
-<span id="l3" class="enabled">VAIKEA</span><br/>
-<span style="white-space:nowrap">Peli:
+</div>
+<div id="levelbox" class="widebox">
+<svg width="745" height="600">
+  <polygon points="680,300 540,542 260,542 120,300" fill="gold" />
+<p id="levelpanel">
+<span id="l0" class="button selected">HELPPO</span>
+<span id="l1" class="button enabled">HELPOHKO</span>
+<span id="l2" class="button enabled">VAIKEAHKO</span>
+<span id="l3" class="button enabled">VAIKEA</span><br/>
+<span style="white-space:nowrap">
+<span id="prevgame" class="button round enabled">-</span>
 <input id="gameid" type="text" value="1" style="text-align:right" size="10">
-<span id="nextgame" class="nextgame-enabled">SEURAAVA</span>
-</span>
+<span id="nextgame" class="button round enabled">+</span></span>
 </p>
-<p>Lis&auml;&auml; vaihtelua saat painikkeesta SEURAAVA tai kirjoittamalla
-kentt&auml;&auml;n Peli numeron 1 paikalle jotain muuta. Kun taso HELPPO tuntuu
-liian helpolla, voit vaihtaa tasoa ylh&auml;&auml;ll&auml; olevilla
-painikkeilla.
-
+</div>
+<div id="finalbox" class="widebox">
+<p id="valmis">VALMIS</p>
+</div>
+<div id="helpbox" class="widebox">
+<svg width="745" height="300">
+  <polygon points="540,58 680,300 120,300 260,58" fill="darkmagenta" />
+</svg>
+<p class="helptext" id="intro">
+Jokaisella kulkijalla
+on p&auml;&auml;m&auml;&auml;r&auml;, mutta reitti
+sinne ei ole selv&auml;.
+Apuasi tarvitaan!
 </p>
-</td>
+<p class="helptext" id="meta" data-blink="nexthelp">
+Painikkeilla < ja > voit
+selata ohjeita.
+</p>
+<p class="helptext" data-blink="playbutton">
+Painikkeella PELI
+p&auml;&auml;set pelaamaan.
+</p>
+<p class="helptext" data-demo="i" data-blink="askel">
+Klikkaa painiketta ASKEL
+<small>(oikealla ylh&auml;&auml;ll&auml;)</small>
+ja katso, mitä tapahtuu.
+</p>
+<p class="helptext" data-demo="i" data-blink="askel">
+Kun klikkaat
+painiketta ASKEL
+kulkijat siirtyv&auml;t, jos voivat.
+</p>
+<p class="helptext" data-demo="p" data-blink="G4">
+Teht&aumlv&aumlsi on
+ohjata jokainen kulkija
+omaan p&auml&aumlm&auml&aumlr&auml&aumlns&auml
+<small>(ympyr&auml; pelialuuen nurkassa)</small>.
+</p>
+<p class="helptext" data-demo="w">
+Jos kulkija ei voi liikkua tai
+on menossa v&auml;&auml;r&auml;&auml;n suuntaan,
+se on k&auml;&auml;nnett&auml;v&auml;.
+</p>
+<p class="helptext" data-demo="w" data-blink="G4">
+Klikkaa p&auml;&auml;m&auml;&auml;r&auml;&auml;
+<small>(ympyr&auml; pelialuuen nurkassa)</small>.
+ja katso, mitä tapahtuu.
+</p>
+<p class="helptext" data-demo="w" data-blink="G4">
+Klikkaamalla p&auml;&auml;m&auml;&auml;r&auml;&auml;
+voit k&auml;&auml;nt&auml;&auml; kyseiseen
+p&auml;&auml;m&auml;&auml;r&auml;&auml;n pyrkiv&auml;t kulkijat
+kohti p&auml;&auml;m&auml;&auml;r&auml;&auml;ns&auml;.
+</p>
+<p class="helptext" data-demo="a">
+Suoraan kohti p&auml;&auml;m&auml;&auml;r&auml;&auml;
+ei aina ole paras suunta,
+jos pit&auml;&auml; v&auml;ist&auml;&auml; muita kulkijoita.
+</p>
+<p class="helptext" data-demo="a" data-blink="M59">
+Yksitt&auml;isen kulkijan
+voit k&auml;&auml;nt&auml;&auml;
+klikkaamalla sit&auml;.
+</p>
+<p class="helptext" data-demo="g" data-blink="askel">
+Kun jokainen kulkija on
+menossa oikeaan suuntaan,
+on aika klikata ASKEL.
+</p>
+<p class="helptext" data-demo="e" data-blink="count">
+Saatuasi pelialueen tyhj&auml;ksi
+teht&auml;v&auml;si on valmis.
+Painikkeen ASKEL päällä oleva
+luku on tuloksesi.
+</p>
+<p class="helptext" data-demo="Z">
+Pelin päätyttyä voit
+aloittaa uuden pelin,
+jos haluat.
+</p>
+<p class="helptext">
+Ennen pelin alkua voit
+valita vaikeustason.
+Voit my&ouml;s vaihtaa toiseen
+samantasoiseen peliin.
+</p>
+<p id="helpnavi">
+<span id="prevhelp" class="button round enabled">&lt;</span>
+<span id="nexthelp" class="button round enabled">&gt;</span>
+</p>
+</div>
+<table id="askel-box">
+<tr>
+<td id="count">0</td>
+</tr>
+<tr>
+<td id="askel" class="button disabled">ASKEL</td>
 </tr>
 </table>
+<div id="helpbuttonbox">
+<span id="helpbutton" class="button enabled">OHJE</span>
+</div>
+<span id="playbutton" class="button enabled">PELI</span>
+</div>
+<!-- -------------------------------------------------------------------- -->
 <script>
 
+"use strict";
+
 (function(undefined) {
-
-//  var GAME = document.getElementById("game");
-
-//
 
 // configuration tables
 
@@ -488,41 +558,71 @@ painikkeilla.
         [ -11.3,-19.5,  18.8,  6.5,   3.8,  6.5,  -3.8, 19.5 ] ];
 
   var animX = [ 0, 30, 60, 30,-30,-60,-30 ];
-  var animY = [ 0,-52, 00, 52, 52, 00,-52 ];
+  var animY = [ 0,-52,  0, 52, 52,  0,-52 ];
 
   var initDir = [
-        [ 3, 0,-1, 0, 4, 0, 0, 0, 0, 0,
-          0,-1, 0,-1, 0,-1, 0,-1, 0, 0,
-          0, 0, 0, 0, 0, 0, 2, 0,-1, 0,
-         -1, 0,-1, 0, 5, 0, 0, 0, 0, 0,
-          0, 0, 0,-1, 0,-1, 0,-1, 0,-1,
-          0, 0, 0, 0, 0, 0, 1, 0,-1, 0,
-          6 ],
-        [ 3, 0, 0, 0, 4, 0, 0,-1,-1, 0,
-          0, 0,-1,-1,-1,-1,-1, 0, 0,-1,
-         -1,-1,-1,-1,-1, 0, 2, 0,-1,-1,
-         -1,-1,-1, 0, 5, 0,-1,-1,-1,-1,
-         -1,-1, 0, 0,-1,-1,-1,-1,-1, 0,
-          0, 0,-1,-1, 0, 0, 1, 0, 0, 0,
-          6 ],
-        [ 3,-1,-1,-1, 4,-1, 0,-1,-1, 0,
-         -1,-1,-1, 0,-1, 0,-1,-1,-1,-1,
-         -1,-1,-1,-1,-1,-1, 2, 0, 0,-1,
-          0,-1, 0, 0, 5,-1,-1,-1,-1,-1,
-         -1,-1,-1,-1,-1, 0,-1, 0,-1,-1,
-         -1, 0,-1,-1, 0,-1, 1,-1,-1,-1,
-          6 ],
-        [ 3, 3,-1, 4, 4, 3, 3,-1,-1, 4,
-          4,-1,-1,-1,-1,-1,-1,-1, 2,-1,
-         -1,-1,-1,-1,-1, 5, 2, 2,-1,-1,
-         -1,-1,-1, 5, 5, 2,-1,-1,-1,-1,
-         -1,-1, 5,-1,-1,-1,-1,-1,-1,-1,
-          1, 1,-1,-1, 6, 6, 1, 1,-1, 6,
-          6 ] ];
+        [         3,  0, -1,  0,  4,
+                0,  0,  0,  0,  0,  0,
+             -1,  0, -1,  0, -1,  0, -1,
+            0,  0,  0,  0,  0,  0,  0,  0,
+          2,  0, -1,  0, -1,  0, -1,  0,  5,
+            0,  0,  0,  0,  0,  0,  0,  0,
+             -1,  0, -1,  0, -1,  0, -1,
+                0,  0,  0,  0,  0,  0,
+                  1,  0, -1,  0,  6          ],
+        [         3,  0,  0,  0,  4,
+                0,  0, -1, -1,  0,  0,
+              0, -1, -1, -1, -1, -1,  0,
+            0, -1, -1, -1, -1, -1, -1,  0,
+          2,  0, -1, -1, -1, -1, -1,  0,  5,
+            0, -1, -1, -1, -1, -1, -1,  0,
+              0, -1, -1, -1, -1, -1,  0,
+                0,  0, -1, -1, 0,  0,
+                  1,  0,  0,  0,  6          ],
+        [         3, -1, -1, -1,  4,
+               -1,  0, -1, -1,  0, -1,
+             -1, -1,  0, -1,  0, -1, -1,
+           -1, -1, -1, -1, -1, -1, -1, -1,
+          2,  0,  0, -1,  0, -1,  0,  0,  5,
+           -1, -1, -1, -1, -1, -1, -1, -1,
+             -1, -1,  0, -1,  0, -1, -1,
+               -1,  0, -1, -1,  0, -1,
+                  1, -1, -1, -1,  6          ],
+        [         3,  3, -1,  4,  4,
+                3,  3, -1, -1,  4,  4,
+             -1, -1, -1, -1, -1, -1, -1,
+            2, -1, -1, -1, -1, -1, -1,  5,
+          2,  2, -1, -1, -1, -1, -1,  5,  5,
+            2, -1, -1, -1, -1, -1, -1,  5,
+             -1, -1, -1, -1, -1, -1, -1,
+                1,  1, -1, -1,  6,  6,
+                  1,  1, -1,  6,  6          ] ];
+
+  var initDemo = {
+     t: { dir: [           4,  0,  0,  0,  0          ],
+        color: [           4,  0,  0,  0,  0          ] },
+     p: { dir: [           4,  0,  0,  0,  3          ],
+        color: [           4,  0,  0,  0,  4          ] },
+     i: { dir: [         0,  2,  5,  3,  5,  0,
+                           0,  4,  0,  1,  0          ],
+        color: [         0,  4,  3,  3,  4,  0,
+                           0,  3,  0,  4,  0          ] },
+     w: { dir: [         0,  3,  0,  0,  4,  0,
+                           0,  2,  0,  4,  0          ],
+        color: [         0,  4,  0,  0,  3,  0,
+                           0,  3,  0,  4,  0          ] },
+     a: { dir: [         0,  4,  0,  0,  3,  0,
+                           0,  2,  0,  5,  0          ],
+        color: [         0,  4,  0,  0,  3,  0,
+                           0,  3,  0,  4,  0          ] },
+     g: { dir: [         0,  4,  0,  0,  3,  0,
+                           0,  2,  0,  6,  0          ],
+        color: [         0,  4,  0,  0,  3,  0,
+                           0,  3,  0,  4,  0          ] } };
 
   var colorCode = [ "c0", "c1", "c2", "c3", "c4", "c5", "c6" ];
 
-// Display elements
+// Game elements
 
   var PLACE = [];
 
@@ -536,16 +636,16 @@ painikkeilla.
   var MARK = [];
 
   for (var xin = 0; xin < 67; xin++) {
-    MARK[xin] = document.getElementById("m"+xin);
+    MARK[xin] = document.getElementById("M"+xin);
   }
 
   var GOAL = [ null,
-               document.getElementById("g1"),
-               document.getElementById("g2"),
-               document.getElementById("g3"),
-               document.getElementById("g4"),
-               document.getElementById("g5"),
-               document.getElementById("g6") ];
+               document.getElementById("G1"),
+               document.getElementById("G2"),
+               document.getElementById("G3"),
+               document.getElementById("G4"),
+               document.getElementById("G5"),
+               document.getElementById("G6") ];
   for (var xin = 1; xin < 7; xin++) {
     GOAL[xin].onmouseover = inGoal;
     GOAL[xin].onmousedown = clickGoal;
@@ -555,42 +655,198 @@ painikkeilla.
     MARK[60+xin].onmouseout = outGoal;
   }
 
-  var L0 = document.getElementById("l0");
-  L0.onmousedown = pressLevel;
-  L0.onmouseup = releaseLevel;
-  L0.onmouseout = releaseLevel;
-  var L1 = document.getElementById("l1");
-  L1.onmousedown = pressLevel;
-  L1.onmouseup = releaseLevel;
-  L1.onmouseout = releaseLevel;
-  var L2 = document.getElementById("l2");
-  L2.onmousedown = pressLevel;
-  L2.onmouseup = releaseLevel;
-  L2.onmouseout = releaseLevel;
-  var L3 = document.getElementById("l3");
-  L3.onmousedown = pressLevel;
-  L3.onmouseup = releaseLevel;
-  L3.onmouseout = releaseLevel;
-  var LEVEL = [L0, L1, L2, L3];
+  var COUNT = document.getElementById("count");
+
+  var FINALBOX = document.getElementById("finalbox");
+
+  var ASKEL = document.getElementById("askel");
+
+// Control elements
+
+  var MAINBOX = document.getElementById("mainbox");
+
+  var buttonAction = {};
+
+  var BUTTONS = document.getElementsByClassName("button");
+  for (var i = 0; i < BUTTONS.length; i++) {
+    var id = BUTTONS[i].id;
+    BUTTONS[i].onmousedown = onButtonDown;
+    BUTTONS[i].onmouseup = onButtonUp;
+    BUTTONS[i].onmouseout = onButtonUp;
+  }
+
+  var PLAYBUTTON = document.getElementById("playbutton");
+
+  var LEVELBUTTON = [
+    document.getElementById("l0"),
+    document.getElementById("l1"),
+    document.getElementById("l2"),
+    document.getElementById("l3") ];
 
   var GAMEID = document.getElementById("gameid");
   GAMEID.oninput = setGameId;
+  GAMEID.value = "1";
+  var gameId = [];
+  for (var i = 0; i < LEVELBUTTON.length; i++) {
+    gameId[i] = "1";
+  }
 
-  var NEXTGAME = document.getElementById("nextgame");
-  NEXTGAME.onmousedown = nextGameId;
+  var LEVELBOX = document.getElementById("levelbox");
 
-  var ASKEL = document.getElementById("askel");
-  ASKEL.onmousedown = doMove;
-  ASKEL.onmouseup = outMove;
-  ASKEL.onmouseout = outMove;
+  var HELPNAVI = document.getElementById("helpnavi");
 
-  var COUNT = document.getElementById("count");
+// Help texts
 
-  var VALMIS = document.getElementById("valmis");
+  var HELPBOX = document.getElementById("helpbox");
+  var HELPTEXT = HELPBOX.getElementsByClassName("helptext");
+  var lastHelp = HELPTEXT.length - 1;
+  var helpDemo = [];
+  var helpBlink = [];
+  for (var i = 0; i < HELPTEXT.length; i++) {
+    if (HELPTEXT[i].hasAttribute("data-demo")) {
+      helpDemo[i] = HELPTEXT[i].getAttribute("data-demo");
+    } else {
+      helpDemo[i] = 0;
+    }
+    if (HELPTEXT[i].hasAttribute("data-blink")) {
+      helpBlink[i] = document.getElementById(
+                         HELPTEXT[i].getAttribute("data-blink"));
+    } else {
+      helpBlink[i] = null;
+    }
+  }
+
+// Button management
+
+  var blinkingTimer = null;
+  var BLINKING = null;
+  var blinkCount = 0;
+
+  function isButtonState(ELEM, state) {
+    var className = ELEM.className;
+    return ( className.endsWith(state)
+          || ( className.endsWith("pressed")
+            && ELEM.getAttribute("user-state") == state ) );
+  }
+
+  function setButtonStateNow(ELEM, newState) {
+    var className = ELEM.className;
+    var p = className.lastIndexOf(" ");
+    if (p < 0) p = className.length;
+    ELEM.className = className.substring(0, p) + " " + newState;
+  }
+
+  function setButtonState(ELEM, newState) {
+    if (isButtonState(ELEM, newState)) return;
+    if (isButtonState(ELEM, "pressed")) {
+      ELEM.setAttribute("user-state", newState);
+    } else {
+      setButtonStateNow(ELEM, newState);
+    }
+  }
+
+  function setButtonPressed(ELEM) {
+    blink(null);
+    var className = ELEM.className;
+    if (className.endsWith("pressed")) return;
+    var p = className.lastIndexOf(" ");
+    if (p < 0) p = className.length;
+    ELEM.setAttribute("user-state", className.substring(p + 1));
+    setButtonStateNow(ELEM, "pressed");
+  }
+
+  function onButtonDown() {
+    if (!isButtonState(this, "disabled")) {
+      blink(null);
+      var className = this.className;
+      if (!className.endsWith("pressed")) {
+        var p = className.lastIndexOf(" ");
+        if (p < 0) p = className.length;
+        this.setAttribute("user-state", className.substring(p + 1));
+        setButtonStateNow(this, "pressed");
+      }
+      (buttonAction[this.id])(this);
+    }
+  }
+
+  function onButtonUp() {
+    if (this.className.endsWith("pressed")) {
+      var nextState = this.getAttribute("user-state");
+      if (nextState) {
+        setButtonStateNow(this, nextState);
+      } else {
+        setButtonStateNow(this, "enabled");
+      }
+      this.setAttribute("user-state", "");
+    }
+  }
+
+  function blink(ELEM) {
+    if (BLINKING) {
+      clearInterval(blinkingTimer);
+      blinkingTimer = null;
+      var key = BLINKING.id.charAt(0);
+      if (key == 'G') {
+        BLINKING.setAttribute("stroke-width", 8);
+      } else if (key == 'M') {
+        BLINKING.setAttribute("opacity", 1);
+      } else {
+        BLINKING.style.backgroundColor = "";
+      }
+    }
+    BLINKING = ELEM;
+    blinkCount = 0;
+    if (ELEM) {
+      var key = ELEM.id.charAt(0);
+      if (key == 'G') {
+        blinkingTimer = setInterval(doBlinkGoal, 500);
+      } else if (key == 'M') {
+        blinkingTimer = setInterval(doBlinkMark, 500);
+      } else {
+        blinkingTimer = setInterval(doBlinkButton, 500);
+      }
+    }
+  }
+
+  function doBlinkButton() {
+    if (blinkCount > 5 && blinkCount < 13) {
+      if (blinkCount & 1) {
+        BLINKING.style.backgroundColor = "yellow";
+      } else {
+        BLINKING.style.backgroundColor = "";
+      }
+    }
+    blinkCount = (blinkCount + 1) % 30;
+  }
+
+  function doBlinkGoal() {
+    if (blinkCount > 5 && blinkCount < 13) {
+      if (blinkCount & 1) {
+        BLINKING.setAttribute("stroke-width", 0);
+      } else {
+        BLINKING.setAttribute("stroke-width", 8);
+      }
+    }
+    blinkCount = (blinkCount + 1) % 30;
+  }
+
+  function doBlinkMark() {
+    if (blinkCount > 5 && blinkCount < 13) {
+      if (blinkCount & 1) {
+        BLINKING.setAttribute("opacity", 0);
+      } else {
+        BLINKING.setAttribute("opacity", 1);
+      }
+    }
+    blinkCount = (blinkCount + 1) % 30;
+  }
 
 // Game state
 
   var gameStatus = 0;
+      // 0: initial state, level panel visible
+      // 1: game on
+      // 2: final state, board empty, final message
   var level = 0;
 
   var markDir = [];
@@ -610,14 +866,15 @@ painikkeilla.
          = [ 0x1111111120ae, 0x222222222293, 0x33333333333d, 0x444444444449 ];
 
   function reset_random() {
-    last_random = first_random[level];
-    var seed = GAMEID.value;
+    last_random = first_random[level < 0 ? 0 : level];
+    var seed = (level < 0 ? "1" : gameId[level]);
     var first = true;
     for (var i = 0; i < seed.length; i++) {
       var c = seed.charCodeAt(i);
-      if (c > 0x20 && (!first || c != 0x30) && c != 0x5f) {
+      if (c > 0x20 && (!first || c != 0x30) && c != 0x5f && c != 0x7f) {
         if (c == 0x2c) c = 0x2e;
         last_random = ((last_random + c) * 0x810500020001) % 0x7ffffffffff;
+        first = (c < '0' || c > '9');
       }
     }
   }
@@ -705,6 +962,7 @@ painikkeilla.
   function checkMoves() {
     for (var xin = 0; xin < 67; xin++) {
       markFr[xin] = -1;
+      setMark(xin);
     }
     for (var xin = 0; xin < 61; xin++) {
       var dir = markDir[xin];
@@ -758,9 +1016,10 @@ painikkeilla.
     }
     for (var xin = 0; xin < 61; xin++) {
       var xinFr = markFr[xin];
+      var effLevel = (level < 0 ? 0 : level);
       var indication = (xinFr > -2 ? -1 : xinFr > -4 ? 2 : xinFr > -5 ? 1 : 0);
-      PLACE[xin].setAttribute("class", indication < level ? "place" :
-            indication == level ? "place-weak" : "place-strong");
+      PLACE[xin].setAttribute("class", indication < effLevel ? "place" :
+            indication == effLevel ? "place-weak" : "place-strong");
     }
   }
 
@@ -770,17 +1029,12 @@ painikkeilla.
       if (markDir[xin] > 0) {
         markDir[xin] = 1 + (markDir[xin] % 6);
       }
-      setMark(xin);
       checkMoves();
     }
   }
 
-  function doMove() {
-    if (gameStatus < 2 && time_left == 0) {
-      if (gameStatus < 1) {
-        setStatus(1);
-      }
-      ASKEL.setAttribute("class", "askel-pressed");
+  buttonAction["askel"] = function () {
+    if (time_left == 0) {
       count++;
       COUNT.innerHTML = count;
       var oldDir = markDir;
@@ -805,12 +1059,6 @@ painikkeilla.
     }
   }
 
-  function outMove() {
-    if (gameStatus < 2) {
-      ASKEL.setAttribute("class", "askel-enabled");
-    }
-  }
-
   function doAnimation() {
     if (timer != null) {
       time_left--;
@@ -825,117 +1073,373 @@ painikkeilla.
           alignMarks();
         }
         checkMoves();
-        var remaining_cnt = 0;
-        for (var xin = 0; xin < 67; xin++) {
-          if (xin < 61 && markColor[xin] > 0) {
-            remaining_cnt++;
+        if (helpPage < 0) {
+          var remaining_cnt = 0;
+          for (var xin = 0; xin < 61; xin++) {
+            if (markColor[xin] > 0) {
+              remaining_cnt++;
+            }
           }
-          setMark(xin);
-        }
-        if (remaining_cnt == 0) {
-          setStatus(2);
+          if (remaining_cnt == 0) {
+            setStatus(2);
+          }
         }
       }
+    }
+  }
+
+// Help management
+
+  var helpPage = 0;
+  var levelHelpPage = 3;
+  var demoHelpPage = 3;
+
+  var interruptedState = {
+    level: -1,
+    count: -1,
+    dir: [],
+    color: [] };
+
+  function interruptGame() {
+    if (interruptedState.level < 0) {
+      interruptedState.level = level;
+      interruptedState.count = count;
+      interruptedState.dir = [...markDir];
+      interruptedState.color = [...markColor];
+      count = 0;
+    }
+  }
+
+  function continueGame() {
+    if (interruptedState.level >= 0) {
+      level = interruptedState.level;
+      count = interruptedState.count;
+      COUNT.innerHTML = count;
+      markDir = [...interruptedState.dir];
+      markColor = [...interruptedState.color];
+      interruptedState.level = -1;
+      checkMoves();
+    }
+  }
+
+  function resetDemo(demo) {
+    level = -1;
+    if (initDemo[demo]) {
+      initializeBoard(initDemo[demo].dir, initDemo[demo].color);
+    } else {
+      initializeBoard(null, null);
+    }
+    count = 0;
+    COUNT.innerHTML = "0";
+    checkMoves();
+  }
+
+  function showHelp(page) {
+      // page == -1 : help off
+      //          0 : intro
+      //          1 : meta help
+      //          2 .. lastHelp : game help
+    if (page == helpPage) return;
+    if (helpPage >= 0 && helpPage < HELPTEXT.length) {
+      HELPTEXT[helpPage].style.display = "none";
+    }
+    if (page < 0 || page > lastHelp) {
+      continueGame();
+      if (gameStatus != 1) {
+        PLAYBUTTON.style.display = "inline";
+        LEVELBOX.style.display = "block";
+        setButtonState(ASKEL, "disabled");
+      } else {
+        PLAYBUTTON.style.display = "none";
+        LEVELBOX.style.display = "none";
+        setButtonState(ASKEL, "enabled");
+      }
+      HELPBOX.style.display = "none";
+      helpPage = -1;
+      blink(null);
+    } else {
+      if (helpDemo[page]) {
+        interruptGame();
+        resetDemo(helpDemo[page]);
+        count = 20;
+        COUNT.innerHTML = count;
+        if (helpDemo[page] == "Z") {
+          LEVELBOX.style.display = "block";
+          setButtonState(ASKEL, "disabled");
+        } else {
+          LEVELBOX.style.display = "none";
+          if (helpDemo[page] == "e") {
+            setButtonState(ASKEL, "disabled");
+          } else {
+            setButtonState(ASKEL, "enabled");
+          }
+        }
+      } else {
+        continueGame();
+        if (gameStatus != 1 || count == 0) {
+          LEVELBOX.style.display = "block";
+        } else {
+          LEVELBOX.style.display = "none";
+        }
+        setButtonState(ASKEL, "disabled");
+      }
+      if (page > 2) {
+        if (gameStatus != 1) {
+          levelHelpPage = page;
+        } else {
+          demoHelpPage = page;
+        }
+      }
+      HELPBOX.style.display = "block";
+      HELPTEXT[page].style.display = "block";
+      if (page > 0) {
+        HELPNAVI.style.display = "block";
+      } else {
+        HELPNAVI.style.display = "none";
+      }
+      PLAYBUTTON.style.display = "inline";
+      helpPage = page;
+      blink(helpBlink[page]);
+    }
+  }
+
+  buttonAction["helpbutton"] = function () {
+    if (helpPage == 1) {
+      showHelp(2);
+    } else if (helpPage < 3) {
+      if (gameStatus != 1 && levelHelpPage > demoHelpPage) {
+        showHelp(levelHelpPage);
+      } else {
+        showHelp(demoHelpPage);
+      }
+    } else {
+      showHelp(1);
+    }
+  }
+
+  buttonAction["prevhelp"] = function () {
+    if (helpPage < 2) {
+      if (gameStatus != 1 && levelHelpPage > demoHelpPage) {
+        showHelp(levelHelpPage);
+      } else {
+        showHelp(demoHelpPage);
+      }
+    } else if (helpPage > 2) {
+      showHelp(helpPage - 1);
+    } else {
+      showHelp(lastHelp);
+    }
+  }
+
+  buttonAction["nexthelp"] = function () {
+    if (helpPage < lastHelp) {
+      showHelp(helpPage + 1);
+    } else {
+      showHelp(2);
     }
   }
 
 // Setup functions
 
-  function reset(newLevel) {
-    level = newLevel;
-    if (level < 0) {
-      level = 0;
-    } else if (newLevel >= initDir.length) {
-      level = initDir.length - 1;
-    }
-    setStatus(0);
+  document.body.onresize = function () {
+    var hgt = window.innerHeight;
+    var wdt = window.innerWidth;
+    var scaleH = hgt / 622;
+    var scaleW = wdt / 722;
+    var scale = (scaleH < scaleW ? scaleH : scaleW);
+    MAINBOX.style.transform = "scale("+scale+")";
+  }
+
+  function initializeBoard(boardDir, boardColor) {
     reset_random();
-    resetDir = initDir[level];
-    for (var xin = 0; xin < 61; xin++) {
-      var dir = resetDir[xin];
+    var fst = 61 - (boardDir ? boardDir.length : 0);
+    for (var xin = 0; xin < fst; xin++) {
+      markDir[xin] = 0;
+      markColor[xin] = 0;
+    }
+    for (var xin = fst; xin < 61; xin++) {
+      var dir = boardDir[xin - fst];
       if (dir < 0) {
         dir = 1 + Math.floor((6 - (dir + 1)/10) * random());
         if (dir > 6) dir = 0;
+        markColor[xin] = dir;
+      } else {
+        markColor[xin] = boardColor[xin - fst];
       }
       markDir[xin] = dir;
     }
     for (var xin = 61; xin < 67; xin++) {
       markDir[xin] = xin - 60;
-    }
-    for (var xin = 0; xin < 67; xin++) {
       markColor[xin] = markDir[xin];
-      markFr[xin] = -2;
-      setMark(xin);
     }
     checkMoves();
   }
 
-  function pressLevel() {
+  function reset() {
+    if (level < 0) {
+      level = 0;
+    } else if (level >= initDir.length) {
+      level = initDir.length - 1;
+    }
+    setStatus(0);
+    initializeBoard(initDir[level], initDir[level]);
+    showHelp(-1);
+  }
+
+  function levelButtonAction(ELEM) {
+    showHelp(-1);
     if (gameStatus != 1) {
-      reset(Number(this.id.substring(1)));
-      LEVEL[level].setAttribute("class", "pressed");
+      for (var i = 0; i < LEVELBUTTON.length; i++) {
+        if (LEVELBUTTON[i] != ELEM) {
+          setButtonState(LEVELBUTTON[i], "enabled");
+        } else {
+          setButtonState(LEVELBUTTON[i], "selected");
+          if (i != level) {
+            count = 0;
+            COUNT.innerHTML = "0";
+          }
+        }
+      }
+      level = Number(ELEM.id.substring(1));
+      GAMEID.value = gameId[level];
+      reset();
     }
   }
 
-  function releaseLevel() {
-    if (gameStatus != 1) {
-      LEVEL[level].setAttribute("class", "selected");
-    }
+  for (var i = 0; i < LEVELBUTTON.length; i++) {
+    buttonAction[LEVELBUTTON[i].id] = levelButtonAction;
   }
 
   function setGameId() {
     if (gameStatus != 1) {
-      reset(level);
+      showHelp(-1);
+      gameId[level] = GAMEID.value;
+      reset();
     }
   }
 
-  function nextGameId() {
+  function newid(oldid, step) {
+    var sgn = 1;
+    var s = 0;
+    var z = 0;
+    var f = 0;
+    var h = 0;
+    var tc = 0;
+    for (var p = 0; p < oldid.length; p++) {
+      var ch = oldid.charAt(p);
+      var e = p + 1;
+      if (ch == '0') {
+        if (p == z) {
+          z = e;
+        } else if (sgn != step) {
+          tc++;
+        } else {
+          f = p;
+          h = e;
+        }
+      } else if (ch > '0' && ch < '9') {
+        f = p;
+        h = e;
+      } else if (ch == '9') {
+        if (sgn == step) {
+          tc++;
+        } else {
+          f = p;
+          h = e;
+        }
+      } else if (ch == '-' && sgn > 0 && p == s) {
+        sgn = -1;
+        z = e;
+      } else if (ch > ' ') {
+        sgn = 1;
+        s = e;
+      } else {
+        if (s == p) s = e;
+        if (z == p) z = e;
+        if (h == p) h = e;
+      }
+      if (z < s) z = s;
+      if (f < z) f = z;
+      if (h < f) h = f;
+      if (h == e) tc = 0;
+    }
+    var hd = (f < h ? Number(oldid.charAt(f)) : 0)
+           + (sgn == step ? 1 : -1);
+    if (sgn < 0) {
+      if (hd > 0 || (hd == 0 && (f > z || tc > 0))) {
+        s++;
+      }
+    }
+    if (hd == 0 && f == z) hd = '';
+    var td = (sgn != step ? '9' : '0');
+    var ans = oldid.substring(0, s)
+                + oldid.substring(z, f)
+                + hd
+                + td.repeat(tc);
+    if (ans.length == 0) ans = "0";
+    return ans.trim();
+  }
+
+  buttonAction["nextgame"] = function () {
     if (gameStatus != 1) {
-      var oldid = GAMEID.value;
-      var lst = oldid.length - 1;
-      while (lst >= 0 && oldid.charAt(lst) <= ' ') lst--;
-      var fst = lst;
-      while (fst >= 0 && oldid.charAt(fst) >= '0'
-                      && oldid.charAt(fst) <= '9') fst--;
-      var pre = oldid.substring(0, fst+1);
-      var num = oldid.substring(fst+1, lst+1);
-      if (num.length == 0) num = "0";
-      GAMEID.value = pre + (Number(num)+1);
-      reset(level);
+      var newGameId = newid(gameId[level], 1);
+      GAMEID.value = newGameId;
+      gameId[level] = newGameId;
+      reset();
+    }
+  }
+
+  buttonAction["prevgame"] = function () {
+    if (gameStatus != 1) {
+      showHelp(-1);
+      var newGameId = newid(gameId[level], -1);
+      GAMEID.value = newGameId;
+      gameId[level] = newGameId;
+      reset();
+    }
+  }
+
+  buttonAction["playbutton"] = function() {
+    var play = (helpPage < 0 || helpPage > lastHelp || !helpDemo[helpPage]);
+    showHelp(-1);
+    if (play && gameStatus != 1) {
+      if (gameStatus > 1) {
+        reset();
+      }
+      setStatus(1);
     }
   }
 
   function setStatus(status) {
-    GAMEID.disabled = (status == 1);
-    if (status < 2) {
-      ASKEL.setAttribute("class", "askel-enabled");
+    if (status == 0) {
+      LEVELBOX.style.display = "block";
+      ASKEL.setAttribute("class", "button enabled");
+      FINALBOX.style.display = "none";
+      gameStatus = 0;
+    } else if (status == 1) {
       count = 0;
       COUNT.innerHTML = "0";
-      VALMIS.setAttribute("fill", "black");
-      if (status == 1) {
-        LEVEL[level].setAttribute("class", "used");
-        NEXTGAME.setAttribute("class", "nextgame-disabled");
-      }
+      LEVELBOX.style.display = "none";
+      ASKEL.setAttribute("class", "button enabled");
+      FINALBOX.style.display = "none";
+      PLAYBUTTON.style.display = "none";
+      gameStatus = 1;
     } else {
-      ASKEL.setAttribute("class", "askel-disabled");
-      VALMIS.setAttribute("fill", "yellow");
-      LEVEL[level].setAttribute("class", "selected");
-      NEXTGAME.setAttribute("class", "nextgame-enabled");
-    }    
-    gameStatus = status;
-    for (var i = 0; i < LEVEL.length; i++) {
-      if (i != level) {
-        LEVEL[i].setAttribute("class", status == 1 ? "disabled" : "enabled");
-      }
+      LEVELBOX.style.display = "block";
+      ASKEL.setAttribute("class", "button disabled");
+      FINALBOX.style.display = "block";
+      PLAYBUTTON.style.display = "inline";
+      gameStatus = 2;
     }
   }
 
 // start game;
 
-  reset(0);
+  initializeBoard(initDir[0], initDir[0]);
+
+  document.body.onresize();
 
 //
-
 
 })();
 
