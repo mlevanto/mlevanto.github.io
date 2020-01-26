@@ -1,0 +1,321 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Palettieditori</title>
+<style>
+  body {
+    padding: 10px;
+  }
+  h1 {
+    margin-left: 20px;
+  }
+  .intro {
+    margin-left: 20px;
+    font-weight: bold;
+  }
+  div {
+    margin: 10px;
+    border: 1px solid black;
+    padding: 10px;
+  }
+  button {
+    background-color: blue;
+    color: white;
+  }
+  input {
+    font-family: monospace;
+    font-size: 12px;
+  }
+  #editor input {
+    text-align: right;
+  }
+  #editor table {
+    border-collapse: collapse;
+    margin: 10px;
+    border: 1px solid black;
+  }
+  #editor th {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  #editor td {
+    padding: 15px 5px;
+  }
+  #editor td input {
+    border: none;
+  }
+</style>
+</head>
+<body>
+<h1>Palettieditori</h1>
+<p class="intro">T&#xE4;ll&#xE4; sivulla voit luoda ja muokata RIFF-palettitiedostoja.</p>
+<div style="display:none">
+  <input id="fileInput" type="file">
+  <a id="download" href="data:," download="--roska--"></a>
+</div>
+<div style="border: 1px solid black; padding: 10px; margin 20px;">
+  <p><button id="load" style="border: 1px solid black;">Avaa ...</button>
+  <input id="name" type="text" size="40" value="uusi.pal">
+  <button id="save" style="border: 1px solid black;">Tallenna</button></p>
+</div>
+<div id="editor">
+Paletin koko: <input id="palettesize" type="text" size="4"/>
+<table id="palette">
+</tr>
+</table>
+</div>
+<script>
+
+(function () {
+
+  var palette = [
+    0x000000,0x0000AA,0x00AA00,0x00AAAA,0xAA0000,0xAA00AA,0xAA5500,0xAAAAAA,
+    0x555555,0x5555FF,0x55FF55,0x55FFFF,0xFF5555,0xFF55FF,0xFFFF55,0xFFFFFF ];
+
+  var PALETTE = document.getElementById("palette");
+
+  var PALETTESIZE = document.getElementById("palettesize");
+
+  function resizePalette() {
+    var newSize = Number(PALETTESIZE.value);
+    if (isNaN(newSize) || !newSize) {
+      PALETTESIZE.value = palette.length;
+      return;
+    }
+    if (newSize < palette.length) {
+      palette.splice(newSize);
+    }
+    while (palette.length < newSize) {
+      palette.push(0);
+    }
+    showPalette();
+  }
+
+  PALETTESIZE.onchange = resizePalette;
+
+  function showPalette() {
+    PALETTESIZE.value = palette.length;
+    PALETTE.innerHTML = "";
+    var rowCnt = Math.ceil(palette.length / 16);
+    var colCnt = (palette.length < 16 ? palette.length : 16);
+    var HEADROW = document.createElement("tr");
+    PALETTE.appendChild(HEADROW);
+    HEADROW.appendChild(document.createElement("th"));
+    for (var col = 0; col < colCnt; col++) {
+      var TH = document.createElement("th");
+      TH.innerHTML = formatHex(col, 1);
+      HEADROW.appendChild(TH);
+    }
+    for (var row = 0; row < rowCnt; row++) {
+      var ROW = document.createElement("tr");
+      PALETTE.appendChild(ROW);
+      var TH = document.createElement("th");
+      ROW.appendChild(TH);
+      TH.innerHTML = formatHex(row, 1);
+      for (var col = 0; col < colCnt; col++) {
+        var xin = 16 * row + col;
+        if (xin < palette.length) {
+          var TD = document.createElement("td");
+          ROW.appendChild(TD);
+          var INPUT = document.createElement("input");
+          TD.appendChild(INPUT);
+          INPUT.type = "text";
+          INPUT.size = 6;
+          INPUT.value = formatHex(palette[xin], 6);
+          INPUT.onchange = recolor;
+          INPUT.oninput = recolor;
+          TD.style.backgroundColor = "#"+INPUT.value;
+        }
+      }
+    }
+  }
+
+  showPalette();
+
+  function recolor(event) {
+    var newImg = this.value;
+    var newVal = Number("0x"+newImg);
+    var tstImg = formatHex(newVal, 6);
+    var xin = Number(this.id.substring(1));
+    if (newImg.toUpperCase() == tstImg) {
+      this.parentElement.style.backgroundColor = "#"+tstImg;
+      if (event.type == "change") {
+        this.value = tstImg;
+        palette[xin] = newVal;
+      }
+    } else if (event.type == "change") {
+      this.value = palette[xin];
+    }
+  }
+
+  function formatHex(value, width) {
+    var img = value.toString(16).toUpperCase();
+    if (img.length < width) {
+      img = ("000000000000000" + img).substr(-width);
+    }
+    return img;
+  }
+
+  function readChars(data, pos, len) {
+    var ans = [];
+    for (var i = 0; i < len && pos + i < data.length; i++) {
+      ans[i] = data.charAt(pos + i);
+    }
+    return ans.join('');
+  }
+
+  function readInt(data, pos, len) {
+    var ans = 0;
+    for (var i = 0; i < len && pos + i < data.length; i++) {
+      ans = ans + ((1 << (8 * i)) * data.charCodeAt(pos + i));
+    }
+    return ans;
+  }
+
+  var NAME = document.getElementById("name");
+  var CONTENT = document.getElementById("content");
+
+  var FILEINPUT = document.getElementById("fileInput");
+
+  var reader = new FileReader();
+
+  FILEINPUT.onchange = function() {
+    if (busy) {
+      alert("Yrit\u00E4 uudelleen my\u00F6hemmin");
+      busy = false;
+      return;
+    }
+    busy = true;
+    var NAME = document.getElementById("name");
+    var files = FILEINPUT.files;
+    if (files.length == 0) {
+      NAME.innerHTML = "<i>No file</i>";
+      return;
+    }
+    var myFile = files[0];
+    NAME.value = myFile.name;
+    reader.onload = function() {
+      var data = reader.result;
+      var dump = "";
+      var signature = readChars(data, 0, 4);
+      var filelength = readInt(data, 4, 4);
+      var filetype = readChars(data, 8, 4);
+      var chunkpos = 12;
+      var datapos = 0;
+      var datacnt = 0;
+      while (chunkpos < data.length && datapos == 0) {
+        var chunktype = readChars(data, chunkpos, 4);
+        var chunksize = readInt(data, chunkpos + 4, 4);
+        if (chunktype == "data") {
+          datacnt = readInt(data, chunkpos + 10, 2);
+          datapos = chunkpos + 12;
+        }
+        chunkpos = chunkpos + 8 + chunksize;
+        if (chunkpos % 2 != 0) chunkpos++;
+      }
+      if (signature != "RIFF" || filetype != "PAL " || datapos == 0) {
+        alert("Ei ole RIFF-palettitiedosto");
+        busy = false;
+        return;
+      }
+      palette = [];
+      for (var xin = 0; xin < datacnt; xin++) {
+        var pos = datapos + 4 * xin;
+        palette[xin] = (readInt(data, pos, 1) << 16)
+                     + (readInt(data, pos+1, 1) << 8)
+                     + (readInt(data, pos+2, 1));
+      }
+      showPalette();
+      busy = false;
+    };
+    reader.onloadend = function () {
+      busy = false;
+    }
+    reader.readAsBinaryString(myFile);
+  }
+
+  var LOAD = document.getElementById("load");
+  var busy = false;
+  LOAD.onmousedown = function() {
+    if (!busy) {
+      FILEINPUT.click();
+    } else {
+      alert("Yrit\u00E4 uudelleen my\u00F6hemmin");
+      busy = false;
+    }
+  }
+
+  var content = [];
+
+  var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  function encodeContent() {
+    var ans = ['data:image/image/vnd.zbrush.pcx;base64,'];
+    for (var p = 0; p < content.length; p = p + 3) {
+      ans.push(b64[(content[p] & 0xFC) >> 2]);
+      if (p + 1 < content.length) {
+        ans.push(b64[((content[p] & 0x03) << 4)|((content[p+1] & 0xF0) >> 4)]);
+        if (p + 2 < content.length) {
+          ans.push(b64[ ((content[p+1] & 0x0F) << 2)
+                      | ((content[p+2] & 0xC0) >> 6) ]);
+          ans.push(b64[content[p+2] & 0x3F]);
+        } else {
+          ans.push(b64[((content[p+1] & 0x0F) << 2)]);
+          ans.push('=');
+        }
+      } else {
+        ans.push(b64[((content[p] & 0x03) << 4)]);
+        ans.push('=');
+        ans.push('=');
+      }
+    }
+    return ans.join('');
+  }
+
+  function putChars(chars) {
+    for (var i = 0; i < chars.length; i++) {
+      content.push(chars.charCodeAt(i) & 0xFF);
+    }
+  }
+
+  function putInt(val, len) {
+    var more = val;
+    for (var i = 0; i < len; i++) {
+      content.push(more & 0xFF);
+      more = more >> 8;
+    }
+  }
+
+  function encodeFile() {
+    content = [];
+    putChars("RIFF");
+    putInt(16 + 4 * palette.length, 4);
+    putChars("PAL ");
+    putChars("data");
+    putInt(4 + 4 * palette.length, 4);
+    putInt(0x0300, 2);
+    putInt(palette.length, 2);
+    for (var xin = 0; xin < palette.length; xin++) {
+      var color = palette[xin];
+      putInt((color >> 16) & 0xFF, 1);
+      putInt((color >> 8) & 0xFF, 1);
+      putInt(color & 0xFF, 1);
+      putInt(0, 1);
+    }
+    return encodeContent();
+  }
+
+  var DOWNLOAD = document.getElementById("download");
+
+  var SAVE = document.getElementById("save");
+
+  SAVE.onmousedown = function () {
+      DOWNLOAD.href = encodeFile();
+      DOWNLOAD.download = NAME.value;
+      DOWNLOAD.click();
+  };
+
+}) () ;
+</script>
+</body>
+</html>
