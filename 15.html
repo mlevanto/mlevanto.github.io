@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    text-align: center;
+    padding: 50px;
+  }
+  #game {
+    height: 300px;
+  }
+  span {
+    position: relative;
+    display: inline-block;
+  }
+  span div {
+    position: relative;
+    top: 100px;
+    border: 1px solid black;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 36px;
+    padding: 10px;
+    margin: 10px;
+  }
+  span .table:hover {
+    background-color: #AACCFF;
+  }
+  span .player {
+    top: 180px;
+  }
+  span .me {
+    top: 20px;
+  }
+  p {
+    display: none;
+  }
+  .r-draw p.r-draw {
+    display: block;
+  }
+  .r-player p.r-player {
+    display: block;
+  }
+  .r-me p.r-me {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<h1>15</h1>
+Vuorotellen kumpikin pelaaja valitsee itselleen kortin.
+Tavoite on saada kolme korttia, joiden summa on 15.
+<div id="game">
+<span><div class="table">1</div></span>
+<span><div class="table">2</div></span>
+<span><div class="table">3</div></span>
+<span><div class="table">4</div></span>
+<span><div class="table">5</div></span>
+<span><div class="table">6</div></span>
+<span><div class="table">7</div></span>
+<span><div class="table">8</div></span>
+<span><div class="table">9</div></span>
+</div>
+<div id="result" class="on">
+<p class="r-draw">Tasapeli</p>
+<p class="r-player">Sinä voitit</p>
+<p class="r-me">Minä voitin</p>
+</div>
+<script>
+(function () {
+
+  var table = document.getElementsByClassName("table");
+
+  var hands = { player: document.getElementsByClassName("player"),
+                me: document.getElementsByClassName("me") };
+
+  var result = document.getElementById("result");
+
+  var winner = null;
+
+  function play(p, c) {
+    if (result.className == "on" && c.className == "table") {
+      var hand = hands[p];
+      c.className = p;
+      for (var i = 2; !winner && i < hand.length; i++) {
+        for (var j = 1; !winner && j < i; j++) {
+          for (var k = 0; !winner && k < j; k++) {
+            if ( Number(hand[i].innerHTML)
+               + Number(hand[j].innerHTML)
+               + Number(hand[k].innerHTML) == 15 )
+            {
+              winner = p;
+              result.className = "r-"+p;
+              return false;
+            }
+          }
+        }
+      }
+      if (table.length == 0) {
+        result.className = "r-draw";
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  for (var x = 0; x < table.length; x++) {
+    table[x].onmousedown = function(event) {
+      if (play("player", this)) {
+        var m = Math.floor(table.length * Math.random());
+        play("me", table[m]);
+      }
+    }
+  }
+})();
+</script>
+</body>
+</html>
