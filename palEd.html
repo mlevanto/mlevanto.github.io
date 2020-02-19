@@ -26,27 +26,27 @@
     font-family: monospace;
     font-size: 12px;
   }
-  #editor input {
-    text-align: right;
+  #paletteEditor input {
+    text-align: center;
   }
-  #editor table {
+  #paletteEditor table {
     border-collapse: collapse;
     margin: 10px;
     border: 1px solid black;
   }
-  #editor th {
+  #paletteEditor th {
     border: 1px solid black;
     padding: 5px;
   }
-  #editor td {
+  #paletteEditor td {
     padding: 15px 5px;
   }
-  #editor td input {
+  #paletteEditor td input {
     border: none;
   }
-  #editor .v {
+  #paletteEditor .v {
   }
-  #editor .h {
+  #paletteEditor .h {
     display: none;
   }
 </style>
@@ -60,17 +60,335 @@ RIFF-palettitiedostoja.</p>
   <a id="download" href="data:," download="--roska--"></a>
 </div>
 <div style="border: 1px solid black; padding: 10px; margin 20px;">
-  <p><button id="load" style="border: 1px solid black;">Avaa ...</button>
-  <input id="name" type="text" size="40" value="uusi.pal">
-  <button id="save" style="border: 1px solid black;">Tallenna</button></p>
+  <p><button id="paletteLoad" style="border: 1px solid black;">Avaa ...</button>
+  <input id="paletteName" type="text" size="40" value="uusi.pal">
+  <button id="paletteSave" style="border: 1px solid black;">Tallenna</button></p>
 </div>
-<div id="editor">
+<div id="paletteEditor">
 Paletin koko: <input id="palettesize" type="text" size="4"/>
-<table id="palette">
-<tr id="headrow"><th></th><th class="colhead">0</th></tr>
-<tr class="datarow V">
-<th>0</th><td class="datacell">
-<input type="text" size="6" id="i0"></td>
+<table id= "palette" style="z-index: -1">
+<tr id="paletteHeadRow">
+<th></th>
+<th id="pch0" class="paletteColHead">0</th>
+<th id="pch1" class="paletteColHead">1</th>
+<th id="pch2" class="paletteColHead">2</th>
+<th id="pch3" class="paletteColHead">3</th>
+<th id="pch4" class="paletteColHead">4</th>
+<th id="pch5" class="paletteColHead">5</th>
+<th id="pch6" class="paletteColHead">6</th>
+<th id="pch7" class="paletteColHead">7</th>
+<th id="pch8" class="paletteColHead">8</th>
+<th id="pch9" class="paletteColHead">9</th>
+<th id="pchA" class="paletteColHead">A</th>
+<th id="pchB" class="paletteColHead">B</th>
+<th id="pchC" class="paletteColHead">C</th>
+<th id="pchD" class="paletteColHead">D</th>
+<th id="pchE" class="paletteColHead">E</th>
+<th id="pchF" class="paletteColHead">F</th>
+</tr>
+<tr id="pr0" class="paletteDataRow">
+<th id="prh0">0</th>
+<td id="pd00"><input type="text" size="6"></td>
+<td id="pd01"><input type="text" size="6"></td>
+<td id="pd02"><input type="text" size="6"></td>
+<td id="pd03"><input type="text" size="6"></td>
+<td id="pd04"><input type="text" size="6"></td>
+<td id="pd05"><input type="text" size="6"></td>
+<td id="pd06"><input type="text" size="6"></td>
+<td id="pd07"><input type="text" size="6"></td>
+<td id="pd08"><input type="text" size="6"></td>
+<td id="pd09"><input type="text" size="6"></td>
+<td id="pd0A"><input type="text" size="6"></td>
+<td id="pd0B"><input type="text" size="6"></td>
+<td id="pd0C"><input type="text" size="6"></td>
+<td id="pd0D"><input type="text" size="6"></td>
+<td id="pd0E"><input type="text" size="6"></td>
+<td id="pd0F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr1" class="paletteDataRow">
+<th id="prh1">1</th>
+<td id="pd10"><input type="text" size="6"></td>
+<td id="pd11"><input type="text" size="6"></td>
+<td id="pd12"><input type="text" size="6"></td>
+<td id="pd13"><input type="text" size="6"></td>
+<td id="pd14"><input type="text" size="6"></td>
+<td id="pd15"><input type="text" size="6"></td>
+<td id="pd16"><input type="text" size="6"></td>
+<td id="pd17"><input type="text" size="6"></td>
+<td id="pd18"><input type="text" size="6"></td>
+<td id="pd19"><input type="text" size="6"></td>
+<td id="pd1A"><input type="text" size="6"></td>
+<td id="pd1B"><input type="text" size="6"></td>
+<td id="pd1C"><input type="text" size="6"></td>
+<td id="pd1D"><input type="text" size="6"></td>
+<td id="pd1E"><input type="text" size="6"></td>
+<td id="pd1F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr2" class="paletteDataRow">
+<th id="prh2">2</th>
+<td id="pd20"><input type="text" size="6"></td>
+<td id="pd21"><input type="text" size="6"></td>
+<td id="pd22"><input type="text" size="6"></td>
+<td id="pd23"><input type="text" size="6"></td>
+<td id="pd24"><input type="text" size="6"></td>
+<td id="pd25"><input type="text" size="6"></td>
+<td id="pd26"><input type="text" size="6"></td>
+<td id="pd27"><input type="text" size="6"></td>
+<td id="pd28"><input type="text" size="6"></td>
+<td id="pd29"><input type="text" size="6"></td>
+<td id="pd2A"><input type="text" size="6"></td>
+<td id="pd2B"><input type="text" size="6"></td>
+<td id="pd2C"><input type="text" size="6"></td>
+<td id="pd2D"><input type="text" size="6"></td>
+<td id="pd2E"><input type="text" size="6"></td>
+<td id="pd2F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr3" class="paletteDataRow">
+<th id="prh3">3</th>
+<td id="pd30"><input type="text" size="6"></td>
+<td id="pd31"><input type="text" size="6"></td>
+<td id="pd32"><input type="text" size="6"></td>
+<td id="pd33"><input type="text" size="6"></td>
+<td id="pd34"><input type="text" size="6"></td>
+<td id="pd35"><input type="text" size="6"></td>
+<td id="pd36"><input type="text" size="6"></td>
+<td id="pd37"><input type="text" size="6"></td>
+<td id="pd38"><input type="text" size="6"></td>
+<td id="pd39"><input type="text" size="6"></td>
+<td id="pd3A"><input type="text" size="6"></td>
+<td id="pd3B"><input type="text" size="6"></td>
+<td id="pd3C"><input type="text" size="6"></td>
+<td id="pd3D"><input type="text" size="6"></td>
+<td id="pd3E"><input type="text" size="6"></td>
+<td id="pd3F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr4" class="paletteDataRow">
+<th id="prh4">4</th>
+<td id="pd40"><input type="text" size="6"></td>
+<td id="pd41"><input type="text" size="6"></td>
+<td id="pd42"><input type="text" size="6"></td>
+<td id="pd43"><input type="text" size="6"></td>
+<td id="pd44"><input type="text" size="6"></td>
+<td id="pd45"><input type="text" size="6"></td>
+<td id="pd46"><input type="text" size="6"></td>
+<td id="pd47"><input type="text" size="6"></td>
+<td id="pd48"><input type="text" size="6"></td>
+<td id="pd49"><input type="text" size="6"></td>
+<td id="pd4A"><input type="text" size="6"></td>
+<td id="pd4B"><input type="text" size="6"></td>
+<td id="pd4C"><input type="text" size="6"></td>
+<td id="pd4D"><input type="text" size="6"></td>
+<td id="pd4E"><input type="text" size="6"></td>
+<td id="pd4F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr5" class="paletteDataRow">
+<th id="prh5">5</th>
+<td id="pd50"><input type="text" size="6"></td>
+<td id="pd51"><input type="text" size="6"></td>
+<td id="pd52"><input type="text" size="6"></td>
+<td id="pd53"><input type="text" size="6"></td>
+<td id="pd54"><input type="text" size="6"></td>
+<td id="pd55"><input type="text" size="6"></td>
+<td id="pd56"><input type="text" size="6"></td>
+<td id="pd57"><input type="text" size="6"></td>
+<td id="pd58"><input type="text" size="6"></td>
+<td id="pd59"><input type="text" size="6"></td>
+<td id="pd5A"><input type="text" size="6"></td>
+<td id="pd5B"><input type="text" size="6"></td>
+<td id="pd5C"><input type="text" size="6"></td>
+<td id="pd5D"><input type="text" size="6"></td>
+<td id="pd5E"><input type="text" size="6"></td>
+<td id="pd5F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr6" class="paletteDataRow">
+<th id="prh6">6</th>
+<td id="pd60"><input type="text" size="6"></td>
+<td id="pd61"><input type="text" size="6"></td>
+<td id="pd62"><input type="text" size="6"></td>
+<td id="pd63"><input type="text" size="6"></td>
+<td id="pd64"><input type="text" size="6"></td>
+<td id="pd65"><input type="text" size="6"></td>
+<td id="pd66"><input type="text" size="6"></td>
+<td id="pd67"><input type="text" size="6"></td>
+<td id="pd68"><input type="text" size="6"></td>
+<td id="pd69"><input type="text" size="6"></td>
+<td id="pd6A"><input type="text" size="6"></td>
+<td id="pd6B"><input type="text" size="6"></td>
+<td id="pd6C"><input type="text" size="6"></td>
+<td id="pd6D"><input type="text" size="6"></td>
+<td id="pd6E"><input type="text" size="6"></td>
+<td id="pd6F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr7" class="paletteDataRow">
+<th id="prh7">7</th>
+<td id="pd70"><input type="text" size="6"></td>
+<td id="pd71"><input type="text" size="6"></td>
+<td id="pd72"><input type="text" size="6"></td>
+<td id="pd73"><input type="text" size="6"></td>
+<td id="pd74"><input type="text" size="6"></td>
+<td id="pd75"><input type="text" size="6"></td>
+<td id="pd76"><input type="text" size="6"></td>
+<td id="pd77"><input type="text" size="6"></td>
+<td id="pd78"><input type="text" size="6"></td>
+<td id="pd79"><input type="text" size="6"></td>
+<td id="pd7A"><input type="text" size="6"></td>
+<td id="pd7B"><input type="text" size="6"></td>
+<td id="pd7C"><input type="text" size="6"></td>
+<td id="pd7D"><input type="text" size="6"></td>
+<td id="pd7E"><input type="text" size="6"></td>
+<td id="pd7F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr8" class="paletteDataRow">
+<th id="prh8">8</th>
+<td id="pd80"><input type="text" size="6"></td>
+<td id="pd81"><input type="text" size="6"></td>
+<td id="pd82"><input type="text" size="6"></td>
+<td id="pd83"><input type="text" size="6"></td>
+<td id="pd84"><input type="text" size="6"></td>
+<td id="pd85"><input type="text" size="6"></td>
+<td id="pd86"><input type="text" size="6"></td>
+<td id="pd87"><input type="text" size="6"></td>
+<td id="pd88"><input type="text" size="6"></td>
+<td id="pd89"><input type="text" size="6"></td>
+<td id="pd8A"><input type="text" size="6"></td>
+<td id="pd8B"><input type="text" size="6"></td>
+<td id="pd8C"><input type="text" size="6"></td>
+<td id="pd8D"><input type="text" size="6"></td>
+<td id="pd8E"><input type="text" size="6"></td>
+<td id="pd8F"><input type="text" size="6"></td>
+</tr>
+<tr id="pr9" class="paletteDataRow">
+<th id="prh9">9</th>
+<td id="pd90"><input type="text" size="6"></td>
+<td id="pd91"><input type="text" size="6"></td>
+<td id="pd92"><input type="text" size="6"></td>
+<td id="pd93"><input type="text" size="6"></td>
+<td id="pd94"><input type="text" size="6"></td>
+<td id="pd95"><input type="text" size="6"></td>
+<td id="pd96"><input type="text" size="6"></td>
+<td id="pd97"><input type="text" size="6"></td>
+<td id="pd98"><input type="text" size="6"></td>
+<td id="pd99"><input type="text" size="6"></td>
+<td id="pd9A"><input type="text" size="6"></td>
+<td id="pd9B"><input type="text" size="6"></td>
+<td id="pd9C"><input type="text" size="6"></td>
+<td id="pd9D"><input type="text" size="6"></td>
+<td id="pd9E"><input type="text" size="6"></td>
+<td id="pd9F"><input type="text" size="6"></td>
+</tr>
+<tr id="prA" class="paletteDataRow">
+<th id="prhA">A</th>
+<td id="pdA0"><input type="text" size="6"></td>
+<td id="pdA1"><input type="text" size="6"></td>
+<td id="pdA2"><input type="text" size="6"></td>
+<td id="pdA3"><input type="text" size="6"></td>
+<td id="pdA4"><input type="text" size="6"></td>
+<td id="pdA5"><input type="text" size="6"></td>
+<td id="pdA6"><input type="text" size="6"></td>
+<td id="pdA7"><input type="text" size="6"></td>
+<td id="pdA8"><input type="text" size="6"></td>
+<td id="pdA9"><input type="text" size="6"></td>
+<td id="pdAA"><input type="text" size="6"></td>
+<td id="pdAB"><input type="text" size="6"></td>
+<td id="pdAC"><input type="text" size="6"></td>
+<td id="pdAD"><input type="text" size="6"></td>
+<td id="pdAE"><input type="text" size="6"></td>
+<td id="pdAF"><input type="text" size="6"></td>
+</tr>
+<tr id="prB" class="paletteDataRow">
+<th id="prhB">B</th>
+<td id="pdB0"><input type="text" size="6"></td>
+<td id="pdB1"><input type="text" size="6"></td>
+<td id="pdB2"><input type="text" size="6"></td>
+<td id="pdB3"><input type="text" size="6"></td>
+<td id="pdB4"><input type="text" size="6"></td>
+<td id="pdB5"><input type="text" size="6"></td>
+<td id="pdB6"><input type="text" size="6"></td>
+<td id="pdB7"><input type="text" size="6"></td>
+<td id="pdB8"><input type="text" size="6"></td>
+<td id="pdB9"><input type="text" size="6"></td>
+<td id="pdBA"><input type="text" size="6"></td>
+<td id="pdBB"><input type="text" size="6"></td>
+<td id="pdBC"><input type="text" size="6"></td>
+<td id="pdBD"><input type="text" size="6"></td>
+<td id="pdBE"><input type="text" size="6"></td>
+<td id="pdBF"><input type="text" size="6"></td>
+</tr>
+<tr id="prC" class="paletteDataRow">
+<th id="prhC">C</th>
+<td id="pdC0"><input type="text" size="6"></td>
+<td id="pdC1"><input type="text" size="6"></td>
+<td id="pdC2"><input type="text" size="6"></td>
+<td id="pdC3"><input type="text" size="6"></td>
+<td id="pdC4"><input type="text" size="6"></td>
+<td id="pdC5"><input type="text" size="6"></td>
+<td id="pdC6"><input type="text" size="6"></td>
+<td id="pdC7"><input type="text" size="6"></td>
+<td id="pdC8"><input type="text" size="6"></td>
+<td id="pdC9"><input type="text" size="6"></td>
+<td id="pdCA"><input type="text" size="6"></td>
+<td id="pdCB"><input type="text" size="6"></td>
+<td id="pdCC"><input type="text" size="6"></td>
+<td id="pdCD"><input type="text" size="6"></td>
+<td id="pdCE"><input type="text" size="6"></td>
+<td id="pdCF"><input type="text" size="6"></td>
+</tr>
+<tr id="prD" class="paletteDataRow">
+<th id="prhD">D</th>
+<td id="pdD0"><input type="text" size="6"></td>
+<td id="pdD1"><input type="text" size="6"></td>
+<td id="pdD2"><input type="text" size="6"></td>
+<td id="pdD3"><input type="text" size="6"></td>
+<td id="pdD4"><input type="text" size="6"></td>
+<td id="pdD5"><input type="text" size="6"></td>
+<td id="pdD6"><input type="text" size="6"></td>
+<td id="pdD7"><input type="text" size="6"></td>
+<td id="pdD8"><input type="text" size="6"></td>
+<td id="pdD9"><input type="text" size="6"></td>
+<td id="pdDA"><input type="text" size="6"></td>
+<td id="pdDB"><input type="text" size="6"></td>
+<td id="pdDC"><input type="text" size="6"></td>
+<td id="pdDD"><input type="text" size="6"></td>
+<td id="pdDE"><input type="text" size="6"></td>
+<td id="pdDF"><input type="text" size="6"></td>
+</tr>
+<tr id="prE" class="paletteDataRow">
+<th id="prhE">E</th>
+<td id="pdE0"><input type="text" size="6"></td>
+<td id="pdE1"><input type="text" size="6"></td>
+<td id="pdE2"><input type="text" size="6"></td>
+<td id="pdE3"><input type="text" size="6"></td>
+<td id="pdE4"><input type="text" size="6"></td>
+<td id="pdE5"><input type="text" size="6"></td>
+<td id="pdE6"><input type="text" size="6"></td>
+<td id="pdE7"><input type="text" size="6"></td>
+<td id="pdE8"><input type="text" size="6"></td>
+<td id="pdE9"><input type="text" size="6"></td>
+<td id="pdEA"><input type="text" size="6"></td>
+<td id="pdEB"><input type="text" size="6"></td>
+<td id="pdEC"><input type="text" size="6"></td>
+<td id="pdED"><input type="text" size="6"></td>
+<td id="pdEE"><input type="text" size="6"></td>
+<td id="pdEF"><input type="text" size="6"></td>
+</tr>
+<tr id="prF" class="paletteDataRow">
+<th id="prhF">F</th>
+<td id="pdF0"><input type="text" size="6"></td>
+<td id="pdF1"><input type="text" size="6"></td>
+<td id="pdF2"><input type="text" size="6"></td>
+<td id="pdF3"><input type="text" size="6"></td>
+<td id="pdF4"><input type="text" size="6"></td>
+<td id="pdF5"><input type="text" size="6"></td>
+<td id="pdF6"><input type="text" size="6"></td>
+<td id="pdF7"><input type="text" size="6"></td>
+<td id="pdF8"><input type="text" size="6"></td>
+<td id="pdF9"><input type="text" size="6"></td>
+<td id="pdFA"><input type="text" size="6"></td>
+<td id="pdFB"><input type="text" size="6"></td>
+<td id="pdFC"><input type="text" size="6"></td>
+<td id="pdFD"><input type="text" size="6"></td>
+<td id="pdFE"><input type="text" size="6"></td>
+<td id="pdFF"><input type="text" size="6"></td>
 </tr>
 </table>
 </div>
@@ -119,10 +437,25 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
 
   var PALETTE = document.getElementById("palette");
 
-  var HEADROW = document.getElementById("headrow");
-  var HEADCELLS = HEADROW.getElementsByClassName("colhead");
+  var PALETTEHEADROW = document.getElementById("paletteHeadRow");
+  var PALETTEHEADCELLS
+              = PALETTEHEADROW.getElementsByClassName("paletteColHead");
 
-  var DATAROWS = PALETTE.getElementsByClassName("datarow");
+  var PALETTEDATAROWS = PALETTE.getElementsByClassName("paletteDataRow");
+  var PALETTEDATACELLSS = [];
+  var PALETTEINPUTSS = [];
+  for (var row = 0; row < 16; row++) {
+    PALETTEDATACELLSS[row] = PALETTEDATAROWS[row].getElementsByTagName("td");
+    PALETTEINPUTSS[row] = PALETTEDATAROWS[row].getElementsByTagName("input");
+    for (var col = 0; col < 16; col++) {
+      var PALETTEINPUT = PALETTEINPUTSS[row][col];
+      PALETTEINPUT.onfocus = recolorPaletteCell;
+      PALETTEINPUT.oninput = recolorPaletteCell;
+      PALETTEINPUT.onchange = recolorPaletteCell;
+      PALETTEINPUT.onmouseup = recolorPaletteCell;
+      PALETTEINPUT.onkeyup = recolorPaletteCell;
+    }
+  }
 
   function resizePalette() {
     var newSize = Number(PALETTESIZE.value);
@@ -140,85 +473,46 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
     var rowCnt = Math.ceil(paletteSize / 16);
     var colCnt = (paletteSize < 16 ? paletteSize : 16);
     for (var col = 0; col < 16; col++) {
-      var TH = HEADCELLS[col];
-      if (col < colCnt) {
-        if (!TH) {
-          TH = document.createElement("th");
-          TH.innerHTML = formatHex(col, 1);
-          HEADROW.appendChild(TH);
-        }
-        TH.className = "colhead v";
-      } else {
-        if (TH) {
-          TH.className = "colhead h";
-        }
-      }
+      var TH = PALETTEHEADCELLS[col];
+      TH.className = (col < colCnt ? "paletteColHead v" : "paletteColHead h");
     }
     for (var row = 0; row < 16; row++) {
-      var ROW = DATAROWS[row];
+      var DATAROW = PALETTEDATAROWS[row];
       if (row < rowCnt) {
-        if (!ROW) {
-          ROW = document.createElement("tr");
-          PALETTE.appendChild(ROW);
-          var TH = document.createElement("th");
-          ROW.appendChild(TH);
-          TH.innerHTML = formatHex(row, 1);
-        }
-        var CELLS = ROW.getElementsByTagName("td");
+        var DATACELLS = PALETTEDATACELLSS[row];
         for (var col = 0; col < 16; col++) {
           var xin = 16 * row + col;
-          var TD = CELLS[col];
+          var TD = DATACELLS[col];
           if (xin < paletteSize) {
-            if (!TD) {
-              TD = document.createElement("td");
-              ROW.appendChild(TD);
-            }
-            var INPUT = TD.getElementsByTagName("input")[0];
-            if (!INPUT) {
-              INPUT = document.createElement("input");
-              TD.appendChild(INPUT);
-              INPUT.id = "i"+xin;
-              INPUT.type = "text";
-              INPUT.size = 6;
-              INPUT.oninput = recolor;
-              INPUT.onchange = recolor;
-            }
+            var INPUT = PALETTEINPUTSS[row][col];
             var color = formatHex(palette[xin], 6);
             INPUT.value = color;
             TD.style.backgroundColor = "#"+color;
             TD.className = "datacell v";
           } else {
-            if (TD) {
-              TD.className = "datacell h";
-            }
+            TD.className = "datacell h";
           }
         }
-        ROW.className = "datarow v";
+        DATAROW.className = "paletteDataRow v";
       } else {
-        if (ROW) {
-          ROW.className = "datarow h";
-        }
+        DATAROW.className = "paletteDataRow h";
       }
     }
   }
 
   showPalette();
 
-  function recolor(event) {
+  function recolorPaletteCell(event) {
     var xin = Number(this.id.substr(1));
-    var img = this.value;
-    var pos = this.selectionStart - img.length;
-    if (pos > 6) pos = 6;
-    var newVal = Number("0x"+img);
+    var startPos = this.selectionStart;
+    var endPos = this.selectionEnd;
+    var newVal = Number(("0x" + this.value + "000000").substr(0, 8));
     if (isNaN(newVal)) {
       newVal = palette[xin];
     }
-    var newImg = formatHex(newVal, 6);
-    var newImgLen = newImg.length;
-    this.value = newImg;
-    pos = pos + newImg.length;
-    this.setSelectionRange(pos, pos);
-    this.parentElement.style.backgroundColor = "#"+newImg;
+    this.value = formatHex(newVal, 6);
+    this.setSelectionRange(startPos, endPos);
+    this.parentElement.style.backgroundColor = "#"+this.value;
     palette[xin] = newVal;
   }
 
@@ -244,8 +538,8 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
     return ans;
   }
 
-  var NAME = document.getElementById("name");
-  var CONTENT = document.getElementById("content");
+  var PALETTENAME = document.getElementById("paletteName");
+//  var CONTENT = document.getElementById("content");
 
   var FILEINPUT = document.getElementById("fileInput");
 
@@ -258,46 +552,52 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
       return;
     }
     busy = true;
-    var NAME = document.getElementById("name");
     var files = FILEINPUT.files;
     if (files.length == 0) {
-      NAME.innerHTML = "<i>No file</i>";
+      PALETTENAME.innerHTML = "<i>No file</i>";
       return;
     }
     var myFile = files[0];
-    NAME.value = myFile.name;
+    PALETTENAME.value = myFile.name;
     reader.onload = function() {
+      var filelength, filetype, chunkpos, datapos, datacnt;
       var data = reader.result;
-      var dump = "";
       var signature = readChars(data, 0, 4);
-      var filelength = readInt(data, 4, 4);
-      var filetype = readChars(data, 8, 4);
-      var chunkpos = 12;
-      var datapos = 0;
-      var datacnt = 0;
-      while (chunkpos < data.length && datapos == 0) {
-        var chunktype = readChars(data, chunkpos, 4);
-        var chunksize = readInt(data, chunkpos + 4, 4);
-        if (chunktype == "data") {
-          datacnt = readInt(data, chunkpos + 10, 2);
-          datapos = chunkpos + 12;
+      var good = signature != "RIFF";
+      if (good) {
+        filelength = readInt(data, 4, 4);
+        filetype = readChars(data, 8, 4);
+        good = (filetype == "PAL ");
+      }
+      if (good) {
+        chunkpos = 12;
+        datapos = 0;
+        datacnt = 0;
+        while (chunkpos < data.length && datapos == 0) {
+          var chunktype = readChars(data, chunkpos, 4);
+          var chunksize = readInt(data, chunkpos + 4, 4);
+          if (chunktype == "data") {
+            datacnt = readInt(data, chunkpos + 10, 2);
+            datapos = chunkpos + 12;
+          }
+          chunkpos = chunkpos + 8 + chunksize;
+          if (chunkpos % 2 != 0) chunkpos++;
         }
-        chunkpos = chunkpos + 8 + chunksize;
-        if (chunkpos % 2 != 0) chunkpos++;
+        good = datapos > 0;
       }
-      if (signature != "RIFF" || filetype != "PAL " || datapos == 0) {
+      if (good) {
+        for (var xin = 0; xin < datacnt; xin++) {
+          var pos = datapos + 4 * xin;
+          palette[xin] = (readInt(data, pos, 1) << 16)
+                       + (readInt(data, pos+1, 1) << 8)
+                       + (readInt(data, pos+2, 1));
+        }
+        paletteSize = datacnt;
+        showPalette();
+      }
+      if (!good) {
         alert("Ei ole RIFF-palettitiedosto");
-        busy = false;
-        return;
       }
-      for (var xin = 0; xin < datacnt; xin++) {
-        var pos = datapos + 4 * xin;
-        palette[xin] = (readInt(data, pos, 1) << 16)
-                     + (readInt(data, pos+1, 1) << 8)
-                     + (readInt(data, pos+2, 1));
-      }
-      paletteSize = datacnt;
-      showPalette();
       busy = false;
     };
     reader.onloadend = function () {
@@ -306,7 +606,7 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
     reader.readAsBinaryString(myFile);
   }
 
-  var LOAD = document.getElementById("load");
+  var LOAD = document.getElementById("paletteLoad");
   var busy = false;
   LOAD.onmousedown = function() {
     if (!busy) {
@@ -321,8 +621,8 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
 
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-  function encodeContent() {
-    var ans = ['data:image/image/vnd.zbrush.pcx;base64,'];
+  function encodeContent(mimetype) {
+    var ans = ['data:',mimetype,';base64,'];
     for (var p = 0; p < content.length; p = p + 3) {
       ans.push(b64[(content[p] & 0xFC) >> 2]);
       if (p + 1 < content.length) {
@@ -358,7 +658,7 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
     }
   }
 
-  function encodeFile() {
+  function encodePaletteFile() {
     content = [];
     putChars("RIFF");
     putInt(16 + 4 * paletteSize, 4);
@@ -374,16 +674,16 @@ Paletin koko: <input id="palettesize" type="text" size="4"/>
       putInt(color & 0xFF, 1);
       putInt(0, 1);
     }
-    return encodeContent();
+    return encodeContent('application/octet-stream');
   }
 
   var DOWNLOAD = document.getElementById("download");
 
-  var SAVE = document.getElementById("save");
+  var PALETTESAVE = document.getElementById("paletteSave");
 
-  SAVE.onmousedown = function () {
-      DOWNLOAD.href = encodeFile();
-      DOWNLOAD.download = NAME.value;
+  PALETTESAVE.onmousedown = function () {
+      DOWNLOAD.href = encodePaletteFile();
+      DOWNLOAD.download = PALETTENAME.value;
       DOWNLOAD.click();
   };
 
