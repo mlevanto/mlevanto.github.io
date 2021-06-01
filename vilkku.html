@@ -1,0 +1,561 @@
+<!DOCTYPE html> <!-- Vilkkuharjoitus - Copyright 2021 Mikko Levanto -->
+<html>
+<head>
+<title>Vilkkuharjoitus</title>
+<style>
+
+  * {
+    cursor: default;
+  }
+
+  #speeds span {
+   cursor: pointer;
+  }
+
+  #options span {
+   cursor: pointer;
+  }
+
+  @media (min-width: 700px) {
+    #keyboard {
+      top: 30px;
+      right: 20px;
+      position: absolute;
+      font-family: monospace;
+    }
+  }
+
+  @media (max-width: 700px) {
+    #keyboard {
+      padding-right: 10px;
+      padding-bottom: 30px;
+      font-family: monospace;
+    }
+  }
+
+  #keyboard p {
+    margin-top: 0px;
+    margin-bottom: 5px;
+  }
+
+  #keyboard2 {
+    margin-left: 5px;
+  }
+
+  #keyboard3 {
+    margin-left: 10px;
+  }
+
+  #keyboard4 {
+    margin-left: 15px;
+  }
+
+  #keyboard5 {
+    margin-left: 20px;
+  }
+
+  #keyboard span {
+    cursor: pointer;
+    padding: 1px 3px;
+  }
+
+  #spacebar {
+    cursor: pointer;
+    padding: 1px 3px;
+    border: 1px solid black;
+    padding-top: 16px;
+    margin-left: 50px;
+    width: 150px;
+  }
+
+  #sky {
+    background: linear-gradient(black, #000055);
+  }
+
+  #img {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAAAXNSR0IArs4c6QAABBhJREFUeAHt2lFKw0AUBdAquo+uWdyfuA4FzVUUq20VYtKXeWegoLbOZE7m5n7obmcQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBEYSuJs281LoNZLt5vdytfkdzN/A0zTFzfxp/m0G9+TfKOdPdD1/ik3PkPaoFI5NY4548d2fVtXaI2es+z0plbPODaI9Sh3FmhfT+WlVsT1ySjrfk3Ip6dog2qPcUax5QV2fVlXbI6ek6z0pmZCODaI9Sh7FmhfV8WlVuT1ySjrek5rpmK6qW4NsoT0q/VX/r9dyX/aEz7ywbk+r6u0x83Ze7Nefp5VvL7b6ggt3apAttMeCt3rRqfPfCEO2SKcG0R6LZmQ3ZIt0aRDtsWw4MvuQLdKlQbTH8gHJCsO1SIcG0R7rhCOrDNciHRpEe6wXkKw0VIuM3iDaY91wZLWhWmT0BtEe6wckKw7TIgnIw/TaTy+DAIFDgcePBhGSQxjfEXicCPYfAQmHkDgUBN4F3sKRL78GJN8LSRSMzgKf4QjC94DkZ0ISBaOjwEE4AnAsIPm5kETB6CTwIxzZ/KmA5D0hiYLRQeBoOLLxcwHJ+0ISBWNkgZPhyKZ/C0g+IyRRMEYUOBuObPgvAcnnhCQKxkgCv4Yjm30FMpB7g9LZPiQAAAAASUVORK5CYII=)
+ no-repeat;
+    height: 200px;
+    width: 200px;
+    position: absolute;
+    right: 20%;
+  }
+
+  #light {
+    position: absolute;
+    margin-top: 155px;
+    margin-left: 90px;
+    color:yellow;
+    font-size: 24px;
+  }
+
+  #copyright {
+    position: relative;
+    font-size: 8pt;
+    color: white;
+    margin: 0px;
+    left: 5px;
+    top: 85px;
+  }
+
+  #accepted-box {
+    position: relative;
+    width: 80%;
+    height: 75px;
+    padding: 10px;
+  }
+
+  #accepted {
+    float: right;
+    margin: 0px;
+    text-align: right;
+    font-size: 48pt;
+    border-right: 1px solid blue;
+  }
+
+  #clickme {
+    cursor: pointer;
+    margin: 30px 50%;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  #ans {
+    color: lightgray;
+    font-size: 12pt;
+  }
+
+  #malli {
+    color: lightgray;
+  }
+
+</style>
+<script>
+"use strict";
+onload = function() {
+
+  var table = {
+    'A': '.-',
+    'B': '-...',
+    'C': '-.-.',
+    'D': '-..',
+    'E': '.',
+    'F': '..-.',
+    'G': '--.',
+    'H': '....',
+    'I': '..',
+    'J': '.---',
+    'K': '-.-',
+    'L': '.-..',
+    'M': '--',
+    'N': '-.',
+    'O': '---',
+    'P': '.--.',
+    'Q': '--.-',
+    'R': '.-.',
+    'S': '...',
+    'T': '-',
+    'U': '..-',
+    'V': '...-',
+    'W': '.--',
+    'X': '-..-',
+    'Y': '-.--',
+    'Z': '--..',
+    '\u0116': '..-..',
+    '\u00C4': '.-.-',
+    '\u00D6': '---.',
+    '\u00C5': '.--.-',
+    '\u00DC': '..--',
+    '\u0160': '----',
+    '\u017D': '--..-',
+    '0': '-----',
+    '1': '.----',
+    '2': '..---',
+    '3': '...--',
+    '4': '....-',
+    '5': '.....',
+    '6': '-....',
+    '7': '--...',
+    '8': '---..',
+    '9': '----.',
+    ' ': ' ',
+    '.': '.-.-.-',
+    ',': '--..--',
+    ':': '---...',
+    '?': '..--..',
+    '\'': '.----.',
+    '-': '-....-',
+    '/': '-..-.',
+    '(': '-.--.',
+    ')': '-.--.-',
+    '"': '.-..-.',
+    '=': '-...-',
+    '+': '.-.-.',
+    '@': '.--.-.',
+    '!': '-.-.--',
+    '&': '.-...',
+    ';': '-.-.-.',
+    '_': '..--.-',
+    '$': '...-..-',
+  }
+
+  var setK = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\u0116';
+  var setKx = '\u00C4\u00D6\u00C5\u00DC\u0160\u017D';
+  var setN = '0123456789';
+  var setM = ' .,:?\'-/()"=+@';
+  var setMx = '!&;_$';
+
+  var charSet = setK;
+
+  var speed = "4";
+  var option = { k: true, n: false, m: false, x: false };
+
+  var SPEEDS = document.getElementById("speeds");
+  var SPEED = SPEEDS.getElementsByTagName("span");
+  var KEYBOARD = document.getElementById("keyboard");
+  var KEYS = KEYBOARD.getElementsByTagName("span");
+  var SPACEBAR = document.getElementById("spacebar");
+  var LIGHT = document.getElementById("light");
+  var CLICKME = document.getElementById("clickme");
+  var ACCEPTED_BOX = document.getElementById("accepted-box");
+  var ACCEPTED = document.getElementById("accepted");
+
+  var OPT = {
+    k: document.getElementById("opt-k"),
+    n: document.getElementById("opt-n"),
+    m: document.getElementById("opt-m"),
+    x: document.getElementById("opt-x"),
+  };
+
+  var blinkSeq = "-----+-+-+-+---+---+-+++-+-+---+-+++-+-+---+++-+++-+++";
+
+  function draw(m) {
+    blinkSeq += '--';
+    for (var j = 0; j < m.length; j++) {
+      var s = m.charAt(j);
+      if (s == '.') {
+        blinkSeq += "-+";
+      } else if (s == '-') {
+        blinkSeq += "-+++";
+      } else if (s == ' ') {
+        blinkSeq += "--";
+      }
+    }
+  }
+
+  var text = "HELLO";
+  var p = 0;
+
+  function show() {
+    var wx = 0;
+    p = 0;
+    blinkSeq = "--";
+    for (var i = 0; i < text.length; i++) {
+      var m = table[text.charAt(i)];
+      if (m) {
+        draw(m);
+      }
+    }
+  }
+
+  var accepted = " ";
+
+  function rndChar() {
+    return charSet.charAt(Math.floor(charSet.length * Math.random()));
+  }
+
+  function rndMsg() {
+    var w = [];
+    var c = rndChar();
+    var a = false;
+    while (w.length < 5) {
+      if (a || c != ' ') {
+        w.push(c);
+      }
+      a = (c != ' ' && w.length < 4);
+      c = rndChar();
+    }
+    return w.join('');
+  }
+
+  function viewWidth() {
+    return document.body.getBoundingClientRect().width;
+  }
+
+  var blinkTimer = null;
+
+  var blinkPos = 0;
+
+  var repeat = false;
+
+  function stopBlinker() {
+    LIGHT.style.display = "none";
+    repeat = false;
+    if (blinkTimer != null) {
+      clearInterval(blinkTimer);
+      blinkTimer = null;
+    }
+  }
+
+  function blinker() {
+    var s = ( blinkPos < 0 ? '-' :
+              blinkPos < blinkSeq.length ? blinkSeq.charAt(blinkPos) : '#' );
+    blinkPos++;
+    if (s == '+') {
+      LIGHT.style.display = "block";
+    } else {
+      LIGHT.style.display = "none";
+      if (s == '#') {
+        if (repeat) {
+          repeat = false;
+          blinkPos = 0;
+        } else {
+          stopBlinker();
+        }
+      }
+    }
+  }
+
+  function startBlinker(w) {
+    if (blinkTimer == null) {
+      repeat = false;
+      blinkPos = - Math.floor(w + Math.random() * speed);
+      blinkTimer = setInterval(blinker, 1200/speed);
+    } else {
+      repeat = true;
+    }
+  }
+
+  function next(w) {
+    text = rndMsg();
+    show();
+    startBlinker(w);
+  }
+
+  function checkChar(c) {
+    var t = (text.length < 1 ? ' ' : text.charAt(0));
+    if ( c == t || (c == 'A' && (t == '\u00C4' || t == '\u00C5'))
+                || (c == 'O' && t == '\u00D6')
+                || (c == 'U' && t == '\u00DC')
+                || (c == 'E' && t == '\u0116')
+                || (c == 'S' && t == '\u0160')
+                || (c == 'Z' && t == '\u017D') )
+    {
+      accepted = accepted + t;
+      if (text.length > 0) {
+        text = text.substring(1);
+      } else {
+        next(0);
+      }
+    } else {
+      startBlinker(0);
+    }
+    if (ACCEPTED.scrollWidth > viewWidth() + 100) {
+      accepted = accepted.substring(2);
+    }
+    ACCEPTED.textContent = accepted;
+  }
+
+  function checkKey(e) {
+    var k = e.keyCode;
+    var c;
+    if (k < 0x21) {
+      c = ' ';
+    } else {
+      if ( (k > 0x60 && k < 0x7B) || (k > 0xDF && k < 0xF7) 
+           || (k > 0xF7 && k < 0x100) )
+      {
+        k = k - 0x20;
+      }
+      if ((k > 0xBF && k < 0xC7) || (k > 0xFF && k < 0x106)) {
+        c = 'A';
+      } else if ((k > 0xC7 && k < 0xCC) || (k > 0x111 && k < 0x11C)) {
+        c = 'E';
+      } else if (k == 0xD7) {
+        c = '\u00D7';
+      } else if ((k > 0xD1 && k < 0xD8) || (k > 0x14B && k < 0x154)) {
+        c = 'O';
+      } else if ((k > 0xD8 && k < 0xDD) || (k > 0x167 && k < 0x174)) {
+        c = 'U';
+      } else if (k > 0x159 && k < 0x162) {
+        c = 'S';
+      } else if (k > 0x178 && k < 0x17F) {
+        c = 'Z';
+      } else {
+        c = String.fromCharCode(k);
+      }
+    }
+    checkChar(c);
+  }
+
+  function checkClicked(e) {
+    checkChar(e.target.textContent);
+  }
+
+  function pause() {
+    stopBlinker();
+    CLICKME.style.display = "block";
+    ACCEPTED.style.display = "none";
+  }
+
+  function speedSet(newSpeed) {
+    for (var x = 0; x < SPEED.length; x++) {
+      var SX = SPEED[x];
+      if (SX.textContent.trim() == newSpeed) {
+        SX.style.textDecoration = 'initial';
+      } else {
+        SX.style.textDecoration = 'line-through';
+      }
+    }
+    speed = newSpeed;
+    pause();
+  }
+
+  function speedChg(e) {
+    speedSet(e.target.textContent.trim());
+  }
+
+  function updateCharSet () {
+    pause();
+    charSet = [];
+    if (option.k) {
+      charSet += setK;
+      if (option.x) {
+        charSet += setKx;
+      }
+      OPT.k.style.textDecoration = 'initial';
+    } else {
+      OPT.k.style.textDecoration = 'line-through';
+    }
+    if (option.n) {
+      charSet += setN;
+      OPT.n.style.textDecoration = 'initial';
+    } else {
+      OPT.n.style.textDecoration = 'line-through';
+    }
+    if (option.m) {
+      charSet += setM;
+      if (option.x) {
+        charSet += setMx;
+      }
+      OPT.m.style.textDecoration = 'initial';
+    } else {
+      OPT.m.style.textDecoration =  'line-through';
+    }
+    if (option.x && (option.k || option.m)) {
+      OPT.x.style.textDecoration = 'initial';
+    } else {
+      OPT.x.style.textDecoration =  'line-through';
+    }
+    for (var k = 0; k < KEYS.length; k++) {
+      var KEY = KEYS[k];
+      if (charSet.indexOf(KEY.textContent) < 0) {
+        KEY.style.visibility = "hidden";
+      } else {
+        KEY.style.visibility = "visible";
+      }
+    }
+    show();
+  }
+
+  function optionChg(e) {
+    var i = e.target.id.charAt(4);
+    option[i] = !option[i];
+    if (!option.k && !option.n && !option.m) {
+      option["knmk".charAt("knm".indexOf(i)+1)] = true;
+    }
+    updateCharSet();
+    text="";
+  }
+
+  ACCEPTED_BOX.onmousedown = function () {
+    startBlinker(5);
+    CLICKME.style.display = "none";
+    ACCEPTED.style.display = "block";
+    if (text.length == 0) checkChar(' ');
+    repeat = false;
+  }
+
+  document.body.onblur = pause;
+
+  for (var x = 0; x < SPEED.length; x++) {
+    SPEED[x].onclick = speedChg;
+  }
+
+  for (var k in OPT) {
+    OPT[k].onclick = optionChg;
+  }
+
+  for (var k = 0; k < KEYS.length; k++) {
+    KEYS[k].onclick = checkClicked;
+  }
+  SPACEBAR.onclick = checkClicked;
+
+  document.onkeypress = checkKey;
+
+  speedSet(speed);
+  updateCharSet();
+
+};
+</script>
+</head>
+<body style="border: 10px solid white">
+<h1 style="margin-bottom: 48px">Vilkkuharjoitus</h1>
+
+<div>
+<p id="speeds"><b>Nopeus:</b>
+  <span>&#xa0;2&#xa0;</span>
+  <span>&#xa0;3&#xa0;</span>
+  <span>&#xa0;4&#xa0;</span>
+  <span>&#xa0;6&#xa0;</span>
+  <span>&#xa0;8&#xa0;</span>
+  <span>&#xa0;10&#xa0;</span>
+  <span>&#xa0;15&#xa0;</span>
+  <span>&#xa0;20&#xa0;</span>
+  <span>&#xa0;30&#xa0;</span>
+  <span>&#xa0;40&#xa0;</span>
+  <span>&#xa0;60&#xa0;</span>
+  <span>&#xa0;80&#xa0;</span>
+</p>
+<p id="options"><b>Optiot:</b>
+  <span id="opt-k">kirjaimet</span>
+  <span id="opt-n">numerot</span>
+  <span id="opt-m">muita merkkej&#xE4;</span>
+  -
+  <span id="opt-x">laajempi valikoima</span>
+</p>
+</div>
+
+<div id="keyboard">
+<p id="keyboard1"><span>!</span> <span>"</span> <span>@</span> <span>$</span>
+<span>_</span> <span>&amp;</span> <span>/</span> <span>(</span> <span>)</span>
+<span>=</span> <span>?</span> <span>'</span> <span>;</span></p>
+<p id="keyboard2"><span>1</span> <span>2</span> <span>3</span> <span>4</span>
+<span>5</span> <span>6</span> <span>7</span> <span>8</span> <span>9</span>
+<span>0</span> <span>+</span> <span>:</span></p>
+<p id="keyboard3"><span>Q</span> <span>W</span> <span>E</span> <span>R</span>
+<span>T</span> <span>Y</span> <span>U</span> <span>I</span> <span>O</span>
+<span>P</span> <span>&#x00C5;</span> <span>&#x160;</span></p>
+<p id="keyboard4"><span>A</span> <span>S</span> <span>D</span> <span>F</span>
+<span>G</span> <span>H</span> <span>J</span> <span>K</span> <span>L</span>
+<span>&#xD6;</span> <span>&#xC4;</span> <span>&#xDC;</span></p>
+<p id="keyboard5"><span>&#x116;</span> <span>Z</span> <span>X</span>
+<span>C</span> <span>V</span> <span>B</span> <span>N</span> <span>M</span>
+<span>,</span> <span>.</span> <span>-</span> <span>&#x17D;</span></p>
+<p id="spacebar"> </p>
+</div>
+
+<div id="sky" style="position: relative; height: 200px; width: 100%">
+<div id="img">
+<p id="light" style="display:none">.</p>
+</div>
+</div>
+<div style="background-color: black; height: 100px">
+<p id="copyright">&#xA9; 2021 Mikko Levanto</p>
+</div>
+<div id="accepted-box"><pre id="accepted" style="display:none">
+<span id="ans">Kirjoita tulkinta:</span><span id="malli"> H</span></pre>
+<p id="clickme">Klikkaa t&#xE4;h&#xE4;n</p>
+</div>
+</body>
+</html>
