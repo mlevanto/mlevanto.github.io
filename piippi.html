@@ -1,7 +1,7 @@
-<!DOCTYPE html> <!-- Vilkkuharjoitus - Copyright 2021 Mikko Levanto -->
+<!DOCTYPE html> <!-- Piippiharjoitus - Copyright 2021 Mikko Levanto -->
 <html>
 <head>
-<title>Vilkkuharjoitus</title>
+<title>Piippiharjoitus</title>
 <style>
 
   * {
@@ -68,34 +68,12 @@
     width: 150px;
   }
 
-  #sky {
-    background: linear-gradient(black, #000055);
-  }
-
-  #img {
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAAAXNSR0IArs4c6QAABBhJREFUeAHt2lFKw0AUBdAquo+uWdyfuA4FzVUUq20VYtKXeWegoLbOZE7m5n7obmcQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBEYSuJs281LoNZLt5vdytfkdzN/A0zTFzfxp/m0G9+TfKOdPdD1/ik3PkPaoFI5NY4548d2fVtXaI2es+z0plbPODaI9Sh3FmhfT+WlVsT1ySjrfk3Ip6dog2qPcUax5QV2fVlXbI6ek6z0pmZCODaI9Sh7FmhfV8WlVuT1ySjrek5rpmK6qW4NsoT0q/VX/r9dyX/aEz7ywbk+r6u0x83Ze7Nefp5VvL7b6ggt3apAttMeCt3rRqfPfCEO2SKcG0R6LZmQ3ZIt0aRDtsWw4MvuQLdKlQbTH8gHJCsO1SIcG0R7rhCOrDNciHRpEe6wXkKw0VIuM3iDaY91wZLWhWmT0BtEe6wckKw7TIgnIw/TaTy+DAIFDgcePBhGSQxjfEXicCPYfAQmHkDgUBN4F3sKRL78GJN8LSRSMzgKf4QjC94DkZ0ISBaOjwEE4AnAsIPm5kETB6CTwIxzZ/KmA5D0hiYLRQeBoOLLxcwHJ+0ISBWNkgZPhyKZ/C0g+IyRRMEYUOBuObPgvAcnnhCQKxkgCv4Yjm30FMpB7g9LZPiQAAAAASUVORK5CYII=)
- no-repeat;
-    height: 200px;
-    width: 200px;
-    position: absolute;
-    right: 20%;
-  }
-
-  #light {
-    position: absolute;
-    margin-top: 155px;
-    margin-left: 90px;
-    color:yellow;
-    font-size: 24px;
-  }
-
   #copyright {
     position: relative;
     font-size: 8pt;
-    color: white;
     margin: 0px;
     left: 5px;
-    top: 85px;
+    top: -30px;
   }
 
   #accepted-box {
@@ -207,7 +185,6 @@ onload = function() {
 
   var charSet = setK;
 
-  var speed = "20";
   var option = { k: true, n: false, m: false, x: false };
 
   var SPEEDS = document.getElementById("speeds");
@@ -215,7 +192,6 @@ onload = function() {
   var KEYBOARD = document.getElementById("keyboard");
   var KEYS = KEYBOARD.getElementsByTagName("span");
   var SPACEBAR = document.getElementById("spacebar");
-  var LIGHT = document.getElementById("light");
   var CLICKME = document.getElementById("clickme");
   var ACCEPTED_BOX = document.getElementById("accepted-box");
   var ACCEPTED = document.getElementById("accepted");
@@ -227,33 +203,62 @@ onload = function() {
     x: document.getElementById("opt-x"),
   };
 
-  var blinkSeq = "-----+-+-+-+---+---+-+++-+-+---+-+++-+-+---+++-+++-+++";
-
-  function draw(m) {
-    blinkSeq += '--';
-    for (var j = 0; j < m.length; j++) {
-      var s = m.charAt(j);
-      if (s == '.') {
-        blinkSeq += "-+";
-      } else if (s == '-') {
-        blinkSeq += "-+++";
-      } else if (s == ' ') {
-        blinkSeq += "--";
-      }
-    }
+  if (!window.AudioContext) {
+    window.AudioContext = window.webkitAudioContext;
   }
 
-  var text = "HELLO";
-  var p = 0;
+  var paused = true;
 
-  function show() {
-    var wx = 0;
-    p = 0;
-    blinkSeq = "--";
-    for (var i = 0; i < text.length; i++) {
-      var m = table[text.charAt(i)];
-      if (m) {
-        draw(m);
+  var context = new AudioContext();
+
+  var oscillator = context.createOscillator();
+  oscillator.frequency.value = 880;
+
+  var gate = context.createGain();
+  var gain = gate.gain;
+  gain.value = 0;
+
+  oscillator.connect(gate);
+  gate.connect(context.destination);
+
+  oscillator.start(0);
+
+  var nextTime = context.currentTime + 1;
+  var startTime = 0;
+  var tick = 0.250;
+
+  var text = "HELLO";
+  var xin = 0;
+
+  function play() {
+    if (startTime < context.currentTime) {
+      if (nextTime < context.currentTime) nextTime = context.currentTime + 0.01;
+      startTime = nextTime;
+      nextTime = nextTime + 2 * tick;
+      for (var i = 0; i < text.length; i++) {
+        nextTime = nextTime + 2 * tick;
+        var m = table[text.charAt(i)];
+        if (m) {
+          for (var j = 0; j < m.length; j++) {
+            nextTime = nextTime + tick;
+            var s = m.charAt(j);
+            if (s == '.') {
+              gain.setValueAtTime(0, nextTime);
+              gain.linearRampToValueAtTime(1, nextTime + 0.005);
+              nextTime = nextTime + tick;
+              gain.setValueAtTime(1, nextTime);
+              gain.linearRampToValueAtTime(0, nextTime + 0.005);
+            } else if (s == '-') {
+              gain.setValueAtTime(0, nextTime);
+              gain.linearRampToValueAtTime(1, nextTime + 0.005);
+              nextTime = nextTime + 3 * tick;
+              gain.setValueAtTime(1, nextTime);
+              gain.linearRampToValueAtTime(0, nextTime + 0.005);
+            } else if (s == ' ') {
+              nextTime = nextTime + 2 * tick;
+            }
+          }
+        }
       }
     }
   }
@@ -282,58 +287,41 @@ onload = function() {
     return document.body.getBoundingClientRect().width;
   }
 
-  var blinkTimer = null;
-
-  var blinkPos = 0;
-
   var repeat = false;
 
   function stopBlinker() {
-    LIGHT.style.display = "none";
+    nextTime = context.currentTime + 0.01;
+    gain.cancelScheduledValues(nextTime);
+    gain.linearRampToValueAtTime(0, nextTime + 0.005);
     repeat = false;
-    if (blinkTimer != null) {
-      clearInterval(blinkTimer);
-      blinkTimer = null;
-    }
-  }
-
-  function blinker() {
-    var s = ( blinkPos < 0 ? '-' :
-              blinkPos < blinkSeq.length ? blinkSeq.charAt(blinkPos) : '#' );
-    blinkPos++;
-    if (s == '+') {
-      LIGHT.style.display = "block";
-    } else {
-      LIGHT.style.display = "none";
-      if (s == '#') {
-        if (repeat) {
-          repeat = false;
-          blinkPos = 0;
-        } else {
-          stopBlinker();
-        }
-      }
-    }
+    startTime = 0;
+    nextTime = nextTime + 1;
   }
 
   function startBlinker(w) {
-    if (blinkTimer == null) {
-      repeat = false;
-      blinkPos = - Math.floor(w + Math.random() * speed);
-      blinkTimer = setInterval(blinker, 5000/speed);
-    } else {
-      repeat = true;
-    }
+    var startTime = context.currentTime + w + Math.random();
+    if (nextTime < startTime) nextTime = startTime;
+    play();
   }
 
   function next(w) {
     text = rndMsg();
-    show();
+    xin = 0;
     startBlinker(w);
   }
 
+  function go() {
+    if (paused) {
+      paused = false;
+      CLICKME.style.display = "none";
+      ACCEPTED.style.display = "block";
+      startBlinker(5);
+    }
+  }
+
   function checkChar(c) {
-    var t = (text.length < 1 ? ' ' : text.charAt(0));
+    go();
+    var t = (xin < text.length ? text.charAt(xin) : ' ');
     if ( c == t || (c == 'A' && (t == '\u00C4' || t == '\u00C5'))
                 || (c == 'O' && t == '\u00D6')
                 || (c == 'U' && t == '\u00DC')
@@ -342,8 +330,8 @@ onload = function() {
                 || (c == 'Z' && t == '\u017D') )
     {
       accepted = accepted + t;
-      if (text.length > 0) {
-        text = text.substring(1);
+      if (xin < text.length) {
+        xin++;
       } else {
         next(0);
       }
@@ -393,9 +381,12 @@ onload = function() {
   }
 
   function pause() {
-    stopBlinker();
-    CLICKME.style.display = "block";
-    ACCEPTED.style.display = "none";
+    if (!paused) {
+      paused = true;
+      stopBlinker();
+      CLICKME.style.display = "block";
+      ACCEPTED.style.display = "none";
+    }
   }
 
   function speedSet(newSpeed) {
@@ -407,7 +398,7 @@ onload = function() {
         SX.style.textDecoration = 'line-through';
       }
     }
-    speed = newSpeed;
+    tick = 5 / newSpeed;
     pause();
   }
 
@@ -455,7 +446,6 @@ onload = function() {
         KEY.style.visibility = "visible";
       }
     }
-    show();
   }
 
   function optionChg(e) {
@@ -468,13 +458,7 @@ onload = function() {
     text="";
   }
 
-  ACCEPTED_BOX.onmousedown = function () {
-    startBlinker(5);
-    CLICKME.style.display = "none";
-    ACCEPTED.style.display = "block";
-    if (text.length == 0) checkChar(' ');
-    repeat = false;
-  }
+  ACCEPTED_BOX.onmousedown = go;
 
   document.body.onblur = pause;
 
@@ -493,14 +477,15 @@ onload = function() {
 
   document.onkeypress = checkKey;
 
-  speedSet(speed);
+  speedSet(20);
   updateCharSet();
 
 };
 </script>
 </head>
 <body style="border: 10px solid white">
-<h1 style="margin-bottom: 48px">Vilkkuharjoitus</h1>
+<h1 style="margin-bottom: 48px">Piippiharjoitus</h1>
+<p id="copyright">&#xA9; 2021 Mikko Levanto</p>
 
 <div>
 <p id="speeds"><b>Nopeus:</b>
@@ -543,17 +528,10 @@ onload = function() {
 <p id="spacebar"> </p>
 </div>
 
-<div id="sky" style="position: relative; height: 200px; width: 100%">
-<div id="img">
-<p id="light" style="display:none">.</p>
-</div>
-</div>
-<div style="background-color: black; height: 100px">
-<p id="copyright">&#xA9; 2021 Mikko Levanto</p>
-</div>
 <div id="accepted-box"><pre id="accepted" style="display:none">
 <span id="ans">Kirjoita tulkinta:</span><span id="malli"> H</span></pre>
 <p id="clickme">Klikkaa t&#xE4;h&#xE4;n</p>
 </div>
+<pre id="trace"></pre>
 </body>
 </html>
