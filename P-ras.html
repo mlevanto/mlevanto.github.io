@@ -1,0 +1,458 @@
+<html>
+<head>
+<style>
+
+  body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  svg {
+    width: 576;
+    height: 480;
+  }
+
+</style>
+<script>
+
+  onload = function() {
+    var PLACES = [];
+    var MOVERS = [];
+    var i = 0;
+    var placeCnt = 0;
+    for (i = 0; i < 5; i++) {
+      var MOVER = document.getElementById("m"+i);
+      MOVERS[i] = MOVER;
+      PLACES[i] = [];
+      var oldPLACE = null;
+      for (var t = 0; t < 250; t++) {
+        var PLACE = document.getElementById(i+"p"+t);
+        if (PLACE) {
+          PLACES[i][t] = PLACE;
+          PLACES[i][501-t] = oldPLACE;
+          oldPLACE = PLACE;
+        }
+      }
+    }
+
+    var t = 0;
+
+    function step() {
+     t = (t + 1) % 500;
+     for (var i = 0; i < MOVERS.length; i++) {
+        var PLACE = PLACES[i][t];
+        if (PLACE) {
+          PLACE.appendChild(MOVERS[i]);
+        }
+      }		
+    }
+
+    setInterval(step, 20);
+
+  }
+
+</script>
+</head>
+<body>
+<h1>Pythagoraan lause</h1>
+<svg viewBox="0 0 576 480">
+	
+  <rect width="576" height="480" rx=12 fill="white"/>
+
+  <polygon fill="lightgray" points="360,288 216,288 216,180"/>
+
+  <g id="0p0" transform="translate(135,180)">
+    <polygon id="m0" points="81,0 81,108 0,108" fill="red"/>
+  </g>
+
+  <g id="0p56" transform="translate(135,175)"/>
+  <g id="0p57" transform="translate(135,170)"/>
+  <g id="0p58" transform="translate(135,165)"/>
+  <g id="0p59" transform="translate(135,160)"/>
+  <g id="0p60" transform="translate(135,155)"/>
+  <g id="0p61" transform="translate(135,150)"/>
+  <g id="0p62" transform="translate(135,145)"/>
+  <g id="0p63" transform="translate(135,140)"/>
+  <g id="0p64" transform="translate(135,135)"/>
+  <g id="0p65" transform="translate(135,130)"/>
+  <g id="0p66" transform="translate(135,125)"/>
+  <g id="0p67" transform="translate(135,120)"/>
+  <g id="0p68" transform="translate(135,115)"/>
+  <g id="0p69" transform="translate(135,110)"/>
+  <g id="0p70" transform="translate(135,105)"/>
+  <g id="0p71" transform="translate(135,100)"/>
+  <g id="0p72" transform="translate(135,95)"/>
+  <g id="0p73" transform="translate(135,90)"/>
+  <g id="0p74" transform="translate(135,85)"/>
+  <g id="0p75" transform="translate(135,80)"/>
+  <g id="0p76" transform="translate(135,75)"/>
+  <g id="0p77" transform="translate(135,70)"/>
+  <g id="0p78" transform="translate(135,65)"/>
+  <g id="0p79" transform="translate(135,60)"/>
+
+  <g id="0p90" transform="translate(138,56)"/>
+  <g id="0p91" transform="translate(141,52)"/>
+  <g id="0p92" transform="translate(144,48)"/>
+  <g id="0p93" transform="translate(149,44)"/>
+  <g id="0p94" transform="translate(152,40)"/>
+  <g id="0p95" transform="translate(155,36)"/>
+
+  <g id="0p159" transform="translate(158,36)"/>
+  <g id="0p160" transform="translate(163,36)"/>
+  <g id="0p161" transform="translate(168,36)"/>
+  <g id="0p162" transform="translate(173,36)"/>
+  <g id="0p163" transform="translate(178,36)"/>
+  <g id="0p164" transform="translate(183,36)"/>
+  <g id="0p165" transform="translate(188,36)"/>
+  <g id="0p166" transform="translate(193,36)"/>
+  <g id="0p167" transform="translate(198,36)"/>
+  <g id="0p168" transform="translate(203,36)"/>
+  <g id="0p169" transform="translate(208,36)"/>
+  <g id="0p170" transform="translate(213,36)"/>
+  <g id="0p171" transform="translate(218,36)"/>
+  <g id="0p172" transform="translate(223,36)"/>
+  <g id="0p173" transform="translate(228,36)"/>
+  <g id="0p174" transform="translate(233,36)"/>
+  <g id="0p175" transform="translate(238,36)"/>
+
+  <g id="0p196" transform="translate(239,36)"/>
+  <g id="0p197" transform="translate(240,36)"/>
+  <g id="0p198" transform="translate(241,36)"/>
+  <g id="0p199" transform="translate(242,36)"/>
+  <g id="0p200" transform="translate(243,36)"/>
+
+  <g id="1p0" transform="translate(108,180)">
+    <g id="m1">
+      <polygon id="m1" points="0,0 108,0 27,108 0,108" fill="orange"/>
+      <g id="2p131" transform="translate(0,108)"/>
+    </g>
+  </g>
+  <g id="1p51" transform="translate(107,180)"/>
+  <g id="1p52" transform="translate(106,180)"/>
+  <g id="1p53" transform="translate(105,180)"/>
+  <g id="1p54" transform="translate(104,180)"/>
+  <g id="1p55" transform="translate(103,180)"/>
+
+  <g id="1p56" transform="translate(98,180)"/>
+  <g id="1p57" transform="translate(93,180)"/>
+  <g id="1p58" transform="translate(88,180)"/>
+  <g id="1p59" transform="translate(83,180)"/>
+  <g id="1p60" transform="translate(78,180)"/>
+  <g id="1p61" transform="translate(73,180)"/>
+  <g id="1p62" transform="translate(68,180)"/>
+  <g id="1p63" transform="translate(63,180)"/>
+  <g id="1p64" transform="translate(58,180)"/>
+  <g id="1p65" transform="translate(53,180)"/>
+  <g id="1p66" transform="translate(48,180)"/>
+  <g id="1p67" transform="translate(43,180)"/>
+  <g id="1p68" transform="translate(38,180)"/>
+  <g id="1p69" transform="translate(33,180)"/>
+  <g id="1p70" transform="translate(28,180)"/>
+  <g id="1p71" transform="translate(23,180)"/>
+
+  <g id="1p78" transform="translate(23,179)"/> 
+  <g id="1p79" transform="translate(23,174)"/>
+  <g id="1p80" transform="translate(23,169)"/> 
+  <g id="1p81" transform="translate(23,164)"/>
+  <g id="1p82" transform="translate(23,159)"/> 
+  <g id="1p83" transform="translate(23,154)"/>
+  <g id="1p84" transform="translate(23,149)"/>
+
+  <g id="1p95" transform="translate(25,149)"/>
+  <g id="1p96" transform="translate(30,149)"/>
+  <g id="1p97" transform="translate(35,149)"/>
+  <g id="1p98" transform="translate(40,149)"/>
+  <g id="1p99" transform="translate(45,149)"/>
+  <g id="1p100" transform="translate(50,149)"/>
+  <g id="1p101" transform="translate(55,149)"/>
+  <g id="1p102" transform="translate(60,149)"/>
+  <g id="1p103" transform="translate(65,149)"/>
+  <g id="1p104" transform="translate(70,149)"/>
+  <g id="1p105" transform="translate(75,149)"/>
+  <g id="1p106" transform="translate(80,149)"/>
+  <g id="1p107" transform="translate(85,149)"/>
+  <g id="1p108" transform="translate(90,149)"/>
+  <g id="1p109" transform="translate(95,149)"/>
+  <g id="1p110" transform="translate(100,149)"/>
+  <g id="1p111" transform="translate(105,149)"/>
+  <g id="1p112" transform="translate(110,149)"/>
+  <g id="1p113" transform="translate(115,149)"/>
+  <g id="1p114" transform="translate(120,149)"/>
+  <g id="1p115" transform="translate(125,149)"/>
+  <g id="1p116" transform="translate(130,149)"/>
+  <g id="1p117" transform="translate(135,149)"/>
+  <g id="1p118" transform="translate(140,149)"/>
+  <g id="1p119" transform="translate(145,149)"/>
+  <g id="1p120" transform="translate(150,149)"/>
+  <g id="1p121" transform="translate(155,149)"/>
+  <g id="1p122" transform="translate(160,149)"/>
+  <g id="1p123" transform="translate(165,149)"/>
+  <g id="1p124" transform="translate(170,149)"/>
+  <g id="1p125" transform="translate(175,149)"/>
+  <g id="1p126" transform="translate(180,149)"/>
+  <g id="1p127" transform="translate(185,149)"/>
+
+  <g id="1p131" transform="translate(190,149)"/>
+  <g id="1p132" transform="translate(195,149)"/>
+  <g id="1p133" transform="translate(200,149)"/>
+  <g id="1p134" transform="translate(205,149)"/>
+  <g id="1p135" transform="translate(210,149)"/>
+  <g id="1p136" transform="translate(215,149)"/>
+  <g id="1p137" transform="translate(220,149)"/>
+  <g id="1p138" transform="translate(225,149)"/>
+  <g id="1p139" transform="translate(230,149)"/>
+  <g id="1p140" transform="translate(235,149)"/>
+  <g id="1p141" transform="translate(240,149)"/>
+  <g id="1p142" transform="translate(245,149)"/>
+  <g id="1p143" transform="translate(250,149)"/>
+  <g id="1p144" transform="translate(255,149)"/>
+  <g id="1p145" transform="translate(260,149)"/>
+  <g id="1p146" transform="translate(265,149)"/>
+  <g id="1p147" transform="translate(270,149)"/>
+  <g id="1p148" transform="translate(275,149)"/>
+  <g id="1p149" transform="translate(280,149)"/>
+  <g id="1p150" transform="translate(285,149)"/>
+  <g id="1p151" transform="translate(290,149)"/>
+  <g id="1p152" transform="translate(295,149)"/>
+  <g id="1p153" transform="translate(300,149)"/>
+  <g id="1p154" transform="translate(305,149)"/>
+  <g id="1p155" transform="translate(310,149)"/>
+  <g id="1p156" transform="translate(315,149)"/>
+  <g id="1p157" transform="translate(320,149)"/>
+  <g id="1p158" transform="translate(325,149)"/>
+  <g id="1p159" transform="translate(330,149)"/>
+  <g id="1p160" transform="translate(335,149)"/>
+  <g id="1p161" transform="translate(340,149)"/>
+  <g id="1p162" transform="translate(345,149)"/>
+  <g id="1p163" transform="translate(350,149)"/>
+  <g id="1p164" transform="translate(355,149)"/>
+  <g id="1p165" transform="translate(360,149)"/>
+  <g id="1p166" transform="translate(365,149)"/>
+
+  <g id="1p196" transform="translate(364,148)"/>
+  <g id="1p197" transform="translate(363,147)"/>
+  <g id="1p198" transform="translate(362,146)"/>
+  <g id="1p199" transform="translate(361,145)"/>
+  <g id="1p200" transform="translate(360,144)"/>
+
+  <g id="2p0" transform="translate(216,288)">
+    <polygon id="m2" points="0,0 27,0 0,36" fill="blue"/>
+  </g>
+  <g id="2p51" transform="translate(215,289)"/>
+  <g id="2p52" transform="translate(214,290)"/>
+  <g id="2p53" transform="translate(213,291)"/>
+  <g id="2p54" transform="translate(211,292)"/>
+  <g id="2p55" transform="translate(210,293)"/>
+
+  <g id="2p56" transform="translate(205,293)"/>
+  <g id="2p57" transform="translate(200,293)"/>
+  <g id="2p58" transform="translate(195,293)"/>
+  <g id="2p59" transform="translate(190,293)"/>
+  <g id="2p60" transform="translate(185,293)"/>
+
+  <g id="2p88" transform="translate(185,290)"/>
+  <g id="2p89" transform="translate(185,287)"/> 
+  <g id="2p90" transform="translate(185,282)"/>
+  <g id="2p91" transform="translate(185,277)"/> 
+  <g id="2p92" transform="translate(185,272)"/>
+  <g id="2p93" transform="translate(185,267)"/> 
+  <g id="2p94" transform="translate(185,262)"/>
+  <g id="2p95" transform="translate(185,257)"/>
+
+  <g id="3p0" transform="translate(216,288)">
+    <g id="m3">
+      <polygon points="144,36 144,144 0,36" fill="violet"/>
+      <polygon points="108,0 144,0 144,36 108,36" fill="brown"/>
+      <polygon points="27,0 108,0 108,36 0,36" fill="cyan"/>
+    </g>
+  </g>
+  <g id="3p51" transform="translate(217,289)"/>
+  <g id="3p52" transform="translate(218,290)"/>
+  <g id="3p53" transform="translate(219,291)"/>
+  <g id="3p54" transform="translate(220,292)"/>
+  <g id="3p55" transform="translate(221,293)"/>
+
+  <g id="3p56" transform="translate(226,293)"/>
+  <g id="3p57" transform="translate(231,293)"/>
+  <g id="3p58" transform="translate(236,293)"/>
+  <g id="3p59" transform="translate(241,293)"/>
+  <g id="3p60" transform="translate(246,293)"/>
+  <g id="3p61" transform="translate(251,293)"/>
+  <g id="3p62" transform="translate(256,293)"/>
+  <g id="3p63" transform="translate(261,293)"/>
+  <g id="3p64" transform="translate(266,293)"/>
+  <g id="3p65" transform="translate(271,293)"/>
+  <g id="3p66" transform="translate(276,293)"/>
+  <g id="3p67" transform="translate(281,293)"/>
+  <g id="3p68" transform="translate(286,293)"/>
+  <g id="3p69" transform="translate(291,293)"/>
+  <g id="3p70" transform="translate(296,293)"/>
+  <g id="3p71" transform="translate(301,293)"/>
+  <g id="3p72" transform="translate(306,293)"/>
+  <g id="3p73" transform="translate(311,293)"/>
+  <g id="3p74" transform="translate(316,293)"/>
+  <g id="3p75" transform="translate(321,293)"/>
+  <g id="3p76" transform="translate(326,293)"/>
+  <g id="3p77" transform="translate(331,293)"/>
+  <g id="3p78" transform="translate(336,293)"/>
+  <g id="3p79" transform="translate(341,293)"/>
+  <g id="3p80" transform="translate(346,293)"/>
+  <g id="3p81" transform="translate(351,293)"/>
+  <g id="3p82" transform="translate(356,293)"/>
+  <g id="3p83" transform="translate(361,293)"/>
+  <g id="3p84" transform="translate(366,293)"/>
+
+  <g id="3p134" transform="translate(361,293)"/>
+  <g id="3p135" transform="translate(356,293)"/>
+  <g id="3p136" transform="translate(351,293)"/>
+  <g id="3p137" transform="translate(346,293)"/>
+  <g id="3p138" transform="translate(341,293)"/>
+  <g id="3p139" transform="translate(336,293)"/>
+  <g id="3p140" transform="translate(331,293)"/>
+  <g id="3p141" transform="translate(326,293)"/>
+  <g id="3p142" transform="translate(321,293)"/>
+  <g id="3p143" transform="translate(316,293)"/>
+  <g id="3p144" transform="translate(311,293)"/>
+  <g id="3p145" transform="translate(306,293)"/>
+  <g id="3p146" transform="translate(301,293)"/>
+  <g id="3p147" transform="translate(296,293)"/>
+  <g id="3p148" transform="translate(291,293)"/>
+  <g id="3p149" transform="translate(286,293)"/>
+
+  <g id="3p150" transform="translate(286,298)"/>
+  <g id="3p151" transform="translate(281,298)"/>
+  <g id="3p152" transform="translate(276,298)"/>
+  <g id="3p153" transform="translate(271,298)"/>
+  <g id="3p154" transform="translate(266,298)"/>
+  <g id="3p155" transform="translate(261,298)"/>
+  <g id="3p156" transform="translate(256,298)"/>
+  <g id="3p157" transform="translate(251,298)"/>
+  <g id="3p158" transform="translate(246,298)"/>
+  <g id="3p159" transform="translate(241,298)"/>
+  <g id="3p160" transform="translate(236,298)"/>
+  <g id="3p161" transform="translate(231,298)"/>
+  <g id="3p162" transform="translate(226,298)"/>
+  <g id="3p163" transform="translate(221,298)"/>
+  <g id="3p164" transform="translate(216,298)"/>
+
+  <g id="3p166" transform="translate(216,293)"/>
+  <g id="3p167" transform="translate(216,288)"/>
+  <g id="3p168" transform="translate(216,283)"/>
+  <g id="3p169" transform="translate(216,278)"/>
+  <g id="3p170" transform="translate(216,273)"/>
+  <g id="3p171" transform="translate(216,268)"/>
+  <g id="3p172" transform="translate(216,263)"/>
+  <g id="3p173" transform="translate(216,258)"/>
+  <g id="3p174" transform="translate(216,253)"/>
+  <g id="3p175" transform="translate(216,248)"/>
+  <g id="3p176" transform="translate(216,243)"/>
+  <g id="3p177" transform="translate(216,238)"/>
+  <g id="3p178" transform="translate(216,233)"/>
+  <g id="3p179" transform="translate(216,228)"/>
+  <g id="3p180" transform="translate(216,223)"/>
+  <g id="3p181" transform="translate(216,218)"/>
+  <g id="3p182" transform="translate(216,213)"/>
+  <g id="3p183" transform="translate(216,208)"/>
+  <g id="3p184" transform="translate(216,203)"/>
+  <g id="3p185" transform="translate(216,198)"/>
+  <g id="3p186" transform="translate(216,193)"/>
+  <g id="3p187" transform="translate(216,188)"/>
+  <g id="3p188" transform="translate(216,183)"/>
+  <g id="3p189" transform="translate(216,178)"/>
+  <g id="3p190" transform="translate(216,173)"/>
+  <g id="3p191" transform="translate(216,168)"/>
+  <g id="3p192" transform="translate(216,163)"/>
+  <g id="3p193" transform="translate(216,158)"/>
+  <g id="3p194" transform="translate(216,153)"/>
+
+  <g id="3p195" transform="translate(216,149)"/>
+  <g id="3p196" transform="translate(216,148)"/>
+  <g id="3p197" transform="translate(216,147)"/>
+  <g id="3p198" transform="translate(216,146)"/>
+  <g id="3p199" transform="translate(216,145)"/>
+  <g id="3p200" transform="translate(216,144)"/>
+
+  <g id="4p0" transform="translate(216,324)">
+    <polygon id="m4" points="0,0 144,108 0,108" fill="lime"/>
+  </g>
+  <g id="4p51" transform="translate(216,325)"/>
+  <g id="4p52" transform="translate(216,326)"/>
+  <g id="4p53" transform="translate(216,328)"/>*
+  <g id="4p54" transform="translate(216,330)"/>*
+  <g id="4p55" transform="translate(216,332)"/>*
+  <g id="4p56" transform="translate(216,333)"/>
+
+  <g id="4p62" transform="translate(216,330)"/>
+  <g id="4p63" transform="translate(216,325)"/>
+  <g id="4p64" transform="translate(216,320)"/>
+  <g id="4p65" transform="translate(216,315)"/>
+  <g id="4p66" transform="translate(216,310)"/>
+  <g id="4p67" transform="translate(216,305)"/>
+  <g id="4p68" transform="translate(216,300)"/>
+  <g id="4p69" transform="translate(216,295)"/>
+  <g id="4p70" transform="translate(216,290)"/>
+  <g id="4p71" transform="translate(216,285)"/>
+  <g id="4p72" transform="translate(216,280)"/>
+  <g id="4p73" transform="translate(216,275)"/>
+  <g id="4p74" transform="translate(216,270)"/>
+  <g id="4p75" transform="translate(216,265)"/>
+  <g id="4p76" transform="translate(216,260)"/>
+  <g id="4p77" transform="translate(216,255)"/>
+  <g id="4p78" transform="translate(216,250)"/>
+  <g id="4p79" transform="translate(216,245)"/>
+  <g id="4p80" transform="translate(216,240)"/>
+  <g id="4p81" transform="translate(216,235)"/>
+  <g id="4p82" transform="translate(216,230)"/>
+  <g id="4p83" transform="translate(216,225)"/>
+  <g id="4p84" transform="translate(216,220)"/>
+  <g id="4p85" transform="translate(216,215)"/>
+  <g id="4p86" transform="translate(216,210)"/>
+  <g id="4p87" transform="translate(216,205)"/>
+  <g id="4p88" transform="translate(216,200)"/>
+  <g id="4p89" transform="translate(216,195)"/>
+  <g id="4p90" transform="translate(216,190)"/>
+  <g id="4p91" transform="translate(216,185)"/>
+  <g id="4p92" transform="translate(216,180)"/>
+
+  <g id="4p100" transform="translate(216,180)"/>
+  <g id="4p101" transform="translate(219,176)"/>
+  <g id="4p102" transform="translate(222,172)"/>
+  <g id="4p103" transform="translate(225,168)"/>
+  <g id="4p104" transform="translate(228,164)"/>
+  <g id="4p105" transform="translate(231,160)"/>
+  <g id="4p106" transform="translate(234,156)"/>
+  <g id="4p107" transform="translate(237,152)"/>
+  <g id="4p108" transform="translate(240,148)"/>
+  <g id="4p109" transform="translate(243,144)"/>
+  <g id="4p110" transform="translate(246,140)"/>
+  <g id="4p111" transform="translate(249,136)"/>
+  <g id="4p112" transform="translate(252,132)"/>
+  <g id="4p113" transform="translate(255,128)"/>
+  <g id="4p114" transform="translate(258,124)"/>
+  <g id="4p115" transform="translate(261,120)"/>
+  <g id="4p116" transform="translate(264,116)"/>
+  <g id="4p117" transform="translate(267,112)"/>
+  <g id="4p118" transform="translate(270,108)"/>
+  <g id="4p119" transform="translate(273,104)"/>
+  <g id="4p120" transform="translate(276,100)"/>
+  <g id="4p121" transform="translate(279,96)"/>
+  <g id="4p122" transform="translate(282,92)"/>
+  <g id="4p123" transform="translate(285,88)"/>
+  <g id="4p124" transform="translate(288,84)"/>
+  <g id="4p125" transform="translate(291,80)"/>
+  <g id="4p126" transform="translate(294,76)"/>
+  <g id="4p127" transform="translate(297,72)"/>
+  <g id="4p128" transform="translate(300,68)"/>
+  <g id="4p129" transform="translate(303,64)"/>
+  <g id="4p130" transform="translate(306,60)"/>
+  <g id="4p131" transform="translate(309,56)"/>
+  <g id="4p132" transform="translate(312,52)"/>
+  <g id="4p133" transform="translate(315,48)"/>
+  <g id="4p134" transform="translate(318,44)"/>
+  <g id="4p135" transform="translate(321,40)"/>
+  <g id="4p136" transform="translate(324,36)"/>
+
+</svg>
+</body>
+</html>
