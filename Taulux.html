@@ -1,0 +1,495 @@
+<html>
+<head>
+<title>Taulux</title>
+<style>
+  * {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  input {
+    font-family: monospace;
+  }
+  input[type=number] {
+    text-align: right;
+    width: 120px;
+  }
+  #ohje td {
+    vertical-align: top;
+    padding: 10px;
+  }
+  #ohje span {
+    font-size: 12px;
+  }
+  code {
+    font-size: inherit;
+  }
+</style>
+<script>
+onload = function() {
+
+  var text = "";
+
+  var MIN = document.getElementById("min");
+  var MAX = document.getElementById("max");
+  var MALLI = document.getElementById("malli");
+  var DEFS = document.getElementById("defs");
+  var HIDDEN = document.getElementById("hidden");
+  var ANS = document.getElementById("ans");
+  var SAVE = document.getElementById("save");
+  var DOWNLOAD = document.getElementById("download");
+  var OHJE = document.getElementById("ohje");
+
+  var TR = OHJE.firstElementChild;
+  while (TR && TR.tagName != "TR") {
+    TR = TR.firstElementChild;
+  }
+  if (TR) {
+    for ( var TD = TR.firstElementChild;
+              TD != null;
+              TD = TD.nextElementSibling )
+    {
+      if (TD.tagName == "TD") {
+        for ( var SPAN = TD.firstElementChild;
+                  SPAN != null;
+                  SPAN = SPAN.nextElementSibling )
+        {
+          if (SPAN.tagName == "SPAN" && SPAN.className != "Oma") {
+            var CODE = SPAN.firstElementChild;
+            if (!(CODE.innerHTML  in Math)) {
+              SPAN.style.display = "none";
+            }
+          }
+        }
+      }
+    }
+  } else {
+    OHJE.style.display = "none";
+  }
+
+  function range_onchange() {
+    MIN.max = MAX.value;
+    MAX.min = MIN.value;
+  }
+
+  MIN.oninput = range_onchange;
+  MAX.oninput = range_onchange;
+
+  var focused = null;
+  var freeId = 1;
+
+  function sym_onfocus() {
+    if (focused != this.id) {
+      focused = this.id;
+      var FOUND = null;
+      for (var i = 0; i < freeId; i++) {
+        var DEF = document.getElementById("def-"+i);
+        if (DEF.parentElement != HIDDEN) {
+          var SYM = document.getElementById("sym-"+i);
+          if (SYM && SYM.id != this.id && SYM.value.trim() == "") {
+            var XPR = document.getElementById("xpr-"+i);
+            if (XPR.value.trim() == "") {
+              if (FOUND) {
+                HIDDEN.appendChild(FOUND);
+              }
+              FOUND = DEF;
+            }
+          }
+        }
+      }
+      if (!FOUND) {
+        var DEF = HIDDEN.firstElementChild;
+        if (!DEF) {
+          DEF = document.createElement("TR");
+          DEF.id = "def-"+freeId;
+          var SYMCELL = document.createElement("TD");
+          var SYM = document.createElement("INPUT");
+          SYM.id = "sym-"+freeId;
+          SYM.type = "text";
+          SYM.size = "10";
+          SYM.onfocus = sym_onfocus;
+          SYMCELL.appendChild(SYM);
+          DEF.appendChild(SYMCELL);
+          var WDTCELL = document.createElement("TD");
+          var WDT = document.createElement("INPUT");
+          WDT.id = "wdt-"+freeId;
+          WDT.type = "number";
+          WDT.min = "0";
+          WDT.value = "0";
+          WDTCELL.append(WDT);
+          DEF.append(WDTCELL);
+          var PRCCELL = document.createElement("TD");
+          var PRC = document.createElement("INPUT");
+          PRC.id = "prc-"+freeId;
+          PRC.type = "number";
+          PRC.min = "0";
+          PRC.value = "0";
+          PRCCELL.append(PRC);
+          DEF.append(PRCCELL);
+          var XPRCELL = document.createElement("TD");
+          var XPR = document.createElement("INPUT");
+          XPR.id = "xpr-"+freeId;
+          XPR.type = "text";
+          XPR.size = "80";
+          XPRCELL.appendChild(XPR);
+          DEF.appendChild(XPRCELL);
+          freeId++;
+        }
+        DEFS.appendChild(DEF);
+      }
+    }
+    this.focus();
+  }
+
+  document.getElementById("sym-0").onfocus = sym_onfocus;
+
+  function numValue(img) {
+    var ans;
+    if (img == "") {
+      ans = null;
+    } else {
+      ans = Number(img);
+      if (!Number.isSafeInteger(ans)) ans = null;
+    }
+    return ans;
+  }
+
+  function identify(malli, syms) {
+    var buf = [malli];
+    for (var k = 0; k < buf.length; k++) {
+      var part = buf[k];
+      if (typeof(part) == "string") {
+        for (var i = 0; i < syms.length; i++) {
+          var sym = syms[i];
+          if (sym) {
+            var len = sym.length;
+            var p = part.indexOf(sym);
+            if (p >= 0) {
+              var rgt = part.substring(p + len);
+              part = part.substring(0, p);
+              buf.splice(k, 1, part, i, rgt);
+            }
+          }
+        }
+      }
+    }
+    return buf;
+  }
+
+  function translate(xpr, syms) {
+    var ans = "";
+    var tail = xpr;
+    while (tail.length > 0) {
+      var found = false;
+      if (tail.charAt(0) == "#" && !tail.match(/^.[0-9A-Z_a-z]/)) {
+        found = true;
+        ans += "(row)";
+        tail = tail.substring(1);
+      }
+      for (var i = 0; i < syms.length && !found; i++) {
+        var sym = syms[i];
+        if (sym && tail.startsWith(sym)) {
+          var next = tail.substring(sym.length);
+          if (!next.match(/^[0-9A-Z_a-z]/)) {
+            found = true;
+            ans += "(data['"+sym+"'])";
+            tail = next;
+          }
+        }
+      }
+      if (!found) {
+        var tok = tail.match(/^[A-Za-z][0-9A-Z_a-z]*/);
+        if (tok) {
+          tok = tok[0];
+          if (tok in Math) {
+            found = true;
+            ans += "(Math."+tok+")";
+            tail = tail.substring(tok.length);
+          } else if (syms.indexOf(tok) < 0) {
+            alert("Symbolia "+tok+" ei ole määritelty");
+            return false;
+          }
+        }
+      }
+      var tok = tail.match(/^[!&()*+-/0-9:.<=>?^|]+/);
+      if (tok) {
+        tok = tok[0];
+        found = true;
+        ans += tok;
+        tail = tail.substring(tok.length);
+      }
+      var tok = tail.match(/^\s+/);
+      if (tok) {
+        tok = tok[0];
+        found = true;
+        ans += " ";
+        tail = tail.substring(tok.length);
+      }
+      if (!found) {
+        return null;
+      }
+    }
+    return ans;
+  }
+
+  function calc(def, row, data) {
+    return eval(def) || 0;
+  }
+
+  document.getElementById("make").onclick = function () {
+    var min = numValue(MIN.value);
+    var max = numValue(MAX.value);
+    if (min === null) {
+      alert("min # ei kelpaa");
+      return;
+    } else if (max === null) {
+      alert("max # ei kelpaa");
+      return
+    } else if (max < min) {
+      alert("max # ei saa olla pienempi kuin min #");
+      return
+    }
+    var syms = [];
+    for (var i = 0; i < freeId; i++) {
+      var DEF = document.getElementById("def-"+i);
+      if (DEF.parentElement != HIDDEN) {
+        var SYM = document.getElementById("sym-"+i);
+        var sym = SYM.value;
+        if (sym.length > 0) {
+          if (sym.indexOf("'") >= 0 || sym.indexOf("#") >= 0) {
+            alert("Symboli "+sym+" ei kelpaa.");
+            return;
+          }
+          syms[i] = sym;
+        }
+      }
+    }
+    var malli = identify(MALLI.value, syms);
+    var defs = [];
+    var wdts = [];
+    var prcs = [];
+    for (var i = 0; i < freeId; i++) {
+      if (syms[i]) {
+        var def = translate(document.getElementById("xpr-"+i).value, syms);
+        if (def) {
+          defs[i] = def;
+        } else {
+          if (def === null) {
+            alert("Symbolin "+syms[i]+" kaavassa on virhe.");
+          } else if (def === "") {
+            alert("symbolilla "+syms[i]+" ei ole kaavaa.");
+          }
+          return;
+        }
+        wdts[i] = numValue(document.getElementById("wdt-"+i).value) || 0;
+        prcs[i] = numValue(document.getElementById("prc-"+i).value) || 0;
+      }
+    }
+    var gooddefs = [];
+    for (var i = 0; i < freeId; i++) {
+      if (gooddefs.indexOf(i) < 0) {
+        var def = defs[i];
+        if (def) {
+          var len = def.length;
+          var p = 0;
+          var good = true;
+          while (p < len && good) {
+            p = def.indexOf("['", p);
+            if (p < 0) {
+              p = len;
+            } else {
+              p = p + 2;
+              var q = def.indexOf("'", p);
+              var sym = def.substring(p, q);
+              p = q + 1;
+              good = false;
+              for (var k = 0; k < gooddefs.length && !good; k++) {
+                if (syms[gooddefs[k]] == sym) {
+                  good = true;
+                }
+              }
+            }
+          }
+          if (good) {
+            gooddefs.push(i);
+            i = -1;
+          }
+        }
+      }
+    }
+    for (var i = 0; i < freeId; i++) {
+      if (gooddefs.indexOf(i) < 0) {
+        var sym = syms[i];
+        if (sym) {
+          if (defs[i]) {
+            alert("Symbolilla "+sym+" on kehämääritelmä.");
+            return;
+          } else {
+            alert("Symbolilla "+sym+" ei ole kaavaa.");
+            return;
+          }
+        }
+      }
+    }
+    var lines = [];
+    for (var xin = min; xin <= max; xin++) {
+      var line = "";
+      var vals = {};
+      for (var k = 0; k < gooddefs.length; k++) {
+        var i = gooddefs[k];
+        var val;
+        try {
+          val = calc(defs[i], xin, vals);        
+          vals[syms[i]] = val;
+        } catch(e) {
+          alert("Symbolin "+syms[i]+" kaavassa on virhe.")
+          return;
+        }
+      }
+      var imgs = [];
+      for (var i = 0; i < freeId; i++) {
+        var sym = syms[i];
+        if (sym) {
+          var img = vals[syms[i]];
+          if (typeof(img) == "number") {
+            img = img.toFixed(prcs[i]);
+            if (img.endsWith("Infinity")) {
+              img = img.substring(0, img.length-8)+"∞";
+              if (prcs[i] > 0) {
+                img += "".repeat(prcs[i]+1);
+              }
+            }
+          } else if (typeof(img) == "undefined") {
+            img = "";
+          } else {
+            img = img.toString();
+          }
+          var w = img.length;
+          if (w < wdts[i]) {
+            img = " ".repeat(wdts[i]-w) + img;
+          }
+          imgs[i] = img;
+        }
+      }
+      for (var k = 0; k < malli.length; k++) {
+        var tok = malli[k];
+        if (typeof(tok) == "string") {
+          line += tok;
+        } else if (typeof(tok) == "number") {
+          var img = imgs[tok];
+          if (img) {
+            line += img;
+          }
+        }
+      }
+      lines.push(line+"\n");
+    }
+    text = lines.join("")+"\n";
+    ANS.innerText = text;
+    SAVE.disabled = false;
+  }
+
+  SAVE.onclick = function () {
+    DOWNLOAD.href = "data:text/plain,"+encodeURIComponent(text);
+    DOWNLOAD.click();
+  }
+
+}
+</script>
+</head>
+<body>
+  <h1>Taulux</h1>
+  <p>Tällä sivulla voit luoda taulukon, jossa samantyyppisillä riveillä on eri
+     numerot, jotka lasketaan rivinumeron perusteella.</p>
+  <p>Kohdasta <b>min #</b> valitaan ensimmäisen rivin numero ja kohdasta
+     <b>max #</b> viimeisen. Nämä yhdessä määräävät rivien lukumäärän. Kohtaan
+     <b>malli</b> kirjoitetaan riville tuleva teksti, jossa laskettavat
+     numerot on korvattu symboleilla. Laskettavat symbolit kirjoitetaan
+     sarakkeesee <b>symboli</b> ja vastaavat laskukaavat sarakkeeseen
+     <b>kaava</b>. Kaavoissa rivinumeron symbolina käytetään
+     <code>#</code>-merkki'. Lisäksi kaavoissa voi käyttää omilla kaavoillaan
+     määriteltyjä symboleja. Sarakkeessa <b>leveys</b> voi valita luvulle
+     varattavan tilan ja sarakkeessa <b>tarkkuus</b> desimaalien määrän.</p>
+  <table>
+    <tr><th>min <code>#</code></th>
+        <td><input id="min" type="number" value="0" max="1"/></td></tr>
+    <tr><th>max <code>#</code></th>
+        <td><input id="max" type="number" value="1" min="0"/></td></tr>
+    <tr><th>malli</th>
+        <td><input id="malli" type="text" size="80"/></td></tr>
+  </table>
+  <table id="defs">
+    <tr><th>symboli</th><th>leveys</th><th>tarkkuus</th><th>kaava</th></tr>
+    <tr id="def-0">
+       <td><input id="sym-0" type="text" size="10"/></td>
+       <td><input id="wdt-0" type="number" value="0" min="0"/></td>
+       <td><input id="prc-0" type="number" value="0" min="0"/></td>
+       <td><input id="xpr-0" type="text" size="80"/></td><tr>
+  </table>
+  <table id="hidden" style="display:none">
+  </table>
+  <table id="ohje"><tr>
+    <td>Kaavoissa voi käyttää symboleita:</td>
+    <td>Kaavoissa voi käyttää funktioita:</td></tr>
+    <tr><td>
+      <span class="Oma"><code>#</code> rivinumero, josta luku
+            lasketaan<br/></span>
+      <span><code>E</code> luonnollisen logafitmin kantaluku<br/></span>
+      <span><code>LN2</code> luvun 2 luonnollinen logaritmi<br/></span>
+      <span><code>LN10</code> luvun 10 luonnollinen logaritmi<br/></span>
+      <span><code>LOG2E</code> edellä mainitun luvun E binäärinen
+            logaritmi<br/></span>
+      <span><code>LOG10E</code> edellä mainitun luvun E Briggsin
+            logaritmi<br/></span>
+      <span><code>PI</code> ympyrän kehän ja läpimitan suhde<br/></span>
+      <span><code>SQRT1_2</code> luvun 1/2 neliöjuuri<br/></span>
+      <span><code>SQRT2</code> luvun 2 neliöjuuri<br/></span></td>
+    <td>
+      <span><code>abs</code> itseisarvo<br/></span>
+      <span><code>acos</code> arkuskosini<br/></span>
+      <span><code>acosh</code> areahyperbelikosini<br/></span>
+      <span><code>asin</code> arkussini<br/></span>
+      <span><code>asinh</code> areahyperbelisini<br/></span>
+      <span><code>atan</code> arkustangentti<br/></span>
+      <span><code>atan2</code> koordinaatteja (x, y) vastaava
+            kulmakoordinaatti<br/></span>
+      <span><code>atanh</code> areahyperbelitangentti<br/></span>
+      <span><code>cbrt</code> kuutiojuuri<br/></span>
+      <span><code>ceil</code> ylöspäin pyöristys<br/></span>
+      <span><code>clz32</code> alkunollien määrä
+            32-bittisessä binääriluvussa<br/></span></td>
+    <td>
+      <span><code>cos</code> kosini<br/></span>
+      <span><code>cosh</code> hyperbelikosini<br/></span>
+      <span><code>exp</code> luonnollinen exponenttifunktio<br/></span>
+      <span><code>expm1</code> yhdellä vähennetty
+            luonnollinen exponenttifunktio<br/></span>
+      <span><code>floor</code> alaspäin pyöristys<br/></span>
+      <span><code>fround</code> pyöristys lähimpään 32-bittiseen 
+            liukulukuun<br/></span>
+      <span><code>log</code> luonnollinen logaritmi<br/></span>
+      <span><code>log10</code> Briggsin logaritmi<br/></span>
+      <span><code>log1p</code> yhdellä lisätty luonnollinen logaritmi<br/>
+            <span>
+      <span><code>log2</code> binäärinen logaritmi<br/></span>
+      <span><code>max</code> suurin argumenteista<br/></span></td>
+    <td>
+      <span><code>min</code> pienin argumenteista<br/></span>
+      <span><code>pow</code> potenssi, sama kuin <code>**</code><br/></span>
+      <span><code>random</code> satunnaisluku<br/></span>
+      <span><code>round</code> pyöristys<br/></span>
+      <span><code>sign</code> etumerkki<br/></span>
+      <span><code>sin</code> sini<br/></span>
+      <span><code>sinh</code> hyperbelisini<br/></span>
+      <span><code>sqrt</code> neliöjuuri<br/></span>
+      <span><code>tan</code> tangentti<br/></span>
+      <span><code>tanh</code> kotangentti<br/></span>
+      <span><code>trunc</code> nollaa kohti pyöristys<br/></span></td></tr>
+  </table>
+  <p><button id="make">Tee</button>
+     <a id="download" style="display:none" download="taulu.txt"></a>
+     <button id="save" disabled>Tiedostoksi</button></p>
+  <pre id="ans"></pre>
+</body>
+</html>
