@@ -375,6 +375,7 @@ function sudokuCreate2() {
     if (sudoku[C] == 0) {
       cntRemain++;
       document.getElementById(""+C).onclick = move;
+      document.getElementById(""+C).style.cursor = "default";
       hard[C] = false;
     }
   }
@@ -422,8 +423,10 @@ function move() {
     hard[C] = (V == 0);
   } else {
     var T = '<i style="color:red">?</i>';
-    if (V == 0 && text.innerHTML != T) {
+    var oldFail = (text.innerHTML == T);
+    if (V == 0 && !oldFail) {
       text.innerHTML = T;
+      MARK = "#ffee11";
     } else {
       text.innerHTML = "<i style='color:red'>&#xa0;</i>";
     }
@@ -436,6 +439,9 @@ function move() {
     } else {
       easyList.push(this.id);
     }
+  }
+  if (failList.length == 0 && hardList.length == 0 && easyList.length == 0) {
+    MARK = "white";
   }
   if (undoList.length > 0) {
     var last = undoList.length - 1;
@@ -474,9 +480,12 @@ function move() {
 
 </script>
 </head>
-<body align="center">
+<body align="center" style="cursor:not-allowed;user-select:none;">
 <H1 align="center">Mikon sudoku</H1>
 <p>&#xa0;</p>
+<div style="position:absolute;top:50px;left:5px;align:left;text-align:left">
+<p id="trace"></p>
+</div>
 <big><big><big>
 <table id="Sudoku" border="1" align="center">
 <tr>
