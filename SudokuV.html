@@ -6,7 +6,9 @@
 <script language="JavaScript">
 
 var Tr = false; // debugging flag
-var MARK = "white"; // use "white" for no mark or "yellow" for mark 
+var MARK = "white";
+
+var has_solution = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
    // cells are indexed 0..80
@@ -30,6 +32,7 @@ function boxCell(C,I) {
 var date = new Date();
 var rndLimit = 4294967296;
 var rndstate = date.getTime() % rndLimit;
+// rndstate = 3291989743; // fixed value for debugging
 function rnd9() {
   rndstate = (1 + rndstate*5) % rndLimit;
   return Math.floor(9*rndstate/rndLimit) + 1;
@@ -44,6 +47,7 @@ var solution = new Array(81);
 var work = new Array(81);
 
 var Nmax = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 function blankBoard() {
@@ -72,15 +76,30 @@ function copyBoard(src) {
   }
   return board;
 }
-</script>
-<script language="javascript">
+
+//========
+// for debugging
+
+function compareBoards(b1, b2) {
+  var ans = "";
+  for (var I = 0; I < 81; I++) {
+    if (b1[I] != b2[I] && b1[I] > 0 && b2[I] > 0) {
+      ans = ans+I+": "+b1[I]+" <-> "+b2[I]+"\n";
+    }
+  }
+  if (ans == "") {
+    return null;
+  } else {
+    return ans;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // validity check
 
 function check(board,C,V) {
   var X;
-  for (I = 0; I < 9; I++) {
+  for (var I = 0; I < 9; I++) {
     X = rowCell(C,I);
     if (X != C && board[X] == V) {
 //if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
@@ -253,8 +272,7 @@ function workShow(X) {
 var timer;
 
 ////////////////////////////////////////////////////////////////////////////////
-</script>
-<script languae="javascript">
+
 var animation_state = 0;
 
 function animation_step(Cmd) {
@@ -288,8 +306,7 @@ function animation_step(Cmd) {
   animation_state = (animation_state + 1) % 9;
   timer = setTimeout(Cmd,100);
 }
-</script>
-<script languae="javascript">
+
 ////////////////////////////////////////////////////////////////////////////////
 
 function sudoku_Clear() {
@@ -321,8 +338,10 @@ function sudokuCreate() {
   var C;
   sudoku = blankBoard();
   solution = rndBoard();
+has_solution = 1;
   sudokuSolve();
   solution = copyBoard(work);
+has_solution = 2;
   sudoku = copyBoard(solution);
   X = 9*rnd9()+rnd9();
   animation_step("sudokuCreate1(0,32,"+X+");");
@@ -330,6 +349,8 @@ function sudokuCreate() {
 
 function sudokuCreate1(I,K,X) {
   var J;
+var e = compareBoards(sudoku, solution);
+if (e) alert("has_solution = "+has_solution+" -- A\n"+e);
   if (I < 81) {
     for (J = I; J < K; J++) {
       C = (X + 31*J) % 81;
@@ -339,11 +360,15 @@ function sudokuCreate1(I,K,X) {
       }
     }
     if (sudokuSolve()) {
+var e = compareBoards(sudoku, solution);
+if (e) alert("has_solution = "+has_solution+" -- B\n"+e);
       for (J = I; J < K; J++) {
         C = (X + 31*J) % 81;
         sudoku[C] = solution[C];
         cntRemain--;
       }
+var e = compareBoards(sudoku, solution);
+if (e) alert("has_solution = "+has_solution+" -- C\n"+e);
       if (K > I + 1) {
         K = (I + K) / 2;
       } else {
@@ -364,9 +389,18 @@ function sudokuCreate1(I,K,X) {
   }
 }
 
+var problem = [];
+
 function sudokuCreate2() {
   var C;
+var e = compareBoards(sudoku, solution);
+if (e) alert("has_solution = "+has_solution+" -- C\n"+e);
   sudokuShow();
+  problem = copyBoard(sudoku);
+has_solution = 3;
+var e = compareBoards(sudoku, solution);
+if (e) alert("has_solution = "+has_solution+"\n"+e);
+has_solution = 4;
   cntRemain = 0;
   undoList = [];
   easyList = [];
@@ -379,6 +413,181 @@ function sudokuCreate2() {
       hard[C] = false;
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var DOWNLOAD;
+
+onload = function() {
+
+  DOWNLOAD = document.getElementById("download");
+
+  document.getElementById("downloadProblemSVG").onclick =
+    function downloadProblemSVG() {
+      var SVGtext = board_svg(problem);
+      var name = 'problem_'+sudoku_hash()+'.svg';
+      download(name, 'image/svg+xml', SVGtext);
+    };
+
+  document.getElementById("downloadSolutionSVG").onclick =
+    function downloadSolutionSVG() {
+      var SVGtext = board_svg(solution);
+      var name = 'solution_'+sudoku_hash()+'.svg';
+      download(name, 'image/svg+xml', SVGtext);
+    };
+
+  document.getElementById("downloadProblemTXT").onclick =
+    function downloadProblemTXT() {
+      var SVGtext = board_txt(problem);
+      var name = 'problem_'+sudoku_hash()+'.txt';
+      download(name, 'text/plain', SVGtext);
+    };
+
+  document.getElementById("downloadSolutionTXT").onclick =
+    function downloadSolutionTXT() {
+var e = compareBoards(problem, solution);
+if (e) alert("has_solution = "+has_solution+"\n"+e);
+      var SVGtext = board_txt(solution);
+      var name = 'solution_'+sudoku_hash()+'.txt';
+      download(name, 'text/plain', SVGtext);
+    };
+
+  document.getElementById("downloadProblemCSV").onclick =
+    function downloadProblemCSV() {
+      var CSVtext = board_csv(problem);
+      var name = 'problem_'+sudoku_hash()+'.csv';
+      download(name, 'text/csv', CSVtext);
+    };
+
+  document.getElementById("downloadSolutionCSV").onclick =
+    function downloadSolutionCSV() {
+      var CSVtext = board_csv(solution);
+      var name = 'solution_'+sudoku_hash()+'.csv';
+      download(name, 'text/csv', CSVtext);
+    };
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var in_download = false;
+
+function download(filename, filetype, text) {
+  if (in_download) return;
+  in_download = true;
+  DOWNLOAD.setAttribute('download', filename);
+  DOWNLOAD.setAttribute('href',
+      'data:'+filetype+',' + encodeURIComponent(text));
+  DOWNLOAD.click();
+  DOWNLOAD.removeAttribute('href');
+  in_download = false;
+}
+
+var hash_range = 562949953421311;
+
+function sudoku_hash() {
+  var code = 0;
+  for (var C = 0; C < 81; C++) {
+    code = (code * 10 + problem[C]) % hash_range;
+  }
+  var ans = [];
+  for (var i = 0; i < 10; i++) {
+    var d = code % 36;
+    code = Math.floor(code / 36);
+    if (d < 10) {
+      ans[i] = 0x30 + d;
+    } else {
+      ans[i] = 0x61 + (d - 10);
+    }
+  }
+  return String.fromCharCode(ans[0],ans[1],ans[2],ans[3],ans[4],ans[5],
+               ans[6],ans[7],ans[8],ans[9]);
+}
+
+function board_txt(board) {
+  var ans = "+-------+-------+-------+\n";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        ans += "| ";
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var t = board[C];
+          if (t > 0) {
+            ans += t;
+          } else {
+            ans += " ";
+          }
+          ans += " ";
+        }
+      }
+      ans += "|\n";
+    }
+    ans += "+-------+-------+-------+\n";
+  }
+  return ans;
+}
+
+function board_csv(board) {
+  var ans = "";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var t = board[C];
+          if (t > 0) {
+            ans += t;
+          }
+          ans += ",";
+        }
+      }
+      ans += "\n";
+    }
+  }
+  return ans;
+}
+
+function board_svg(board) {
+  var ans = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+    + "<svg width=\"378\" height=\"378\" xmlns=\"http://www.w3.org/2000/svg\">"
+    + "\n"
+    + "  <style>\n"
+    + "    text {\n"
+    + "     text-anchor: middle;\n"
+    + "     dominant-baseline: central;\n"
+    + "     font-size: 40px;\n"
+    + "    }\n"
+    + "    rect {\n"
+    + "      width: 40px;\n"
+    + "      height: 40px;\n"
+    + "      fill: white;\n"
+    + "    }\n"
+    + "    rect.bg {\n"
+    + "      width: 378px;\n"
+    + "      height: 378px;\n"
+    + "      fill: black;\n"
+    + "    }\n"
+    + "  </style>\n\n"
+    + "  <rect x=\"0\" y=\"0\" class=\"bg\"/>\n";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var x = 3 + 41 * k + 125 * j;
+          var y = 3 + 41 * i + 125 * h;
+          var t = board[C];
+          ans += "<rect x=\""+x+"\" y=\""+y+"\"/>\n";
+          if (t > 0) {
+            ans += "<text x=\""+(x+20)+"\" y=\""+(y+20)+"\">"+t+"</text>\n";
+          }
+        }
+      }
+    }
+  }
+  ans += "</svg>\n";
+  return ans;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -443,30 +652,38 @@ function move() {
   if (failList.length == 0 && hardList.length == 0 && easyList.length == 0) {
     MARK = "white";
   }
-  if (undoList.length > 0) {
-    var last = undoList.length - 1;
-    var C1 = Number(undoList[last]);
-    if (sudoku[C1] != 0) {
-      document.getElementById(undoList[last]).style.backgroundColor = MARK;
-    }
-  }
+  var marked = false;
   if (failList.length > 0) {
     var last = failList.length - 1;
     var C1 = Number(failList[last]);
-    if (sudoku[C1] == 0) {
-      document.getElementById(failList[last]).style.backgroundColor = MARK;
+    if (sudoku[C] != 0 && sudoku[C1] == 0) {
+      for (var V1 = 1; V1 < 10 && !check(sudoku,C1,V1); V1++);
+      if (V1 < 10) {
+        document.getElementById(failList[last]).style.backgroundColor = MARK;
+        marked = true;
+      }
     }
-  } else if (hardList.length > 0) {
+  } else if (!marked && hardList.length > 0) {
     var last = hardList.length - 1;
     var C1 = Number(hardList[last]);
     if (sudoku[C1] == 0) {
       document.getElementById(hardList[last]).style.backgroundColor = MARK;
+      marked = true;
     }
-  } else if (easyList.length > 0) {
+  } else if (!marked && easyList.length > 0) {
     var last = easyList.length - 1;
     var C1 = Number(easyList[last]);
     if (sudoku[C1] == 0) {
       document.getElementById(easyList[last]).style.backgroundColor = MARK;
+      marked = true;
+    }
+  }
+  if (!marked && undoList.length > 0) {
+    var last = undoList.length - 1;
+    var C1 = Number(undoList[last]);
+    if (sudoku[C1] != 0) {
+      document.getElementById(undoList[last]).style.backgroundColor = MARK;
+      marked = true;
     }
   }
   if (cntRemain > 0) {
@@ -652,7 +869,14 @@ function move() {
 </table>
 </big></big></big>
 <p id="status">&#xa0;</p>
-<p>&#xa0;</p>
+<pre id="trace">&#xa0;</pre>
+<p><button id="downloadProblemSVG">Teht&#xe4;v&#xe4; SVG-kuvaksi</button>
+<button id="downloadProblemTXT">Teht&#xe4;v&#xe4; tekstiksi</button>
+<button id="downloadProblemCSV">Teht&#xe4;v&#xe4; CSV-taulukoksi</button></p>
+<p><button id="downloadSolutionSVG">Ratkaisu SVG-kuvaksi</button>
+<button id="downloadSolutionTXT">Ratkaisu tekstiksi</button>
+<button id="downloadSolutionCSV">Ratkaisu CSV-taulukoksi</button></p>
+<a id="download" style="display:none;" download></a>
 <script language="JavaScript">
 //alert("Hei");
 Nmax = 0;
