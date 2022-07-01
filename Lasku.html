@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<title>Lasku</title>
+<script type="text/javascript">
+
+var Tr = false; // debugging flag
+
+////////////////////////////////////////////////////////////////////////////////////
+// random number generator
+
+var date = new Date();
+var rndLimit = 4294967296;
+var rndstate = date.getTime() % rndLimit;
+function rnd(N) {
+  rndstate = (1 + rndstate*5) % rndLimit;
+  return Math.floor(N*rndstate/rndLimit);
+}
+rnd(1);rnd(1);rnd(1);rnd(1);rnd(1);rnd(1);
+rnd(1);rnd(1);rnd(1);rnd(1);rnd(1);rnd(1);
+
+////////////////////////////////////////////////////////////////////////////////////
+// variables
+
+var starttime = date.getTime() + 300000;
+var opid; // operation id
+var exp = "42"; // expected answer
+var cnt = 1;   // retry count
+
+var level = Array(16);
+for (opid = 0; opid < 16; opid++) {
+  level[opid] = 10;
+}
+
+opid = 0; // typical multiplication
+
+////////////////////////////////////////////////////////////////////////////////////
+// check result
+
+function check() {
+  var endtime = (new Date()).getTime();
+  var kesto = endtime - starttime;
+  var ans = document.getElementById("ans").value.replace(/\s/g,"");
+  document.getElementById("rdy").disabled = "disabled";
+  if (ans == exp) {
+    document.getElementById("arvio").innerHTML = "Oikein";
+    document.getElementById("arvio").style.color = "green";
+    document.getElementById("nxt").disabled = "";
+    document.getElementById("ans").disabled = "disabled";
+    if (cnt > 0) {
+      level[opid] = 3.6 + level[opid] * 0.1;
+    } else if (kesto > 30000) {
+      level[opid] = 0.4 + level[opid] * 0.9;
+    } else if (kesto < 5000) {
+      level[opid] = level[opid] * 10;
+    } else {
+      level[opid] = level[opid] * 1.778;
+      if (level[opid] > 1000000000) {
+        level[opid] = 1000000000;
+      }
+    }
+  } else {
+    if (ans != "") {
+      document.getElementById("nxt").disabled = "disabled";
+      if (cnt < 2) {
+        document.getElementById("arvio").innerHTML = "Väärin";
+        document.getElementById("arvio").style.color = "red";
+      } else {
+        document.getElementById("arvio").style.color = "black";
+        document.getElementById("arvio").innerHTML = "Oikea vastaus on " + exp;
+      }
+      cnt++;
+    } else {
+      hide_check();
+    }
+    document.getElementById("ans").focus();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// close check display
+
+function hide_check() {
+  if (document.getElementById("ans").value.replace(/\s/g,"") != "") {
+    document.getElementById("rdy").disabled = "";
+  } else {
+    document.getElementById("rdy").disabled = "disabled";
+  }
+  document.getElementById("nxt").disabled = "disabled";
+  if (cnt < 4) {
+    document.getElementById("arvio").innerHTML = "&#xa0;";
+  }
+  document.getElementById("ans").focus();
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// create problem
+
+function create() {
+  var x;
+  var y;
+  var op;
+  var ans;
+  cnt = 0;
+  opid = (opid*2 + rnd(17) + 8) % 32;
+  if (opid % 2 == 0) {
+    opid = opid / 2;
+  } else {
+    opid = 4 * Math.floor(opid / 8);
+  }
+  x = rnd(level[opid]);
+  y = rnd(level[opid]);
+  if (opid < 4) {
+    op = "&#xd7;";
+    if (opid == 1) {
+      y = x;
+    } else if (opid == 2) {
+      y = Math.pow(10, rnd(4) + 1);
+    } else if (opid == 3) {
+      x = 2;
+    }
+    ans = x * y;
+  } else if (opid < 8) {
+    op = "/";
+    if (opid == 6) {
+      y = Math.pow(10, rnd(4) + 1);
+    } else if (opid == 7) {
+      y = 2;
+    } else {
+      y = y + 1;
+    }
+    if (opid == 5) {
+      ans = 1; 
+    } else {
+      ans = x;
+    }
+    x = y * ans;
+  } else if (opid < 12) {
+    op = "-";
+    if (opid == 9) {
+      y = 0;
+    } else if (opid == 10) {
+      y = 1;
+    }
+    if (opid == 11) {
+      ans = 0;
+    } else {
+      ans = x;
+    }
+    x = ans + y;
+  } else {
+    op = "+";
+    if (opid == 13) {
+      y = 0;
+    } else if (opid == 14) {
+      y = 1;
+    } else if (opid == 15) {
+      y = x;
+    }
+    ans = x + y;
+  }
+  exp = "" + ans;
+  document.getElementById("x").value = "" + x;
+  document.getElementById("y").value = "" + y;
+  document.getElementById("op").innerHTML = op;
+  document.getElementById("ans").value = "";
+  hide_check();
+  document.getElementById("ans").disabled = "";
+  document.getElementById("ans").focus();
+  starttime = new Date().getTime();
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// key pressed in answer field
+
+function key(event) {
+  var code = event.keyCode;
+  if (code == 10 || code == 13) {
+    if (document.getElementById("nxt").disabled == "") {
+      create();
+    } else if (document.getElementById("rdy").disabled == "") {
+      check();
+    }
+  } else if (document.getElementById("nxt").disabled != "") {
+    hide_check();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
+</script>
+
+<style>
+
+ div {
+   margin: auto;
+   width: 400px;
+   background-color: white;
+   padding: 50px;
+   padding-top: 20px;
+ }
+
+ h1 {
+   text-align: center;
+ }
+
+ p {
+   font-size: 32px;
+ }
+
+ #arvio {
+   font: 36px serif;
+   font-weight: bold;
+ }
+
+ input {
+   font-size: 32px;
+   text-align: right;
+   padding-right: 10px;
+ }
+
+ button {
+   font-size: 24px;
+   padding-top: 2px;
+   padding-bottom: 2px;
+   padding-left: 10px;
+   padding-right: 10px;
+   background-color: blue;
+   color: white;
+ }
+
+ button:disabled {
+   background-color: lightgray;
+ }
+
+ body {
+   margin: auto;
+   background-color: lightgray;
+ }
+</style>
+
+</head>
+
+
+<body _style="margin-right:50px" onclick="document.getElementById('ans').focus()" onkeyup="key(event)">
+<div>
+<h1>Lasku</H1>
+<p>&#xa0;</p>
+
+<p align="right"><input align="right" type="text" id="x" readonly="readonly" value = "6"></p>
+<p align="right"><span id="op">&#xd7;</span> <input align="right" type="text" id="y" readonly="readonly" value = "7"></p>
+<p align="right">= <input align="right" type="text" id="ans" onclick="hide_check()" tabindex="3"></p>
+<p align="right"><button id="rdy" type="button" disabled="disabled" onclick="check()" tabindex="2">Valmis</button></p>
+<p align="center"><span id="arvio">&#xa0;</span></p>
+<p align="right"><button id="nxt" type="button" disabled="disabled" onclick="create()" tabindex="1">Seuraava</button></p>
+
+</div>
+<script type="text/javascript">
+document.getElementById("ans").focus();
+</script>
+</body>
+</html>
