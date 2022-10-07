@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf8">
+<title>Latinalainen neli&ouml;</title>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+
+onload = function() {
+
+////////////////////////////////////////////////////////////////////////////////
+
+var problem_size = 4;
+var problem_size2 = 16;
+
+////////////////////////////////////////////////////////////////////////////////
+   // cells are indexed 0 .. (problem_size2 - 1)
+   // rows and cols are indexed 0 .. (problem_size - 1)
+   // cells of row or col are indexed 0 .. (problem_size - 1)
+
+function row(C) {
+  return (C - (C % problem_size)) / problem_size;
+}
+
+function col(C) {
+  return C % problem_size;
+}
+
+function rowCell(C,I) {
+  return (C - (C % problem_size)) + I;
+}
+
+function colCell(C,I) {
+  return (C % problem_size) + problem_size * I;
+}
+
+function cellLabel(C) {
+  return ""+(10*row(C)+col(C));
+}
+
+function cellByLabel(L) {
+  var X = Number(L);
+  var Y = X % 10;
+  return ((X - Y) / 10) * problem_size + Y;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// random number generator
+
+//var work = 1663261523280; // debugging
+//var work = 1663261523281; // debugging
+var work = Date.now();
+
+var key = work % 32;
+var rndState = key / 32;
+
+for (var i = 1; i < 10; i++) {
+  work = (work - (work % 32)) / 32;
+  key = key ^ (work % 32);
+  rndState = (rndState + key) / 32;
+}
+
+var chrs = [];
+work = rndState;
+
+for (var i = 0; i < 10; i++) {
+  work = 26 * work;
+  key = Math.floor(work);
+  chrs.push(String.fromCharCode(0x61 + key));
+  work = work - key;
+}
+
+var gamename = chrs.join('');
+
+var rndUnit = 0.00000000000044053649617126211524;
+
+function rnd(size) {
+  rndState = 125 * rndState + rndUnit;
+  rndState = rndState - Math.floor(rndState);
+  return 1 + Math.floor(size * rndState);
+}
+
+rnd(1);
+
+////////////////////////////////////////////////////////////////////////////////
+
+var game = [];
+var solution = [];
+var work = [];
+
+////////////////////////////////////////////////////////////////////////////////
+
+function blankBoard() {
+  var I;
+  var board = new Array(problem_size2);
+  for (I = 0; I < problem_size2; I++) {
+    board[I] = 0;
+  }
+  return board;
+}
+
+function rndBoard() {
+  var I;
+  var board = [];
+  for (I = 0; I < problem_size2; I++) {
+    board[I] = rnd(problem_size);
+  }
+  return board;
+}
+
+function copyBoard(src) {
+  var I;
+  var board = [];
+  for (I = 0; I < problem_size2; I++) {
+    board[I] = src[I];
+  }
+  return board;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// validity check
+
+function check(board,C,V) {
+  var X;
+  for (var I = 0; I < problem_size; I++) {
+    X = rowCell(C,I);
+    if (X != C && board[X] == V) {
+      return false;
+    }
+    X = colCell(C,I);
+    if (X != C && board[X] == V) {
+      return false;
+    }
+  }
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// solve game
+//  - initial data
+//    - game: problem to be solved
+//    - solution: previous solution or random numbers
+//  - results
+//    - function value is true if a new solution is found
+//      - the found solution is in work
+//    - otherwise function value is false
+
+function gameSolve() {
+  var C;
+  var D;
+  var E;
+  var F;
+  var phase = new Array(problem_size2);
+  var ans = 0;
+  var good;
+  var worklist = new Array(problem_size2);
+  for (var k = 0; k < problem_size2; k++) worklist[k] = k;
+  work = copyBoard(game);
+  C = 0;
+  D = problem_size2;
+  E = 0;
+  F = 0;
+  phase[0] = 0;
+  work[0] = solution[0];
+  var N = 0;
+  while (E < problem_size2) {
+    N++;
+    C = worklist[E];
+    if (phase[C] < problem_size) {
+      phase[C]++;
+      if (game[C] > 0) {
+        phase[C] = problem_size + 1;
+      } else {
+        if (phase[C] == 1 && C > D) {
+          work[C] = solution[C];
+        } else {
+          work[C] = (work[C] % problem_size) + 1;
+        }
+        if (work[C] != solution[C]) {
+          if (D > E) {
+            D = E;
+          }
+        } else {
+          if (D == E) {
+            D = problem_size2;
+          }
+        }
+      }
+      if (phase[C] == problem_size + 1 || check(work,C,work[C])) {
+        E++;
+        if (F > E) {
+          worklist = worklist.slice(0,E).concat(worklist.slice(F,F+1),
+                     worklist.slice(E,F),worklist.slice(F+1));
+          F = 0;
+        }
+        C = worklist[E];
+        if (E < problem_size2) {
+          if (game[C] > 0) {
+            work[C] = game[C];
+            phase[C] = problem_size - 1;
+          } else {
+            work[C] = solution[C];
+            phase[C] = 0;
+          }
+        } else {
+          // solution found
+          if (D < problem_size2) {
+            ans = 2; // new solution found
+          } else {
+            ans = 1; // old solution is unique
+          }
+        }
+      }
+    } else {
+      work[C] = game[C];
+      if (D == E) {
+        D = problem_size2;
+      }
+      if (E > 0) {
+        if (F < E) F = E;
+        E--;
+      } else {
+        E = problem_size2; // no other solution
+      }
+    }
+  } // while(E < problem_size2);
+  return (ans > 1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var letter = ["\u00a0","A","B","C","D","E","F","G","H","I","K"];
+
+function cellShow(C, moved, marked) {
+  var lbl = cellLabel(C);
+  var CELL = document.getElementById(lbl);
+  var V = game[C];
+  if (typeof(V) == 'number') {
+    if (V < 0) {
+      CELL.textContent = "?";
+      CELL.style.fontStyle = 'italic';
+      CELL.style.color = 'red';
+    } else {
+      CELL.textContent = letter[V];
+      if (moved) {
+        CELL.style.fontStyle = 'italic';
+        CELL.style.color = 'green';
+      } else {
+        CELL.style.fontStyle = 'normal';
+        CELL.style.color = 'black';
+        CELL.style.backgroundColor = 'white';
+      }
+    }
+    if (marked) {
+      CELL.style.backgroundColor = '#ffee11';
+    } else {
+      CELL.style.backgroundColor = 'white';
+    }
+  } else {
+    document.getElementById(lbl).innerHTML = V;
+  }
+}
+
+function gameShow() {
+  var C;
+  for (C = 0; C < problem_size2; C++) {
+    cellShow(C, false);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var timer;
+
+////////////////////////////////////////////////////////////////////////////////
+
+var animation_state = 0;
+var animation_sequences = [ null, null, null, null,
+  ["0","1","2","11","12","21","22","23"],
+  ["0","2","4","21","23","40","42","44"],
+  ["10","11","12","32","33","53","54","55"],
+  ["11","13","15","32","34","51","53","55"],
+  ["20","22","24","42","44","62","64","66"],
+  ["22","24","26","43","45","62","64","66"],
+  ["11","22","33","44","55","66","77","88"] ];
+var animation_sequence = animation_sequences[4];
+
+var animation_lower = ["h","e","t","k","i","n","e","n"];
+var animation_upper = ["H","E","T","K","I","N","E","N"];
+
+function animation_step(Cmd, arg) {
+  if (animation_state < 8) {
+    document.getElementById(animation_sequence[animation_state]).innerHTML
+          = animation_upper[animation_state];
+  } else {
+    for (var i = 0; i < 8; i++) {
+      document.getElementById(animation_sequence[i]).innerHTML
+            = animation_lower[i];
+    }
+  }
+  animation_state = (animation_state + 1) % 9;
+  timer = setTimeout(Cmd,100,arg);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function game_Clear() {
+//alert("gameClear:A:");
+  game = blankBoard();
+  gameShow();
+  document.getElementById("11").innerHTML = "H";
+  document.getElementById("13").innerHTML = "E";
+  document.getElementById("15").innerHTML = "T";
+  document.getElementById("39").innerHTML = "K";
+  document.getElementById("41").innerHTML = "I";
+  document.getElementById("65").innerHTML = "N";
+  document.getElementById("67").innerHTML = "E";
+  document.getElementById("69").innerHTML = "N";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var cntRemain = 0;
+var undoList = [];
+var marked = -1;
+
+////////////////////////////////////////////////////////////////////////////////
+
+function gameCreate(arg) {
+  var C;
+  game = blankBoard();
+  solution = rndBoard();
+  gameSolve();
+  solution = copyBoard(work);
+  game = copyBoard(solution);
+
+  var worklist = [0];
+  for (var i = 1; i < problem_size2; i++) {
+    var x = rnd(worklist.length + 1) - 1;
+    if (x < worklist.length) {
+      worklist.push(worklist[x]);
+      worklist[x] = i;
+    } else {
+      worklist.push(i);
+    }
+  }
+
+  animation_step(gameCreate1, worklist);
+}
+
+function gameCreate1(worklist) {
+  var C = worklist.pop();
+  var V = game[C];
+  game[C] = 0;
+  if (gameSolve()) { // a different solution found
+    game[C] = V;
+  }
+  if (worklist.length > 0) {
+    animation_step(gameCreate1, worklist);
+  } else {
+    animation_step(gameCreate2, null);
+  }
+}
+
+var problem = [];
+
+function gameCreate2(arg) {
+  var C;
+  gameShow();
+  problem = copyBoard(game);
+  cntRemain = 0;
+  undoList = [];
+  for (C = 0; C < problem_size2; C++) {
+    if (game[C] == 0) {
+      cntRemain++;
+      document.getElementById(cellLabel(C)).onclick = move;
+      document.getElementById(cellLabel(C)).style.cursor = "default";
+    }
+  }
+  document.getElementById("controlbox").style.display = "block";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+var DOWNLOAD = document.getElementById("download");
+
+document.getElementById("downloadProblemSVG").onclick =
+  function downloadProblemSVG() {
+    var SVGtext = board_svg(problem);
+    var name = 'problem_L'+gamename+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
+
+document.getElementById("downloadSolutionSVG").onclick =
+  function downloadSolutionSVG() {
+    var SVGtext = board_svg(solution);
+    var name = 'solution_L'+gamename+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
+
+document.getElementById("downloadProblemTXT").onclick =
+  function downloadProblemTXT() {
+    var SVGtext = board_txt(problem);
+    var name = 'problem_L'+gamename+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
+
+document.getElementById("downloadSolutionTXT").onclick =
+  function downloadSolutionTXT() {
+    var SVGtext = board_txt(solution);
+    var name = 'solution_L'+gamename+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
+
+document.getElementById("downloadProblemCSV").onclick =
+  function downloadProblemCSV() {
+    var CSVtext = board_csv(problem);
+    var name = 'problem_L'+gamename+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
+
+document.getElementById("downloadSolutionCSV").onclick =
+  function downloadSolutionCSV() {
+    var CSVtext = board_csv(solution);
+    var name = 'solution_L'+gamename+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
+
+////////////////////////////////////////////////////////////////////////////////
+
+var in_download = false;
+
+function download(filename, filetype, text) {
+  if (in_download) return;
+  in_download = true;
+  DOWNLOAD.setAttribute('download', filename);
+  DOWNLOAD.setAttribute('href',
+      'data:'+filetype+',' + encodeURIComponent(text));
+  DOWNLOAD.click();
+  DOWNLOAD.removeAttribute('href');
+  in_download = false;
+}
+
+function board_txt(board) {
+  var top = "+"+"-".repeat(1+2*problem_size)+"+\n";
+  var ans = top;
+  for (var i = 0; i < problem_size; i++) {
+    ans += "| ";
+    for (var j = 0; j < problem_size; j++) {
+      var C = problem_size * i + j;
+      var t = board[C];
+      if (typeof(t) == 'number' && t > 0) {
+        ans += letter[t];
+      } else {
+        ans += " ";
+      }
+      ans += " ";
+    }
+    ans += "|\n";
+  }
+  ans += top;
+  return ans;
+}
+
+function board_csv(board) {
+  var ans = "";
+  for (var i = 0; i < problem_size; i++) {
+    for (var j = 0; j < problem_size; j++) {
+      var C = problem_size * i + j;
+      var t = board[C];
+      if (typeof(t) == 'number' && t > 0) {
+        ans += letter[t];
+      } else if (t.length == 1) {
+        ans += t;
+      } else {
+        ans += " ";
+      }
+      ans += ",";
+    }
+    ans += "\n";
+  }
+  return ans;
+}
+
+function board_svg(board) {
+  var b = 9 + problem_size * 41;
+  var s = b + 4;
+  var ans = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+    + "<svg width=\""+s+"\" height=\""+s
+            +"\" xmlns=\"http://www.w3.org/2000/svg\">"
+    + "\n"
+    + "  <style>\n"
+    + "    text {\n"
+    + "     text-anchor: middle;\n"
+    + "     dominant-baseline: central;\n"
+    + "     font-size: 40px;\n"
+    + "    }\n"
+    + "    rect {\n"
+    + "      width: "+b+"px;\n"
+    + "      height: "+b+"px;\n"
+    + "      fill: none;\n"
+    + "      stroke: black;\n"
+    + "      stroke-width: 2px;\n"
+    + "    }\n"
+    + "  </style>\n\n"
+    + "  <rect x=\"2\" y=\"2\"/>\n";
+  for (var i = 0; i < problem_size; i++) {
+    for (var j = 0; j < problem_size; j++) {
+      var x = 27 + 41 * i;
+      var y = 27 + 41 * j;
+      var C = i + problem_size * j;
+      var t = board[C];
+      if (typeof(t) == 'number' && t > 0) {
+        t = letter[t];
+        ans += "  <text x=\""+x+"\" y=\""+y+"\">"+t+"</text>\n";
+      }
+    }
+  }
+  ans += "</svg>\n";
+  return ans;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function move() {
+  var marking = marked;
+  var C = cellByLabel(this.id);
+  var V = game[C];
+  if (V < 1) {
+    cntRemain--;
+  }
+  var W = (V < 0 ? 0 : V);
+  do {
+    W =  W + 1;
+  } while (W < problem_size + 1 && !check(game,C,W));
+  if (W < problem_size + 1) { // found
+    if (V < 1) { // was blank
+      undoList.push(C);
+    }
+    game[C] = W;
+  } else { // clearing
+    if (undoList.length > 0) {
+      var xin = undoList.indexOf(C);
+      if (xin >= 0) undoList.splice(xin, 1);
+    }
+    if (V < 0) { // was question mark
+      game[C] = 0;
+    } else {
+      if (V == 0) { // was blank
+        game[C] = -1;
+      } else { // was a letter
+        game[C] = 0;
+      }
+    }
+  }
+  W = game[C];
+  if (W < 1) cntRemain++;
+
+  if (V < 0 && W == 0) {
+    marking = C;
+  } else if (W < 0 || (W == 0 && marked == C)) {
+    marking = ((undoList.length < 1) ? -1 : undoList[undoList.length - 1]);
+  } else {
+    marking = -1;
+  }
+
+  cellShow(C, true, marking == C);
+
+  if (marked != marking) {
+    if (marked != -1 && marked != C) {
+      cellShow(marked, true, false);
+    }
+    if (marking != -1 && marking != C) {
+      cellShow(marking, true, true);
+    }
+    marked = marking;
+  }
+
+  if (cntRemain > 0) {
+    document.getElementById("status").innerHTML = "&#xa0;";
+  } else {
+    document.getElementById("status").innerHTML = "Valmis";
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function init() {
+  for (var i = 3; i < 10; i++) {
+    var TD = document.getElementById((""+i)+i);
+    if (TD) {
+      var BUTTON = TD.firstElementChild;
+      if (BUTTON && BUTTON.className == "button") {
+        BUTTON.onclick = start;
+        BUTTON.style.cursor = "default";
+      }
+    }
+  }
+}
+
+function start() {
+  problem_size = Number(this.innerText);
+  problem_size2 = problem_size * problem_size;
+  if (problem_size > 0) {
+    for (var i = 0; i < 10; i++) {
+      if (i < problem_size) {
+        for (var j = 0; j < 10; j++) {
+          var TD = document.getElementById(""+(10*i+j));
+          if (j < problem_size) {
+            TD.innerHTML = "";
+            TD.className = "";
+          } else {
+            TD.style.display = "none";
+          }
+        }
+      } else {
+        var TR = document.getElementById("r"+i);
+        TR.style.display = "none";
+      }
+    }
+    animation_sequence = animation_sequences[problem_size];
+    animation_step(gameCreate, {});
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+init();
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+</script>
+<style>
+
+  body {
+    cursor: not-allowed;
+    text-align: center;
+  }
+
+  * {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+  }
+
+  table {
+    border: 1px solid;
+    border-collapse: collapse;
+  }
+
+  td {
+    height: 32px;
+    width: 32px;    
+  }
+
+  td.r {
+    border-right: 1px solid;
+  }
+
+  td.b {
+    border-bottom: 1px solid;
+  }
+
+  p.button {
+    margin: 0px;
+    color: white;
+    background-color: blue;
+    border-radius: 10px;
+    height: 32px;
+    width: 32px;
+  }
+
+</style>
+</head>
+<body align="center" style="cursor:not-allowed;user-select:none;">
+<H1 align="center">Latinalainen neli&ouml;</H1>
+<p>&#xa0;</p>
+<div style="position:absolute;top:50px;left:5px;align:left;text-align:left">
+<pre id="trace"></pre>
+</div>
+<big><big><big>
+<table id="Problem" align="center">
+<tr id="r0">
+<td id="0">V</td>
+<td id="1">a</td>
+<td id="2">l</td>
+<td id="3">i</td>
+<td id="4">t</td>
+<td id="5">s</td>
+<td id="6">e</td>
+<td id="7">&#xa0;</td>
+<td id="8">&#xa0;</td>
+<td id="9">&#xa0;</td>
+</tr>
+<tr id="r1">
+<td id="10">k</td>
+<td id="11">o</td>
+<td id="12">k</td>
+<td id="13">o</td>
+<td id="14">:</td>
+<td id="15">&#xa0;</td>
+<td id="16">&#xa0;</td>
+<td id="17">&#xa0;</td>
+<td id="18">&#xa0;</td>
+<td id="19">&#xa0;</td>
+</tr>
+<tr id="r2">
+<td id="20">&#xa0;</td>
+<td id="21">&#xa0;</td>
+<td id="22">&#xa0;</td>
+<td id="23" class="r">&#xa0;</td>
+<td id="24" class="r">&#xa0;</td>
+<td id="25" class="r">&#xa0;</td>
+<td id="26" class="r">&#xa0;</td>
+<td id="27" class="r">&#xa0;</td>
+<td id="28" class="r">&#xa0;</td>
+<td id="29">&#xa0;</td>
+</tr>
+<tr id="r3">
+<td id="30" class="b">&#xa0;</td>
+<td id="31" class="b">&#xa0;</td>
+<td id="32" class="b">&#xa0;</td>
+<td id="33" class="b r"><p class="button">4</p></td>
+<td id="34" class="r">&#xa0;</td>
+<td id="35" class="r">&#xa0;</td>
+<td id="36" class="r">&#xa0;</td>
+<td id="37" class="r">&#xa0;</td>
+<td id="38" class="r">&#xa0;</td>
+<td id="39">&#xa0;</td>
+<tr id="r4">
+<td id="40" class="b">&#xa0;</td>
+<td id="41" class="b">&#xa0;</td>
+<td id="42" class="b">&#xa0;</td>
+<td id="43" class="b">&#xa0;</td>
+<td id="44" class="b r"><p class="button">5</p></td>
+<td id="45" class="r">&#xa0;</td>
+<td id="46" class="r">&#xa0;</td>
+<td id="47" class="r">&#xa0;</td>
+<td id="48" class="r">&#xa0;</td>
+<td id="49">&#xa0;</td>
+</tr>
+<tr id="r5">
+<td id="50" class="b">&#xa0;</td>
+<td id="51" class="b">&#xa0;</td>
+<td id="52" class="b">&#xa0;</td>
+<td id="53" class="b">&#xa0;</td>
+<td id="54" class="b">&#xa0;</td>
+<td id="55" class="b r"><p class="button">6</p></td>
+<td id="56" class="r">&#xa0;</td>
+<td id="57" class="r">&#xa0;</td>
+<td id="58" class="r">&#xa0;</td>
+<td id="59">&#xa0;</td>
+</tr>
+<tr id="r6">
+<td id="60" class="b">&#xa0;</td>
+<td id="61" class="b">&#xa0;</td>
+<td id="62" class="b">&#xa0;</td>
+<td id="63" class="b">&#xa0;</td>
+<td id="64" class="b">&#xa0;</td>
+<td id="65" class="b">&#xa0;</td>
+<td id="66" class="b r"><p class="button">7</p></td>
+<td id="67" class="r">&#xa0;</td>
+<td id="68" class="r">&#xa0;</td>
+<td id="69">&#xa0;</td>
+</tr>
+<tr id="r7">
+<td id="70" class="b">&#xa0;</td>
+<td id="71" class="b">&#xa0;</td>
+<td id="72" class="b">&#xa0;</td>
+<td id="73" class="b">&#xa0;</td>
+<td id="74" class="b">&#xa0;</td>
+<td id="75" class="b">&#xa0;</td>
+<td id="76" class="b">&#xa0;</td>
+<td id="77" class="b r"><p class="button">8</p></td>
+<td id="78" class="r">&#xa0;</td>
+<td id="79">&#xa0;</td>
+</tr>
+<tr id="r8">
+<td id="80" class="b">&#xa0;</td>
+<td id="81" class="b">&#xa0;</td>
+<td id="82" class="b">&#xa0;</td>
+<td id="83" class="b">&#xa0;</td>
+<td id="84" class="b">&#xa0;</td>
+<td id="85" class="b">&#xa0;</td>
+<td id="86" class="b">&#xa0;</td>
+<td id="87" class="b">&#xa0;</td>
+<td id="88" class="b r"><p class="button">9</p></td>
+<td id="89">&#xa0;</td>
+</tr>
+<tr id="r9">
+<td id="90">&#xa0;</td>
+<td id="91">&#xa0;</td>
+<td id="92">&#xa0;</td>
+<td id="93">&#xa0;</td>
+<td id="94">&#xa0;</td>
+<td id="95">&#xa0;</td>
+<td id="96">&#xa0;</td>
+<td id="97">&#xa0;</td>
+<td id="98">&#xa0;</td>
+<td id="99"><p class="button">10</p></td>
+</tr>
+</table>
+</big></big></big>
+<p id="status">&#xa0;</p>
+<div id="controlbox" style="display:none;">
+<p><button id="downloadProblemSVG">Teht&#xe4;v&#xe4; SVG-kuvaksi</button>
+<button id="downloadProblemTXT">Teht&#xe4;v&#xe4; tekstiksi</button>
+<button id="downloadProblemCSV">Teht&#xe4;v&#xe4; CSV-taulukoksi</button></p>
+<p><button id="downloadSolutionSVG">Ratkaisu SVG-kuvaksi</button>
+<button id="downloadSolutionTXT">Ratkaisu tekstiksi</button>
+<button id="downloadSolutionCSV">Ratkaisu CSV-taulukoksi</button></p>
+<a id="download" style="display:none;" download></a>
+</div>
+</body>
+</html>
