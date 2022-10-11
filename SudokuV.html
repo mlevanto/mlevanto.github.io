@@ -5,48 +5,86 @@
 <title>Mikon sudoku</title>
 <script>
 
-var Tr = false; // debugging flag
-var MARK = "white";
+////////////////////////////////////////////////////////////////////////////////
 
-var has_solution = 0;
+onload = function() {
 
 ////////////////////////////////////////////////////////////////////////////////
-   // cells are indexed 0..80
-   // cells of row, col, or box are indexed 0..8
+   // cells are indexed 0 .. 80
+   // rows, cols, and boxes are indexed 0 .. 8
+   // cells of row, col, or box are indexed 0 .. 8
 
+function row(C) {
+  return (C - (C % 8)) / 8;
+}
+
+function col(C) {
+  return C % 8;
+}
+  
 function rowCell(C,I) {
   return (C - (C % 9)) + I;
 }
 
 function colCell(C,I) {
-  return (C % 9) + 9*I;
+  return (C % 9) + 9 * I;
 }
 
 function boxCell(C,I) {
   return (C - (C % 3) - ((C - (C % 9)) % 27)) + (I % 3) + 3*(I - (I % 3));
 }
 
+function cellLabel(C) {
+  return ""+C;
+}
+
+function cellByLabel(L) {
+  return Number(L);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // random number generator
 
-var date = new Date();
-var rndLimit = 4294967296;
-var rndstate = date.getTime() % rndLimit;
-// rndstate = 3291989743; // fixed value for debugging
-function rnd9() {
-  rndstate = (1 + rndstate*5) % rndLimit;
-  return Math.floor(9*rndstate/rndLimit) + 1;
+//var work = 1663261523280; // debugging
+//var work = 1663261523281; // debugging
+var work = Date.now();
+
+var key = work % 32;
+var rndState = key / 32;
+
+for (var i = 1; i < 10; i++) {
+  work = (work - (work % 32)) / 32;
+  key = key ^ (work % 32);
+  rndState = (rndState + key) / 32;
 }
-rnd9();rnd9();rnd9();rnd9();rnd9();rnd9();
-rnd9();rnd9();rnd9();rnd9();rnd9();rnd9();
+
+var chrs = [];
+work = rndState;
+
+for (var i = 0; i < 10; i++) {
+  work = 26 * work;
+  key = Math.floor(work);
+  chrs.push(String.fromCharCode(0x61 + key));
+  work = work - key;
+}
+
+var gamename = chrs.join('');
+
+var rndUnit = 0.00000000000044053649617126211524;
+
+function rnd(size) {
+  rndState = 125 * rndState + rndUnit;
+  rndState = rndState - Math.floor(rndState);
+  return 1 + Math.floor(size * rndState);
+}
+
+rnd(1);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var sudoku = new Array(81);
-var solution = new Array(81);
-var work = new Array(81);
-
-var Nmax = 0;
+var game = [];
+var solution = [];
+var work = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +101,7 @@ function rndBoard() {
   var I;
   var board = new Array(81);
   for (I = 0; I < 81; I++) {
-    board[I] = rnd9();
+    board[I] = rnd(9);
   }
   return board;
 }
@@ -77,23 +115,6 @@ function copyBoard(src) {
   return board;
 }
 
-//========
-// for debugging
-
-function compareBoards(b1, b2) {
-  var ans = "";
-  for (var I = 0; I < 81; I++) {
-    if (b1[I] != b2[I] && b1[I] > 0 && b2[I] > 0) {
-      ans = ans+I+": "+b1[I]+" <-> "+b2[I]+"\n";
-    }
-  }
-  if (ans == "") {
-    return null;
-  } else {
-    return ans;
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // validity check
 
@@ -102,35 +123,31 @@ function check(board,C,V) {
   for (var I = 0; I < 9; I++) {
     X = rowCell(C,I);
     if (X != C && board[X] == V) {
-//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
       return false;
     }
     X = colCell(C,I);
     if (X != C && board[X] == V) {
-//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
       return false;
     }
     X = boxCell(C,I);
     if (X != C && board[X] == V) {
-//if(Tr) alert("["+C+"] = "+V+" == ["+X+"] = "+board[X]);
       return false;
     }
   }
-//if(Tr) alert("["+C+"] : "+V+" - OK");
   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// solve sudoku
+// solve game
 //  - initial data
-//    - sudoku: problem to be solved
+//    - game: problem to be solved
 //    - solution: previous solution or random numbers
 //  - results
 //    - function value is true if a new solution is found
 //      - the found solution is in work
 //    - otherwise function value is false
 
-function sudokuSolve() {
+function gameSolve() {
   var C;
   var D;
   var E;
@@ -140,22 +157,20 @@ function sudokuSolve() {
   var good;
   var worklist = new Array(81);
   for (var k = 0; k < 81; k++) worklist[k] = k;
-  work = copyBoard(sudoku);
+  work = copyBoard(game);
   C = 0;
   D = 81;
   E = 0;
   F = 0;
   phase[0] = 0;
   work[0] = solution[0];
-//alert("sudokuSolve:A");
   var N = 0;
   while (E < 81) {
     N++;
     C = worklist[E];
-//alert("sudokuSolve:B:"+D+"~"+C+":"+phase[C]);
     if (phase[C] < 9) {
       phase[C]++;
-      if (sudoku[C] > 0) {
+      if (game[C] > 0) {
         phase[C] = 10;
       } else {
         if (phase[C] == 1 && C > D) {
@@ -173,11 +188,6 @@ function sudokuSolve() {
           }
         }
       }
-//alert("sudokuSolve:C:"+phase[C]);
-//if (phase[C] < 10) {
-//workShow(C);
-//alert("sudokuSolve:H:"+D+"~"+C+":"+phase[C]+":"+solution[C]+"->"+work[C]);
-//}
       if (phase[C] == 10 || check(work,C,work[C])) {
         E++;
         if (F > E) {
@@ -187,8 +197,8 @@ function sudokuSolve() {
         }
         C = worklist[E];
         if (E < 81) {
-          if (sudoku[C] > 0) {
-            work[C] = sudoku[C];
+          if (game[C] > 0) {
+            work[C] = game[C];
             phase[C] = 8;
           } else {
             work[C] = solution[C];
@@ -196,17 +206,15 @@ function sudokuSolve() {
           }
         } else {
           // solution found
-//alert("sudokuSolve:I:"+D+"~"+C+":"+ans+":"+C);
           if (D < 81) {
             ans = 2; // new solution found
           } else {
             ans = 1; // old solution is unique
           }
-//alert("sudokuSolve:L:"+D+"~"+C+":"+ans+":"+C);
         }
       }
     } else {
-      work[C] = sudoku[C];
+      work[C] = game[C];
       if (D == E) {
         D = 81;
       }
@@ -214,56 +222,46 @@ function sudokuSolve() {
         if (F < E) F = E;
         E--;
       } else {
-//workShow(C);
-//alert("sudokuSolve:M1:");
         E = 81; // no other solution
-//workShow(C);
-//alert("sudokuSolve:M2:");
       }
     }
   } // while(E < 81);
-//workShow(C);
-//alert("sudokuSolve:Z:"+ans);
-  if (N > Nmax) Nmax = N;
-//document.getElementById("status").innerHTML = Nmax+" -> "+ans;
   return (ans > 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function sudokuShow() {
-  var C;
-  for (C = 0; C < 81; C++) {
-    if (sudoku[C] > 0) {
-      document.getElementById(""+(C)).innerHTML = sudoku[C];
+function cellShow(C, moved, marked) {
+  var lbl = cellLabel(C);
+  var CELL = document.getElementById(lbl);
+  var V = game[C];
+  if (V < 0) {
+    CELL.textContent = "?";
+    CELL.style.fontStyle = 'italic';
+    CELL.style.color = 'red';
+  } else if (V > 0) {
+    CELL.textContent = "" + V;
+    if (moved) {
+      CELL.style.fontStyle = 'italic';
+      CELL.style.color = 'green';
     } else {
-      document.getElementById(""+(C)).innerHTML = "&#xa0;";
+      CELL.style.fontStyle = 'normal';
+      CELL.style.color = 'black';
     }
+  } else {
+    CELL.textContent = "\u00a0";
+  }
+  if (marked) {
+    CELL.style.backgroundColor = '#ffee11';
+  } else {
+    CELL.style.backgroundColor = 'white';
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-function workShow(X) {
+function gameShow() {
   var C;
   for (C = 0; C < 81; C++) {
-    var Img = "";
-    if (solution[C] > 0 && work[C] != solution[C]) {
-      Img = "<s>" + solution[C] + "</s>";
-    }
-    if (work[C] > 0) {
-      Img = Img + work[C];
-    }
-    if (Img == "") {
-      Img = "&#xa0;";
-    }
-    if (C == X) {
-      Img = "<u>" + Img + "</u>";
-    }
-    if (sudoku[C] == 0) {
-      Img = "<i>" + Img + "</i>";
-    }
-    document.getElementById(""+(C)).innerHTML = Img;
+    cellShow(C, false, false);
   }
 }
 
@@ -274,45 +272,31 @@ var timer;
 ////////////////////////////////////////////////////////////////////////////////
 
 var animation_state = 0;
+var animation_sequence = 
+  ["11","13","15","39","41","65","67","69"];
 
-function animation_step(Cmd) {
-//alert("animation step: "+Cmd);
-  if (animation_state == 8) {
-    document.getElementById("11").innerHTML = "h";
-  } else if (animation_state == 7) {
-    document.getElementById("13").innerHTML = "e";
-  } else if (animation_state == 6) {
-    document.getElementById("15").innerHTML = "t";
-  } else if (animation_state == 5) {
-    document.getElementById("39").innerHTML = "k";
-  } else if (animation_state == 4) {
-    document.getElementById("41").innerHTML = "i";
-  } else if (animation_state == 3) {
-    document.getElementById("65").innerHTML = "n";
-  } else if (animation_state == 2) {
-    document.getElementById("67").innerHTML = "e";
-  } else if (animation_state == 1) {
-    document.getElementById("69").innerHTML = "n";
+var animation_lower = ["h","e","t","k","i","n","e","n"];
+var animation_upper = ["H","E","T","K","I","N","E","N"];
+
+function animation_step(Cmd, arg) {
+  if (animation_state < 8) {
+    document.getElementById(animation_sequence[animation_state]).innerHTML
+          = animation_lower[animation_state];
   } else {
-    document.getElementById("11").innerHTML = "H";
-    document.getElementById("13").innerHTML = "E";
-    document.getElementById("15").innerHTML = "T";
-    document.getElementById("39").innerHTML = "K";
-    document.getElementById("41").innerHTML = "I";
-    document.getElementById("65").innerHTML = "N";
-    document.getElementById("67").innerHTML = "E";
-    document.getElementById("69").innerHTML = "N";
+    for (var i = 0; i < 8; i++) {
+      document.getElementById(animation_sequence[i]).innerHTML
+            = animation_upper[i];
+    }
   }
   animation_state = (animation_state + 1) % 9;
-  timer = setTimeout(Cmd,100);
+  timer = setTimeout(Cmd,100,arg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function sudoku_Clear() {
-//alert("sudokuClear:A:");
-  sudoku = blankBoard();
-  sudokuShow();
+function game_Clear() {
+  game = blankBoard();
+  gameShow();
   document.getElementById("11").innerHTML = "H";
   document.getElementById("13").innerHTML = "E";
   document.getElementById("15").innerHTML = "T";
@@ -327,146 +311,109 @@ function sudoku_Clear() {
 
 var cntRemain = 0;
 var undoList = [];
-var failList = []; // usually empty or singlet
-var hardList = [];
-var easyList = [];
-var hard = blankBoard();
+var marked = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function sudokuCreate() {
+function gameCreate(arg) {
   var C;
-  sudoku = blankBoard();
+  game = blankBoard();
   solution = rndBoard();
-has_solution = 1;
-  sudokuSolve();
+  gameSolve();
   solution = copyBoard(work);
-has_solution = 2;
-  sudoku = copyBoard(solution);
-  X = 9*rnd9()+rnd9();
-  animation_step("sudokuCreate1(0,32,"+X+");");
+  game = copyBoard(solution);
+
+  var worklist = [0];
+  for (var i = 1; i < 81; i++) {
+    var x = rnd(worklist.length + 1) - 1;
+    if (x < worklist.length) {
+      worklist.push(worklist[x]);
+      worklist[x] = i;
+    } else {
+      worklist.push(i);
+    }
+  }
+
+  animation_step(gameCreate1, worklist);
 }
 
-function sudokuCreate1(I,K,X) {
-  var J;
-var e = compareBoards(sudoku, solution);
-if (e) alert("has_solution = "+has_solution+" -- A\n"+e);
-  if (I < 81) {
-    for (J = I; J < K; J++) {
-      C = (X + 31*J) % 81;
-      if (sudoku[C] > 0) {
-        sudoku[C] = 0;
-        cntRemain++;
-      }
-    }
-    if (sudokuSolve()) {
-var e = compareBoards(sudoku, solution);
-if (e) alert("has_solution = "+has_solution+" -- B\n"+e);
-      for (J = I; J < K; J++) {
-        C = (X + 31*J) % 81;
-        sudoku[C] = solution[C];
-        cntRemain--;
-      }
-var e = compareBoards(sudoku, solution);
-if (e) alert("has_solution = "+has_solution+" -- C\n"+e);
-      if (K > I + 1) {
-        K = (I + K) / 2;
-      } else {
-        I = I + 1;
-        K = I + 1;
-      }
-    } else {
-      J = K - I;
-      I = K;
-      K = K + J;
-      if (K > 81) {
-        K = 81;
-      }
-    }
-    animation_step("sudokuCreate1("+I+","+K+","+X+");");
+function gameCreate1(worklist) {
+  var C = worklist.pop();
+  var V = game[C];
+  game[C] = 0;
+  if (gameSolve()) { // a different solution found
+    game[C] = V;
+  }
+  if (worklist.length > 0) {
+    animation_step(gameCreate1, worklist);
   } else {
-    animation_step("sudokuCreate2()",1);
+    animation_step(gameCreate2, null);
   }
 }
 
 var problem = [];
 
-function sudokuCreate2() {
+function gameCreate2(arg) {
   var C;
-var e = compareBoards(sudoku, solution);
-if (e) alert("has_solution = "+has_solution+" -- C\n"+e);
-  sudokuShow();
-  problem = copyBoard(sudoku);
-has_solution = 3;
-var e = compareBoards(sudoku, solution);
-if (e) alert("has_solution = "+has_solution+"\n"+e);
-has_solution = 4;
+  gameShow();
+  problem = copyBoard(game);
   cntRemain = 0;
   undoList = [];
-  easyList = [];
-  hardList = [];
   for (C = 0; C < 81; C++) {
-    if (sudoku[C] == 0) {
+    if (game[C] == 0) {
       cntRemain++;
-      document.getElementById(""+C).onclick = move;
-      document.getElementById(""+C).style.cursor = "default";
-      hard[C] = false;
+      document.getElementById(cellLabel(C)).onclick = move;
+      document.getElementById(cellLabel(C)).style.cursor = "default";
     }
   }
+  document.getElementById("controlbox").style.display = "block";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var DOWNLOAD;
+var DOWNLOAD = document.getElementById("download");
 
-onload = function() {
+document.getElementById("downloadProblemSVG").onclick =
+  function downloadProblemSVG() {
+    var SVGtext = board_svg(problem);
+    var name = 'problem_S'+gamename+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
 
-  DOWNLOAD = document.getElementById("download");
+document.getElementById("downloadSolutionSVG").onclick =
+  function downloadSolutionSVG() {
+    var SVGtext = board_svg(solution);
+    var name = 'solution_S'+gamename+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
 
-  document.getElementById("downloadProblemSVG").onclick =
-    function downloadProblemSVG() {
-      var SVGtext = board_svg(problem);
-      var name = 'problem_'+sudoku_hash()+'.svg';
-      download(name, 'image/svg+xml', SVGtext);
-    };
+document.getElementById("downloadProblemTXT").onclick =
+  function downloadProblemTXT() {
+    var SVGtext = board_txt(problem);
+    var name = 'problem_S'+gamename+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
 
-  document.getElementById("downloadSolutionSVG").onclick =
-    function downloadSolutionSVG() {
-      var SVGtext = board_svg(solution);
-      var name = 'solution_'+sudoku_hash()+'.svg';
-      download(name, 'image/svg+xml', SVGtext);
-    };
+document.getElementById("downloadSolutionTXT").onclick =
+  function downloadSolutionTXT() {
+    var SVGtext = board_txt(solution);
+    var name = 'solution_S'+gamename+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
 
-  document.getElementById("downloadProblemTXT").onclick =
-    function downloadProblemTXT() {
-      var SVGtext = board_txt(problem);
-      var name = 'problem_'+sudoku_hash()+'.txt';
-      download(name, 'text/plain', SVGtext);
-    };
+document.getElementById("downloadProblemCSV").onclick =
+  function downloadProblemCSV() {
+    var CSVtext = board_csv(problem);
+    var name = 'problem_S'+gamename+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
 
-  document.getElementById("downloadSolutionTXT").onclick =
-    function downloadSolutionTXT() {
-var e = compareBoards(problem, solution);
-if (e) alert("has_solution = "+has_solution+"\n"+e);
-      var SVGtext = board_txt(solution);
-      var name = 'solution_'+sudoku_hash()+'.txt';
-      download(name, 'text/plain', SVGtext);
-    };
-
-  document.getElementById("downloadProblemCSV").onclick =
-    function downloadProblemCSV() {
-      var CSVtext = board_csv(problem);
-      var name = 'problem_'+sudoku_hash()+'.csv';
-      download(name, 'text/csv', CSVtext);
-    };
-
-  document.getElementById("downloadSolutionCSV").onclick =
-    function downloadSolutionCSV() {
-      var CSVtext = board_csv(solution);
-      var name = 'solution_'+sudoku_hash()+'.csv';
-      download(name, 'text/csv', CSVtext);
-    };
-}
+document.getElementById("downloadSolutionCSV").onclick =
+  function downloadSolutionCSV() {
+    var CSVtext = board_csv(solution);
+    var name = 'solution_S'+gamename+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -481,27 +428,6 @@ function download(filename, filetype, text) {
   DOWNLOAD.click();
   DOWNLOAD.removeAttribute('href');
   in_download = false;
-}
-
-var hash_range = 562949953421311;
-
-function sudoku_hash() {
-  var code = 0;
-  for (var C = 0; C < 81; C++) {
-    code = (code * 10 + problem[C]) % hash_range;
-  }
-  var ans = [];
-  for (var i = 0; i < 10; i++) {
-    var d = code % 36;
-    code = Math.floor(code / 36);
-    if (d < 10) {
-      ans[i] = 0x30 + d;
-    } else {
-      ans[i] = 0x61 + (d - 10);
-    }
-  }
-  return String.fromCharCode(ans[0],ans[1],ans[2],ans[3],ans[4],ans[5],
-               ans[6],ans[7],ans[8],ans[9]);
 }
 
 function board_txt(board) {
@@ -530,20 +456,16 @@ function board_txt(board) {
 
 function board_csv(board) {
   var ans = "";
-  for (var h = 0; h < 3; h++) {
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
-        for (var k = 0; k < 3; k++) {
-          var C = 27 * h + 9 * i + 3 * j + k;
-          var t = board[C];
-          if (t > 0) {
-            ans += t;
-          }
-          ans += ",";
-        }
+  for (var i = 0; i < 9; i++) {
+    for (var j = 0; j < 9; j++) {
+      var C = 9 * i + j;
+      var t = board[C];
+      if (t > 0) {
+        ans += t;
       }
-      ans += "\n";
+      ans += ",";
     }
+    ans += "\n";
   }
   return ans;
 }
@@ -593,104 +515,78 @@ function board_svg(board) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function move() {
-  var C = Number(this.id);
-  var text = document.getElementById(this.id);
-  var V = sudoku[C];
-  if (V == 0) {
+  var marking = marked;
+  var C = cellByLabel(this.id);
+  var V = game[C];
+  if (V < 1) {
     cntRemain--;
   }
-  if (undoList.length > 0) {
-    var last = undoList.length - 1;
-    document.getElementById(undoList[last]).style.backgroundColor = "white";
-    var xin = undoList.indexOf(this.id);
-    if (xin >= 0) undoList.splice(xin, 1);
-  }
-  if (failList.length > 0) {
-    var last = failList.length - 1;
-    document.getElementById(failList[last]).style.backgroundColor = "white";
-    var xin = failList.indexOf(this.id);
-    if (xin >= 0) failList.splice(xin, 1);
-  }
-  if (hardList.length > 0) {
-    var last = hardList.length - 1;
-    document.getElementById(hardList[last]).style.backgroundColor = "white";
-    var xin = hardList.indexOf(this.id);
-    if (xin >= 0) hardList.splice(xin, 1);
-  }
-  if (easyList.length > 0) {
-    var last = easyList.length - 1;
-    document.getElementById(easyList[last]).style.backgroundColor = "white";
-    var xin = easyList.indexOf(this.id);
-    if (xin >= 0) easyList.splice(xin, 1);
-  }
+  var W = (V < 0 ? 0 : V);
   do {
-    sudoku[C] = (sudoku[C] + 1) % 10;
-  } while (sudoku[C] != 0 && !check(sudoku,C,sudoku[C]));
-  if (sudoku[C] > 0) {
-    text.innerHTML = "<i style='color:green'>"+sudoku[C]+"</i>";
-    undoList.push(this.id);
-    hard[C] = (V == 0);
-  } else {
-    var T = '<i style="color:red">?</i>';
-    var oldFail = (text.innerHTML == T);
-    if (V == 0 && !oldFail) {
-      text.innerHTML = T;
-      MARK = "#ffee11";
-    } else {
-      text.innerHTML = "<i style='color:red'>&#xa0;</i>";
+    W =  W + 1;
+  } while (W < 10 && !check(game,C,W));
+  if (W < 10) { // found
+    if (V < 1) { // was blank
+      undoList.push(C);
     }
-    cntRemain++;
-    if (V == 0) {
-      hard[C] = true;
-      failList.push(this.id);
-    } else if (hard[C]) {
-      hardList.push(this.id);
-    } else {
-      easyList.push(this.id);
+  } else { // clearing
+    if (undoList.length > 0) {
+      var xin = undoList.indexOf(C);
+      if (xin >= 0) undoList.splice(xin, 1);
     }
-  }
-  if (failList.length == 0 && hardList.length == 0 && easyList.length == 0) {
-    MARK = "white";
-  }
-  var marked = false;
-  if (failList.length > 0) {
-    var last = failList.length - 1;
-    var C1 = Number(failList[last]);
-    if (sudoku[C] != 0 && sudoku[C1] == 0) {
-      for (var V1 = 1; V1 < 10 && !check(sudoku,C1,V1); V1++);
-      if (V1 < 10) {
-        document.getElementById(failList[last]).style.backgroundColor = MARK;
-        marked = true;
+    if (V < 0) { // was question mark
+      W = 0;
+    } else {
+      if (V == 0) { // was blank
+        W = -1;
+      } else { // was a number
+        W = 0;
       }
     }
-  } else if (!marked && hardList.length > 0) {
-    var last = hardList.length - 1;
-    var C1 = Number(hardList[last]);
-    if (sudoku[C1] == 0) {
-      document.getElementById(hardList[last]).style.backgroundColor = MARK;
-      marked = true;
-    }
-  } else if (!marked && easyList.length > 0) {
-    var last = easyList.length - 1;
-    var C1 = Number(easyList[last]);
-    if (sudoku[C1] == 0) {
-      document.getElementById(easyList[last]).style.backgroundColor = MARK;
-      marked = true;
-    }
   }
-  if (!marked && undoList.length > 0) {
-    var last = undoList.length - 1;
-    var C1 = Number(undoList[last]);
-    if (sudoku[C1] != 0) {
-      document.getElementById(undoList[last]).style.backgroundColor = MARK;
-      marked = true;
-    }
+  game[C] = W;
+  if (W < 1) cntRemain++;
+
+  if (V < 0 && W == 0) {
+    marking = C;
+  } else if (W < 0 || (W == 0 && marked == C)) {
+    marking = ((undoList.length < 1) ? -1 : undoList[undoList.length - 1]);
+  } else {
+    marking = -1;
   }
+
+  cellShow(C, true, marking == C);
+
+  if (marked != marking) {
+    if (marked != -1 && marked != C) {
+      cellShow(marked, true, false);
+    }
+    if (marking != -1 && marking != C) {
+      cellShow(marking, true, true);
+    }
+    marked = marking;
+  }
+
   if (cntRemain > 0) {
     document.getElementById("status").innerHTML = "&#xa0;";
   } else {
     document.getElementById("status").innerHTML = "Valmis";
   }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function init() {
+  animation_step(gameCreate, {});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+init();
+
+////////////////////////////////////////////////////////////////////////////////
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -702,6 +598,12 @@ function move() {
     cursor: not-allowed;
     user-select: none;
     text-align: center;
+  }
+
+  * {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
   }
 
 </style>  
@@ -878,7 +780,7 @@ function move() {
 </table>
 </big></big></big>
 <p id="status">&#xa0;</p>
-<pre id="trace">&#xa0;</pre>
+<div id="controlbox" style="display:none;">
 <p><button id="downloadProblemSVG">Teht&#xe4;v&#xe4; SVG-kuvaksi</button>
 <button id="downloadProblemTXT">Teht&#xe4;v&#xe4; tekstiksi</button>
 <button id="downloadProblemCSV">Teht&#xe4;v&#xe4; CSV-taulukoksi</button></p>
@@ -886,10 +788,6 @@ function move() {
 <button id="downloadSolutionTXT">Ratkaisu tekstiksi</button>
 <button id="downloadSolutionCSV">Ratkaisu CSV-taulukoksi</button></p>
 <a id="download" style="display:none;" download></a>
-<script language="JavaScript">
-//alert("Hei");
-Nmax = 0;
-animation_step("sudokuCreate();");
-</script>
+</div>
 </body>
 </html>
