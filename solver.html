@@ -3,7 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf8">
 <title>Sudoku ratkaisija</title>
-<script language="JavaScript">
+<script>
+////////////////////////////////////////////////////////////////////////////////
+
+onload = function () {
+
 ////////////////////////////////////////////////////////////////////////////////
 
 var sudoku = new Array(81);
@@ -13,8 +17,18 @@ var Level = 0;
 
 var timer;
 
+var msg = "&#xa0;";
+
+var LEVEL = document.getElementById("level");
+
 var CELL = new Array(81);
-var LEVEL;
+
+for (var C = 0; C < 81; C++) {
+  CELL[C] = document.getElementById(""+C);
+  CELL[C].style.cursor = "default";
+}
+
+var DOWNLOAD = document.getElementById("download");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +68,7 @@ function copyBoard(src) {
 }
 
 function emptycells(board) {
+  var I;
   var ans = new Array();
   var K = 0;
   for (I = 0; I < 81; I++) {
@@ -70,6 +85,7 @@ function emptycells(board) {
 
 function check(board,C,V) {
   var X;
+  var I;
   for (I = 0; I < 9; I++) {
     X = rowCell(C,I);
     if (X != C && board[X] == V) {
@@ -106,8 +122,8 @@ function sudokuSolve() {
   var good;
   var work = copyBoard(sudoku);
   var worklist = emptycells(work);
-  E = 0;
-  F = 0;
+  var E = 0;
+  var F = 0;
   var N = 0;
   Level = 0;
   while (E >= 0 && ans < 2) {
@@ -157,6 +173,7 @@ function sudokuShow(result) {
     msg = "Anna alkuarvo klikkaamalla numeroa";
   }
   LEVEL.innerHTML = msg;
+  //document.getElementById("trace").innerHTML = "Looped "+Level+" times";
   for (var C = 0; C < 81; C++) {
     var text;
     if (sudoku[C] > 0) {
@@ -175,24 +192,10 @@ function sudokuShow(result) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function sudokuCreate() {
-  LEVEL = document.getElementById("level");
-  for (var C = 0; C < 81; C++) {
-    CELL[C] = document.getElementById(""+C);
-    CELL[C].onclick = move;
-    CELL[C].style.cursor = "default";
-  }
-  sudoku = blankBoard();
-  sudokuSolve();
-  sudokuShow();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 function move() {
   var msg = "&#xa0;";
   LEVEL.innerHTML = msg;
-  timer = setTimeout("move1("+this.id+")",10);
+  timer = setTimeout(move1, 10, Number(this.id));
 }
 
 function move1(C) {
@@ -214,11 +217,205 @@ function move1(C) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+var in_download = false;
+
+function download(filename, filetype, text) {
+  if (in_download) return;
+  in_download = true;
+  DOWNLOAD.setAttribute('download', filename);
+  DOWNLOAD.setAttribute('href',
+      'data:'+filetype+',' + encodeURIComponent(text));
+  DOWNLOAD.click();
+  DOWNLOAD.removeAttribute('href');
+  in_download = false;
+}
+
+var hash_range = 562949953421311;
+
+function sudoku_hash() {
+  var code = 0;
+  for (var C = 0; C < 81; C++) {
+    code = (code * 10 + sudoku[C]) % hash_range;
+  }
+  var ans = [];
+  for (var i = 0; i < 10; i++) {
+    var d = code % 36;
+    code = Math.floor(code / 36);
+    if (d < 10) {
+      ans[i] = 0x30 + d;
+    } else {
+      ans[i] = 0x61 + (d - 10);
+    }
+  }
+  return String.fromCharCode(ans[0],ans[1],ans[2],ans[3],ans[4],ans[5],
+               ans[6],ans[7],ans[8],ans[9]);
+}
+
+function board_txt(board) {
+  var ans = "+-------+-------+-------+\n";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        ans += "| ";
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var t = board[C];
+          if (t > 0) {
+            ans += t;
+          } else {
+            ans += " ";
+          }
+          ans += " ";
+        }
+      }
+      ans += "|\n";
+    }
+    ans += "+-------+-------+-------+\n";
+  }
+  return ans;
+}
+
+function board_csv(board) {
+  var ans = "";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var t = board[C];
+          if (t > 0) {
+            ans += t;
+          }
+          ans += ",";
+        }
+      }
+      ans += "\n";
+    }
+  }
+  return ans;
+}
+
+function board_svg(board) {
+  var ans = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+    + "<svg width=\"378\" height=\"378\" xmlns=\"http://www.w3.org/2000/svg\">"
+    + "\n"
+    + "  <style>\n"
+    + "    text {\n"
+    + "     text-anchor: middle;\n"
+    + "     dominant-baseline: central;\n"
+    + "     font-size: 40px;\n"
+    + "    }\n"
+    + "    rect {\n"
+    + "      width: 40px;\n"
+    + "      height: 40px;\n"
+    + "      fill: white;\n"
+    + "    }\n"
+    + "    rect.bg {\n"
+    + "      width: 378px;\n"
+    + "      height: 378px;\n"
+    + "      fill: black;\n"
+    + "    }\n"
+    + "  </style>\n\n"
+    + "  <rect x=\"0\" y=\"0\" class=\"bg\"/>\n";
+  for (var h = 0; h < 3; h++) {
+    for (var i = 0; i < 3; i++) {
+      for (var j = 0; j < 3; j++) {
+        for (var k = 0; k < 3; k++) {
+          var C = 27 * h + 9 * i + 3 * j + k;
+          var x = 3 + 41 * k + 125 * j;
+          var y = 3 + 41 * i + 125 * h;
+          var t = board[C];
+          ans += "<rect x=\""+x+"\" y=\""+y+"\"/>\n";
+          if (t > 0) {
+            ans += "<text x=\""+(x+20)+"\" y=\""+(y+20)+"\">"+t+"</text>\n";
+          }
+        }
+      }
+    }
+  }
+  ans += "</svg>\n";
+  return ans;
+}
+
+document.getElementById("downloadProblemSVG").onclick =
+  function downloadProblemSVG() {
+    var SVGtext = board_svg(sudoku);
+    var name = 'problem_'+sudoku_hash()+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
+
+document.getElementById("downloadSolutionSVG").onclick =
+  function downloadSolutionSVG() {
+    var SVGtext = board_svg(solution);
+    var name = 'solution_'+sudoku_hash()+'.svg';
+    download(name, 'image/svg+xml', SVGtext);
+  };
+
+document.getElementById("downloadProblemTXT").onclick =
+  function downloadProblemTXT() {
+    var SVGtext = board_txt(sudoku);
+    var name = 'problem_'+sudoku_hash()+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
+
+document.getElementById("downloadSolutionTXT").onclick =
+  function downloadSolutionTXT() {
+    var SVGtext = board_txt(solution);
+    var name = 'solution_'+sudoku_hash()+'.txt';
+    download(name, 'text/plain', SVGtext);
+  };
+
+document.getElementById("downloadProblemCSV").onclick =
+  function downloadProblemCSV() {
+    var CSVtext = board_csv(sudoku);
+    var name = 'problem_'+sudoku_hash()+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
+
+document.getElementById("downloadSolutionCSV").onclick =
+  function downloadSolutionCSV() {
+    var CSVtext = board_csv(solution);
+    var name = 'solution_'+sudoku_hash()+'.csv';
+    download(name, 'text/csv', CSVtext);
+  };
+
+////////////////////////////////////////////////////////////////////////////////
+
+sudoku = blankBoard();
+sudokuSolve();
+sudokuShow();
+
+for (var C = 0; C < 81; C++) {
+  CELL[C].onclick = move;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
 </script>
+<style>
+
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    text-align: center;
+  }
+
+  button {
+    border: 1px solid blue;
+    background-color: white;
+  }
+
+</style>
 </head>
 <body align="center">
 <H1 align="center">Sudokun ratkaisija</H1>
 <p>&#xa0;</p>
+<div style="position:absolute;top:50px;left:5px;align:left;text-align:left">
+<p id="trace"></p>
+</div>
 <big><big><big>
 <table id="Sudoku" border="1" align="center">
 <tr>
@@ -385,8 +582,14 @@ function move1(C) {
 </table>
 </big></big></big>
 <p id="level">&#xa0;</p>
-<script language="JavaScript">
-sudokuCreate();
-</script>
+<div id="controlbox">
+<p><button id="downloadProblemSVG">Teht&#xe4;v&#xe4; SVG-kuvaksi</button>
+<button id="downloadProblemTXT">Teht&#xe4;v&#xe4; tekstiksi</button>
+<button id="downloadProblemCSV">Teht&#xe4;v&#xe4; CSV-taulukoksi</button></p>
+<p><button id="downloadSolutionSVG">Ratkaisu SVG-kuvaksi</button>
+<button id="downloadSolutionTXT">Ratkaisu tekstiksi</button>
+<button id="downloadSolutionCSV">Ratkaisu CSV-taulukoksi</button></p>
+<a id="download" style="display:none;" download></a>
+</div>
 </body>
 </html>

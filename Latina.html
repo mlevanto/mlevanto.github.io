@@ -236,36 +236,33 @@ function cellShow(C, moved, marked) {
   var lbl = cellLabel(C);
   var CELL = document.getElementById(lbl);
   var V = game[C];
-  if (typeof(V) == 'number') {
-    if (V < 0) {
-      CELL.textContent = "?";
+  if (V < 0) {
+    CELL.textContent = "?";
+    CELL.style.fontStyle = 'italic';
+    CELL.style.color = 'red';
+  } else if (V > 0) {
+    CELL.textContent = letter[V];
+    if (moved) {
       CELL.style.fontStyle = 'italic';
-      CELL.style.color = 'red';
+      CELL.style.color = 'green';
     } else {
-      CELL.textContent = letter[V];
-      if (moved) {
-        CELL.style.fontStyle = 'italic';
-        CELL.style.color = 'green';
-      } else {
-        CELL.style.fontStyle = 'normal';
-        CELL.style.color = 'black';
-        CELL.style.backgroundColor = 'white';
-      }
-    }
-    if (marked) {
-      CELL.style.backgroundColor = '#ffee11';
-    } else {
-      CELL.style.backgroundColor = 'white';
+      CELL.style.fontStyle = 'normal';
+      CELL.style.color = 'black';
     }
   } else {
-    document.getElementById(lbl).innerHTML = V;
+    CELL.textContent = "\u00a0";
+  }
+  if (marked) {
+    CELL.style.backgroundColor = '#ffee11';
+  } else {
+    CELL.style.backgroundColor = 'white';
   }
 }
 
 function gameShow() {
   var C;
   for (C = 0; C < problem_size2; C++) {
-    cellShow(C, false);
+    cellShow(C, false, false);
   }
 }
 
@@ -306,7 +303,6 @@ function animation_step(Cmd, arg) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function game_Clear() {
-//alert("gameClear:A:");
   game = blankBoard();
   gameShow();
   document.getElementById("11").innerHTML = "H";
@@ -674,6 +670,11 @@ init();
     border-radius: 10px;
     height: 32px;
     width: 32px;
+  }
+
+  button {
+    border: 1px solid blue;
+    background-color: white;
   }
 
 </style>
