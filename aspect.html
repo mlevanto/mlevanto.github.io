@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Aspect-peli</title>
+<script>
+  onload = function() {
+
+/**** View control ****/
+
+    var ISONNA = document.getElementById("isonna");
+    var PIENENNA = document.getElementById("pienenna");
+    var BIGGER = document.getElementById("bigger");
+    var SMALLER = document.getElementById("smaller");
+    var GAMEBOX = document.getElementById("gamebox");
+
+    var size = -1;
+
+    function resize(newSize) {
+      if (newSize > -11 && newSize < 22) {
+        size = newSize;
+      }
+      var wdt = 100;
+      if (size < -5) {
+        wdt = 5 * size + 55;
+      } else if (size < -1) {
+        wdt = 10 * size + 80;
+      } else if (size < 6) {
+        wdt = 20 * size + 100;
+      } else {
+        wdt = 50 * size - 50;
+      }
+      GAMEBOX.style.width = wdt+"%";
+    }
+
+    ISONNA.onclick = function () {
+      resize(size + 1);
+    }
+
+    PIENENNA.onclick = function () {
+      resize(size - 1);
+    }
+
+    BIGGER.onclick = ISONNA.onclick;
+    SMALLER.onclick = PIENENNA.onclick;
+
+/**** Game ****/
+
+    var detectors = ['detA','detB','detC','detD',
+                     'det1','det2','det3','det4'];
+
+    var paths = {det1:['tdet1','tp1','g1','g12','r1'],
+                 det2:['tdet2','tp2','g2','g12','r2'],
+                 det3:['tdet3','tp3','g3','g34','r3'],
+                 det4:['tdet4','tp4','g4','g34','r4'],
+                 detA:['tdetA','tpA','gA','gAB','rA'],
+                 detB:['tdetB','tpB','gB','gAB','rB'],
+                 detC:['tdetC','tpC','gC','gCD','rC'],
+                 detD:['tdetD','tpD','gD','gCD','rD']};
+    var colors = ['white','black','black','black','black'];
+    var attrs = ['fill','fill','stroke','stroke','stroke'];
+
+    var PATHS = {};
+
+    var GM = document.getElementById('gm');
+
+    var BUTTONS = {bAB: document.getElementById('bAB'),
+                   bCD: document.getElementById('bCD'),
+                   b12: document.getElementById('b12'),
+                   b34: document.getElementById('b34'),
+                   tAB: document.getElementById('tAB'),
+                   tCD: document.getElementById('tCD'),
+                   t12: document.getElementById('t12'),
+                   t34: document.getElementById('t34')};
+
+    var SWITCHES = {sL: document.getElementById('sL'),
+                    sR: document.getElementById('sR')};
+
+    var ACTIVATOR = document.getElementById('bg');
+
+    var CNTS = {};
+
+    var SCORE = document.getElementById('score');
+
+    for (var i = 0; i < 8; i++) {
+      var det = detectors[i];
+      PATHS[det] = [];
+      var path = paths[det];
+      for (var j = 0; j < path.length; j++) {
+        PATHS[det][j] = document.getElementById(path[j]);
+/*
+PATHS[det][j].setAttributeNS(null, attrs[j], 'gold');
+PATHS[det][j].setAttributeNS(null, attrs[j], 'lime');
+*/
+      }
+/*
+GM.setAttributeNS(null, 'stroke', 'lime');
+setPathColor(det, null);
+*/
+    }
+
+    selectedLft = null;
+    selectedRgt = null;
+
+    var buttonStates = {tAB:false, tCD:false, t12:false, t34:false};
+
+    var switchStates = {sL:false, sR:false};
+
+    var selectedLft = null;
+    var selectedRgt = null;
+
+    var cnts = {detA: {det1: 0, det2: 0, det3: 0, det4: 0},
+                detB: {det1: 0, det2: 0, det3: 0, det4: 0},
+                detC: {det1: 0, det2: 0, det3: 0, det4: 0},
+                detD: {det1: 0, det2: 0, det3: 0, det4: 0}};
+    var total = 0;
+
+    function setPathColor(det, color) {
+      var PATH = PATHS[det];
+      for (var j = 0; j < PATH.length; j++) {
+        PATH[j].setAttributeNS(null, attrs[j], color || colors[j]);
+      }
+      GM.setAttributeNS(null, 'stroke', color || 'black');
+    }
+
+    function selectPath(lft, rgt) {
+      if (selectedLft) {
+        setPathColor(selectedLft, null);
+      }
+      if (selectedRgt) {
+        setPathColor(selectedRgt, null);
+      }
+      selectedLft = lft;
+      selectedRgt = rgt;
+      if (selectedLft) {
+        setPathColor(selectedLft, 'gold');
+      }
+      if (selectedRgt) {
+        setPathColor(selectedRgt, 'gold');
+      }
+    }
+
+    function toggle() {
+      var idcs = this.id.split('');
+      idcs[0] = 't';
+      var id = idcs.join('');
+      var newState = !buttonStates[id];
+      var newKey = idcs[newState ? 2 : 1];
+      buttonStates[id] = newState;
+      BUTTONS[id].textContent = newKey;
+      selectPath(null, null);
+    }
+
+    BUTTONS.bAB.onclick = toggle;
+    BUTTONS.bCD.onclick = toggle;
+    BUTTONS.b12.onclick = toggle;
+    BUTTONS.b34.onclick = toggle;
+    BUTTONS.tAB.onclick = toggle;
+    BUTTONS.tCD.onclick = toggle;
+    BUTTONS.t12.onclick = toggle;
+    BUTTONS.t34.onclick = toggle;
+
+    function part_score(lf1, lf2, rg1, rg2) {
+      var t = cnts[lf1][rg1] + cnts[lf1][rg2] + cnts[lf2][rg1] + cnts[lf2][rg2];
+      if (t < 1) return 0;
+      var d = 1 / Math.sqrt(t);
+      var v = cnts[lf1][rg1] - cnts[lf1][rg2] - cnts[lf2][rg1] + cnts[lf2][rg2];
+      var e = Math.abs(v) / t - d;
+      if (e < 0.05 && t < 5) e = t / 100;
+      if (v < 0) e = -e;
+      return e;
+    }
+
+    ACTIVATOR.onclick = function() {
+      if (selectedLft || selectedRgt) {
+        selectPath(null, null);
+      } else {
+        if (Math.random() < 0.5) {
+          switchStates.sL = !switchStates.sL;
+        }
+        if (Math.random() < 0.5) {
+          switchStates.sR = !switchStates.sR;
+        }
+
+        var lft = switchStates.sL ? (buttonStates.tCD ? 'detD' : 'detC')
+                                  : (buttonStates.tAB ? 'detB' : 'detA');
+        var rgt = switchStates.sR ? (buttonStates.t12 ? 'det2' : 'det1')
+                                  : (buttonStates.t34 ? 'det4' : 'det3');
+
+        selectPath(lft, rgt);
+        cnts[lft][rgt]++;
+        CNTS[lft][rgt].textContent = cnts[lft][rgt];
+        total++;
+
+        var score = part_score('detA', 'detB', 'det1', 'det2')
+                  + part_score('detA', 'detB', 'det3', 'det4')
+                  + part_score('detC', 'detD', 'det1', 'det2')
+                  + part_score('detC', 'detD', 'det4', 'det3');
+
+        SCORE.textContent = Math.abs(score).toFixed(2);
+
+      }
+    }
+
+    for (var i = 0; i < 4; i++) {
+      CNTS[detectors[i]] = {};
+      for (var j = 4; j < 8; j++) {
+        var id = detectors[i]+detectors[j];
+        CNTS[detectors[i]][detectors[j]] = document.getElementById(id);
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    cursor: not-allowed;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+  }
+  h1 {
+    text-align: center;
+    margin-top: 0px;
+  }
+  #control-lft {
+    float: left;
+    width: 47%;
+    margin-bottom: 20px;
+  }
+  #control-rgt {
+    float: right;
+    text-align: right;
+    width: 47%;
+    margin-bottom: 20px;
+  }
+  #isonna, #pienenna, #bigger, #smaller, a {
+    cursor: default;
+  }
+  #gamebox {
+    width: 80%;
+    margin: auto;
+  }
+  #bAB, #bCD, #b12, #b34, #tAB, #tCD, #t12, #t34, #bg {
+    cursor: pointer;
+  }
+  #info-lft {
+    float: left;
+    padding: 20px;
+    max-width: 300pt;
+    line-height: 2;
+    text-align: justify;
+    hyphens: manual;
+  }
+  #info-rgt {
+    float: right;
+    padding: 20px;
+    max-width: 300pt;
+    line-height: 2;
+    text-align: justify;
+    hyphens: manual;
+  }
+</style>
+</head>
+<body>
+<div id="top">
+<div id="control-lft">
+<h1 id="top-lft">Aspect-peli</h1>
+| <a href="#ohje">Pelaaminen</a>
+| <a href="#tausta">Taustaa</a>
+| <span id="isonna">Isommaksi</span>
+| <span id="pienenna">Pienemm&auml;ksi</span>&#xa0;|
+</div>
+<div id="control-rgt">
+<h1 id="top-rgt">Aspect Game</h1>
+| <span id="bigger">Bigger</span>
+| <span id="smaller">Smaller</span>
+| <a href="#howto">How&#xa0;to&#xa0;Play</a>
+| <a href="#background">Background</a>&#xa0;|
+</div>
+</div>
+<div id="gamebox">
+<svg id="game" width="100%" viewBox="0 0 1180 600" text-anchor="middle">
+
+  <rect x="522" y="7" width="136" height="86" stroke="black" fill="none"/>
+  <rect x="525" y="10" width="130" height="80" fill="black"/>
+  <rect id="bAB" x="535" y="20" width="25" height="25" fill="green"/>
+  <rect id="b12" x="620" y="20" width="25" height="25" fill="green"/>
+  <rect id="bCD" x="535" y="55" width="25" height="25" fill="dodgerblue"/>
+  <rect id="b34" x="620" y="55" width="25" height="25" fill="dodgerblue"/>
+  <rect x="225" y="25" width="50" height="50" fill="silver"/>
+  <rect x="905" y="25" width="50" height="50" fill="silver"/>
+  <rect x="100" y="25" width="50" height="50" fill="green"/>
+  <rect x="1030" y="25" width="50" height="50" fill="green"/>
+  <rect x="10" y="10" width="50" height="80" fill="red" id="detA"/>
+  <rect x="1120" y="10" width="50" height="80" fill="red" id="det1"/>
+  <rect x="85" y="115" width="80" height="50" fill="red" id="detB"/>
+  <rect x="1015" y="115" width="80" height="50" fill="red" id="det2"/>
+  <rect x="225" y="150" width="50" height="50" fill="dodgerblue"/>
+  <rect x="905" y="150" width="50" height="50" fill="dodgerblue"/>
+  <rect x="210" y="240" width="80" height="50" fill="red" id="detC"/>
+  <rect x="890" y="240" width="80" height="50" fill="red" id="det3"/>
+  <rect x="315" y="135" width="50" height="80" fill="red" id="detD"/>
+  <rect x="815" y="135" width="50" height="80" fill="red" id="det4"/>
+
+  <g font-size="24" fill="white">
+    <text id="tAB" x="548" y="41">A</text>
+    <text id="t12" x="633" y="41">1</text>
+    <text id="tCD" x="548" y="76">C</text>
+    <text id="t34" x="633" y="76">3</text>
+    <text id="tdetA" x="35" y="57">A</text>
+    <text id="tdet1" x="1145" y="57">1</text>
+    <text id="tdetB" x="125" y="148">B</text>
+    <text id="tdet2" x="1055" y="148">2</text>
+    <text id="tdetC" x="250" y="273">C</text>
+    <text id="tdet3" x="930" y="273">3</text>
+    <text id="tdetD" x="340" y="183">D</text>
+    <text id="tdet4" x="840" y="183">4</text>
+  </g>
+
+  <g stroke-width="6" stroke-linecap="square" stroke="black">
+    <line id="gA" x1="60" y1="50" x2="125" y2="50"/>
+    <line id="g1" x1="1120" y1="50" x2="1055" y2="50"/>
+    <line id="gB" x1="125" y1="50" x2="125" y2="115"/>
+    <line id="g2" x1="1055" y1="50" x2="1055" y2="115"/>
+    <line id="gAB" x1="125" y1="50" x2="250" y2="50"/>
+    <line id="g12" x1="1055" y1="50" x2="930" y2="50"/>
+    <line id="gC" x1="250" y1="175" x2="250" y2="240"/>
+    <line id="g3" x1="930" y1="175" x2="930" y2="240"/>
+    <line id="gD" x1="250" y1="175" x2="315" y2="175"/>
+    <line id="g4" x1="930" y1="175" x2="865" y2="175"/>
+    <line id="gCD" x1="250" y1="50" x2="250" y2="175"/>
+    <line id="g34" x1="930" y1="50" x2="930" y2="175"/>
+    <line id="gm" x1="250" y1="50" x2="930" y2="50"/>
+  </g>
+
+  <rect id="bg" x="575" y="35" width="30" height="30"
+        stroke="black" fill="gold"/>
+
+  <polygon id="tpA" points="50,50 70,40 70,60" fill="black"/>
+  <polygon id="tp1" points="1130,50 1110,40 1110,60" fill="black"/>
+  <polygon id="tpB" points="125,125 115,105 135,105" fill="black"/>
+  <polygon id="tp2" points="1055,125 1065,105 1045,105" fill="black"/>
+  <polygon id="tpC" points="250,250 240,230 260,230" fill="black"/>
+  <polygon id="tp3" points="930,250 940,230 920,230" fill="black"/>
+  <polygon id="tpD" points="325,175 305,165 305,185" fill="black"/>
+  <polygon id="tp4" points="855,175 875,165 875,185" fill="black"/>
+
+  <g stroke="black" stroke-width="2" fill="none">
+    <path id="rA"
+          d="M35 90 L35 380 Q35 415 65 415 L403 415 Q455 415 461 421"/>
+    <path id="rB"
+          d="M125 165 L125 344 Q125 379 155 379 L439 379 Q491 379 497 385"/>
+    <path id="rC"
+          d="M250 290 L250 308 Q250 342 280 342 L475 342 Q528 342 534 348"/>
+    <path id="rD"
+          d="M340 215 L340 272 Q340 306 370 306 L511 306 Q564 306 570 312"/>
+    <path id="r4"
+          d="M840 215 L840 272 Q840 306 810 306 L669 306 Q616 306 610 312"/>
+    <path id="r3"
+          d="M930 290 L930 308 Q930 342 900 342 L705 342 Q652 342 646 348"/>
+    <path id="r2"
+          d="M1055 165 L1055 344 Q1055 379 1025 379 L741 379 Q689 379 683 385"/>
+    <path id="r1" 
+          d="M1145 90 L1145 380 Q1145 414 1115 415 L777 415 Q725 415 719 421"/>
+  </g>
+
+  <polygon points="590,590 441,441 590,292 739,441" fill="silver"/>
+
+  <g fill="black">
+    <polygon points="590,586 518,514 590,442 662,514"/>
+    <polygon points="517,513 445,441 517,369 589,441"/>
+    <polygon points="590,440 518,368 590,296 662,368"/>
+    <polygon points="663,513 591,441 663,369 735,441"/>
+  </g>
+  <g fill="white">
+    <polygon points="554,478 518,514 554,550 590,514"/>
+    <polygon points="481,477 445,441 481,405 517,441"/>
+    <polygon points="626,550 590,514 626,478 662,514"/>
+    <polygon points="553,477 517,441 553,405 589,441"/>
+    <polygon points="627,477 591,441 627,405 662,441"/>
+    <polygon points="590,368 554,404 590,440 626,404"/>
+    <polygon points="699,477 663,441 699,405 735,441"/>
+    <polygon points="590,296 554,332 590,368 626,332"/>
+  </g>
+
+  <g font-size="20" fill="black">
+    <text id="detDdet4" x="590" y="337">0</text>
+    <text id="detDdet1" x="699" y="446">0</text>
+    <text id="detCdet3" x="590" y="409">0</text>
+    <text id="detCdet2" x="627" y="446">0</text>
+    <text id="detBdet3" x="553" y="446">0</text>
+    <text id="detBdet1" x="626" y="519">0</text>
+    <text id="detAdet4" x="481" y="446">0</text>
+    <text id="detAdet2" x="554" y="519">0</text>
+  </g>
+  <g font-size="20" fill="white">
+    <text id="detDdet3" x="626" y="373">0</text>
+    <text id="detDdet2" x="663" y="410">0</text>
+    <text id="detCdet4" x="554" y="373">0</text>
+    <text id="detCdet1" x="663" y="483">0</text>
+    <text id="detBdet4" x="517" y="410">0</text>
+    <text id="detBdet2" x="590" y="483">0</text>
+    <text id="detAdet3" x="517" y="483">0</text>
+    <text id="detAdet1" x="590" y="555">0</text>
+  </g>
+
+  <text id="score" x="590" y="225" font-family="sans-serif" font-size="96"
+           fill="red">0.00</text>
+
+</svg>
+</div>
+<div id="info-lft">
+<a id="ohje" href="#top">Peli</a>
+<div>
+<h2>Pelaaminen</h2>
+<p>Ylhäällä keskellä on musta kehystetty suora&shy;kulmio, jossa on
+eri&shy;värisiä neliöitä. Tämä on hiukkaslähde. Hiukkasia voi
+oh&shy;jata klik&shy;kaamalla pieniä neliöitä, joissa on numero tai kirjain.
+Kun oh&shy;jaukset on kunnossa, hiukkaset lähetetään
+klik&shy;kaa&shy;mal&shy;la hiukkaslähteen
+keskellä olevaa neliötä. Tällöin lähtee kaksi
+hiuk&shy;kasta, vasemmalle ja oikealle. Kumpikin hiukkanen osuu
+yhteen de&shy;tek&shy;toreista, jonka kirjain tai numero näkyy
+hiukkaslähteessä.
+Sa&shy;mal&shy;la alhaalla olevassa ruudukossa näitä detektoreja
+vas&shy;taa&shy;vas&shy;sa ruu&shy;dussa oleva numero kasvaa yhdellä.</p>
+<p>Pelin tavoite on saada mahdollisimman suuria lukuja
+val&shy;koi&shy;siin ruutuihin ja mahdollisimman pieniä mustiin (tai
+toi&shy;sin&shy;päin). Ruudukon vieressä oleva iso numero on tulos, jossa on
+otet&shy;tu huomioon myös hiukkasten kokonaismäärä. Hyvä tulos on yli 1.50 ja erinomainen yli 2.50.</p>
+<p>Klikkaamalla sanoja Isommaksi ja Pienemmäksi voi säätää
+pe&shy;lin ko&shy;koa.</p>
+</div>
+<a id="tausta" href="#top">Peli</a>
+<div>
+<h2>Taustaa</h2>
+<p>Vuonna 1935 Einstein, Podolsky, ja Rosen esittivät
+EPR-artik&shy;kelissaan, että kvanttimekaniikka on epätoäydellinen ja
+sii&shy;hen pitäisi lisätä uusia muutujia. Vuonna 1964 Bell osoitti,
+et&shy;tä mikään paikallinen piilomuuttujateoria ei ole
+kvantti&shy;mekaniikan kanssa yhtäpitävä.
+Siksi pitäisi keksiä koe, jolla voisi
+ku&shy;mo&shy;ta joko kaikki paikalliset piilomuuttujateoriat tai kvant&shy;ti&shy;me&shy;ka&shy;nii&shy;kan.
+Aspect teki ensimmäisen sellaisen kokeen
+vuon&shy;na 1980. Sen jälkeen sekä Aspect
+että muut ovat tehneet
+pa&shy;rem&shy;pia samankaltaisia kokeita. Kaikkien näiden kokeiden
+tu&shy;lok&shy;set tukevat kvanttimekaniikka ja kumoavat sellaiset
+piilo&shy;muuttuja&shy;teoriat, jotka eivät ole oudompia kuin
+kvantti&shy;mekaniikka.</p>
+<p>Peli esittää tyypllistä tämän tyyppistä koetta. Iso punainen
+tulosnumero alkaa nollasta ja lähestyy lukua, jollaisella
+tällaisen kokeen tulos tavallisesti esitetään. Hyvänstä 
+peli&shy;strategiasta
+voi johtaa piilomuuttujateorian. Vastaavasti hyvästä
+piilo&shy;muuttujateoriasta voi johtaa hyvän strategian tähän
+peliin.
+</div>
+<a href="#top">Peli</a>
+</div>
+<div id="info-rgt">
+<a id="howto" href="#top">Game</a>
+<div>
+<h2>How to Play</h2>
+<p>In the centre of the top of the game area the is a framed black
+rectangle that contains small squares. It is the particle source.
+The particles can be directed by clicking the small squares
+that contain a letter or digit. When the square in the middle of
+the particle source is clicked two particles are sent, one to the
+left and one to the right. Each particle hits one of the detectors
+identified by a letter or num&shy shown in the particle source.
+At the same time in the lower part of the game area the
+num&shy;ber in the square corresponding to the two hit detectors is incremented.</p>
+<p>The goal is to get as great numbers as possible to the white
+squares and as small as possible to the black squares (or the
+con&shy;verse). The big red number is the
+score, with an ad&shy;just&shy;ment for the number of particles. More than 1.50 is good,
+more than 2.50 is excellent.</p>
+<p>The size of the game area can be adjusted by clicking the
+words Bigger and Smaller.
+</p>
+</div>
+<a id="background" href="#top">Game</a>
+<div>
+<h2>Background</h1>
+<p>In 1935 Einstein, Podolsky, and Rosen argued in the EPR
+paper that quantum mechanics is incomplete and should be
+aug&shy;mented with additional variables. In 1964 Bell proved that
+no local hidden varibale theory is equivalent to quantum
+me&shy;chan&shy;ics. Therefore, experimentalists should find a way to
+refute either quantum mechanics or every local hidden variable
+theory. Aspect performed first such experiments in 1980.
+Later both Aspect and others have performed similar but
+better experiments. The results of all these experiments
+support quantum mechanics and refute all those local hidden
+variable theories that are not more weird than quantum
+mechanics.</p>
+<p>The game represents a typical experiment of this kind. The big red score
+starts from zero and approaches the number commonly used to summarize the
+result. A good strategy can be converted to a hidden variable theory.
+Conversely, a good hidden variable theory can be converted to a good
+strategy in this game.
+</p>
+</div>
+<a href="#top">Game</a>
+</div>
+</body>
+</html>
