@@ -16,13 +16,27 @@
       margin-top: 5px;
       margin-bottom: 5px;
     }
+    @media (min-width: 900px) {
+      .narrow {
+        display: none;
+      }
+      .left {
+        float: left;
+        width: 45%;
+      }
+      .right {
+        float: right;
+        width: 45%;
+      }
+    }
   </style>
 </head>
 <body>
 
-<h1>Mikon sivusto</h1>
 <div>
-<div style="float:left; width: 45%">
+<div class="narrow"><a href="#common">In Common Laugage</a></div>
+<div id="suomi" class="left">
+  <h1>Mikon sivusto</h1>
   <p><a href="lopetetaan.html">Lopetetaan k&ouml;yhyys</a> -- vuodelta 1988</p>
   <p><a href="kesaruno.html">Kes&auml;runo</a>
   <div class="list">Probleemoja:
@@ -31,6 +45,7 @@
     <p><a href="SudokuV.html">Sudoku</a></p>
     <p>Sudoku <a href="solver.html">ratkaisija</a></p>
     <p><a href="aspect.html">Aspect-peli</a></p>
+    <p><a href="thumbs.html">Peukut pystyyn</p>
   </div>
   <div class="list">Pelej&auml; automaattisen vastapelaajan kanssa:
     <p><a href="15.html">15</a></p>
@@ -47,10 +62,12 @@
     <p><a href="Taulux.html">Taulukon tai listan laskeminen</a></p>
   </div>
 </div>
-<div style="float:right; width: 45%">
-  <div class="list">Problems:
+<div id="common" class="right">
+  <h1>Mikko's pages</h1>
+  <div class="list">Puzzles:
     <p><a href="SudokuV.html">Sudoku</a></p>
     <p><a href="aspect.html">Aspect Game</a></p>
+    <p><a href="thumbs.html">Thumbs up</p>
   </div>
   <div class="list">Games with an automatic opponent:
     <p><a href="15.html">15</a></p>
@@ -60,5 +77,6 @@
     <p><a href="P-ras.html">Pyhthagorean theorem</a></p>
   </div>
 </div>
+<div class="narrow"><a href="#suomi">Suomeksi</a></div>
 </body>
 </html>
