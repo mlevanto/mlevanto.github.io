@@ -1,0 +1,367 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Peukut pystyyn</title>
+<style>
+body {
+  padding: 10px 100px;
+}
+#trace {
+  position: absolute;
+  left: 20px;
+  top: 310px;
+}
+h1 {
+  margin: 0px;
+  padding: 0px;
+}
+.right {
+  padding-top: 0px;
+  float: right;
+  text-align: right;
+}
+p {
+  margin: 5px;
+}
+#buttonbox {
+  padding-top: 0px;
+  padding-bottom: 30px;
+}
+button {
+  background-color: blue;
+  color: white;
+  font-size: 14pt;
+  padding: 0px 20px;
+  border-style: outset;
+  border-radius: 30px;
+  margin-right: 50px;
+  border-top-width: 4px;
+}
+.right > button {
+  margin-right: 0px;
+}
+button.active {
+  border-style: inset;
+}
+#board {
+  position: relative;
+}
+.empty {
+  position: absolute;
+  top: 10px;
+  left: 1494px;
+  width: 100px;
+  height: 140px;
+  background-color: lime;
+  text-align: center;
+  cursor: default;
+}
+.off {
+  position: absolute;
+  top: 50px;
+  left: 500px;
+  width: 100px;
+  height: 140px;
+  cursor: default;
+  background-image: url('data:image/svg+xml,<svg width="100" height="140"\
+ xmlns="http://www.w3.org/2000/svg"><path fill="red" d="M 100 92\
+ Q 85 92 71 90 Q 63 98 59 103 Q 53 112 58 123 Q 60 135 52 135 Q 38 135 40 112\
+ Q 44 96 28 97 L 15 97 C 6 97 6 84 14 81 C 6 81 6 67 15 67 C 9 64 9 53 19 53\
+ C 12 53 12 42 21 40 Q 33 38 40 41 Q 54 40 68 53 Q 80 48 100 48"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.on {
+  position: absolute;
+  top: 50px;
+  left: 700px;
+  width: 100px;
+  height: 140px;
+  cursor: default;
+  background-image: url('data:image/svg+xml,<svg width="100" height="140"\
+ xmlns="http://www.w3.org/2000/svg"><path fill="green" d="M 100 48\
+ Q 85 48 71 50 Q 63 42 59 37 Q 53 28 58 17 Q 60 5 52 5 Q 38 5 40 28\
+ Q 44 44 28 43 L 15 43 C 6 43 6 56 14 59 C 6 59 6 73 15 73 C 9 76 9 87 19 87\
+ C 12 87 12 98 21 100 Q 33 102 40 99 Q 54 100 68 87 Q 80 92 100 92"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#next {
+  float: right;
+}
+table {
+  margin: 30px;
+}
+td {
+  padding: 50px;
+}
+td > p {
+  margin-top: 20px;
+}
+</style>
+<script>
+
+onload = function () {
+
+  var TRACE = document.getElementById("trace");
+
+// Parameters
+
+  const maxsize = 9;
+
+// Dispplay
+
+  var display_size = 0;
+
+  var RESERVE = document.createElement("div");
+
+  var BUTTONBOX = document.getElementById("buttonbox");
+  var BUTTON = [];
+
+  var CELL = [];
+
+  var cell_actions = {};
+
+  for (var i = 2; i <= maxsize; i++) {
+    BUTTON[i] = document.createElement("button");
+    BUTTON[i].id = "b"+i;
+    BUTTON[i].textContent = ""+i;
+    BUTTONBOX.appendChild(BUTTON[i]);
+  }
+
+  var BOARD = document.getElementById("board");
+
+  function configure_display(new_size) {
+    if (new_size != display_size) {
+      if (BUTTON[display_size]) BUTTON[display_size].className = "";
+      var view_height = window.innerHeight - BOARD.offsetTop - 30;
+      var view_width = BOARD.clientWidth;
+      var board_edge = view_height;
+      if (board_edge > view_width) board_edge = view_width;
+      var cell_step = 2 * Math.round(0.5 * board_edge / new_size);
+      if (cell_step < 11) cell_step = 11;
+      var orgX = Math.round((BOARD.clientWidth - new_size * cell_step) / 2);
+      var cell_edge = cell_step;
+      for (var x = 0; x < maxsize; x++) {
+        for (var y = 0; y < maxsize; y++) {
+          if (x < new_size && y < new_size) {
+            if (!CELL[x]) CELL[x] = [];
+            var CELL_xy = CELL[x][y];
+            if (!CELL_xy) {
+              CELL_xy = document.createElement("div");
+              CELL_xy.id = x+","+y;
+              CELL_xy.className = "off";
+              for (var event in cell_actions) {
+                CELL_xy[event] = cell_actions[event];
+              }
+              CELL_xy.tabIndex = 1 + x + maxsize * y;
+              CELL[x][y] = CELL_xy;
+            }
+            BOARD.appendChild(CELL_xy);
+            CELL_xy.style.left = orgX + cell_step * x + "px";
+            CELL_xy.style.top = cell_step * y + "px";
+            CELL_xy.style.width = cell_edge+"px";
+            CELL_xy.style.height = cell_edge+"px";
+          } else {
+            if (CELL[x] && CELL[x][y]) {
+              RESERVE.appendChild(CELL[x][y]);
+            }
+          }
+        }
+      }
+      display_size = new_size;
+      BUTTON[new_size].className = "active";
+      BOARD.style.height = board_edge+"px";
+    }
+  }
+
+  function display_board(state) {
+    for (var x = 0; x < display_size; x++) {
+      for (var y = 0; y < display_size; y++) {
+        CELL[x][y].className = (state[x][y] ? "on" : "off");
+      }
+    }
+  }
+
+// Logic
+
+  var size;
+  var state = [];
+  var init_state = null;
+  var old_state = null;
+  var last_action = 'N' // initial letter of Move, New, Reset
+
+  function copy_state(state) {
+    var copy = [];
+    for (var x = 0; x < state.length; x++) {
+      copy[x] = [...state[x]];
+    }
+    return copy;
+  }
+
+  function toggle(x, y) {
+    if (x >= 0 && x < size && y >= 0 && y < size) {
+      state[x][y] = !state[x][y];
+    }
+  }
+
+  function move(x, y) {
+    last_action = 'M';
+    toggle(x-1, y);
+    toggle(x, y-1);
+    toggle(x, y);
+    toggle(x, y+1);
+    toggle(x+1, y);
+//CELL[x][y].textContent = "o";
+    display_board(state);
+  }
+
+  function new_game(new_size) {
+    old_size = size;
+    size = new_size;
+    old_init_state = init_state;
+    old_state = state;
+    state = [];
+    configure_display(new_size);
+    for (var x = 0; x < size; x++) {
+      state[x] = [];
+      for (var y = 0; y < size; y++) {
+        state[x][y] = true;
+      }
+    }
+    var cnt = 0;
+    while (cnt == 0) {
+      for (var x = 0; x < size; x++) {
+        for (var y = 0; y < size; y++) {
+          if (Math.random() < 0.5) {
+            move(x, y);
+          }
+        }
+      }
+      for (var x = 0; x < size; x++) {
+        for (var y = 0; y < size; y++) {
+          if (!state[x][y]) {
+            cnt++;
+          }
+        }
+      }
+    }
+    init_state = copy_state(state);
+    last_action = 'N';
+  }
+
+  function reset_game() {
+    if (last_action == 'N') {
+      if (old_size && size != old_size) {
+        configure_display(old_size);
+        size = old_size;
+      }
+      if (old_init_state) {
+        init_state = copy_state(old_init_state);
+      }
+      if (old_state) {
+        state = copy_state(old_state);
+      }
+      last_action = 'M';
+    } else if (last_action == 'R') {
+      last_action = 'M';
+      if (old_state) {
+        state = copy_state(old_state);
+      }
+    } else {
+      last_action = 'R';
+      if (init_state) {
+        old_state = copy_state(state);
+        state = copy_state(init_state);
+      }
+    } 
+    display_board(state);
+  }
+
+// Actions
+
+  function cell_action() {
+    var id_parts = this.id.split(',');
+    move(Number(id_parts[0]), Number(id_parts[1]));
+  }
+
+  function button_onclick(e) {
+    var new_size = Number(this.id.substring(1));
+    new_game(new_size);
+  }
+
+  for (var i = 0; i < BUTTON.length; i++) {
+    if (BUTTON[i]) {
+      BUTTON[i].onmouseup = button_onclick;
+      BUTTON[i].tabIndex = 32000+i;
+    }
+  }
+
+  function reset_action(e) {
+    reset_game();
+  }
+
+  document.getElementById("reset").onmouseup = reset_action;
+
+  window.onresize = function () {
+    configure_display(display_size); // adjust but keep game size
+  };
+
+  cell_actions.onmouseup = cell_action;
+
+// Initialization
+
+  new_game(2);
+
+}
+</script>
+</head>
+<body id ="body">
+<div class="right">
+  <h1>Thumbs Up!</h1>
+  <p><a href="#info" tabindex="32762">How to play</a></p>
+  <button id="reset" tabindex="32760">Reset</button>
+</div>
+<div id="top">
+  <h1>Peukut pystyyn!</h1>
+  <p><a href="#ohje" tabindex="32761">Miten pelata</a></p>
+  <div id="buttonbox"></div>
+</div>
+<div>
+<div class="right">
+</div>
+</div>
+<div id="board">
+&#xa0;
+</div>
+<pre id="trace">&#xa0;
+</pre>
+<table>
+<tr>
+<td id="ohje">
+<p><a href="#body">Takaisin peliin</a></p>
+<h2>Miten tätä peliä pelataan</h2>
+<p>Pelialueella on käden kuvia. Alkutilanteessa ainakin osa käsistä on peukalo alaspäin. Tavoitteena on kääntää kaikki peukalot ylöspäin.</p>
+<p>Klikkaamalla kädettä kääntyy klikattu käsi ja lähimmät viereiset kädet. Klikkauksen voi perua klikkaamalla samaa kättä uudestaan ennen kuin klikkaa mitään muuta.</p>
+<p>Mistä tahansa pelitilanteesta voi palata alkutilanteeseen klikkaamalla Reset-painiketta. Takaisin pelitilanteeseen pääsee klikkamalla
+Reset-painiketta uudestaan ennen kuin klikkaa mitään muuta.</p>
+<p>Numeroiduilla painikkeilla voi valita pelin koon. Suuremmat numerot eivät tarkoita vaikeampia tasoja. Esimerkiksi 9 on helpohko.
+Saman pelikoon voi valita useita kertoja, jolloin eri kerroilla voi saada eri alkutilanteen. Uuden alkutilanteen voi perua klikkaamalla Reset-painiketta ennen kuin klikkaa mitään muuta.</p>
+<p><a href="#body">Takaisin peliin</a></p>
+</td>
+<td id="info">
+<p><a href="#body">Back to the game</a></p>
+<h2>How to play this game</h2>
+<p>In the game area there are hand images. In the initial position at least some of the hands are thumbs down. The goal is to turn all thumbs up.<p>
+<p>Clicking on a hand will turn the clicked hand and the nearest neighboring hands. You can undo the click by clicking the same hand again before clicking anything else.<p>
+<p>You can return to the initial position from any game position by clicking the Reset button. You can get back to the game position by clicking the Reset button again before clicking anything else.<p>
+<p>You can use the numbered buttons to select the game size. Higher numbers do not mean more difficult levels. For example, 9 is fairly easy. The same game size can be selected several times, which allows you to get a different initial position each time. You can cancel a new initial position by clicking the Reset button before clicking anything else.<p>
+<p><a href="#body" class = "right">Back to the game</a></p>
+</td>
+</tr>
+</table>
+</body>
+</html>
